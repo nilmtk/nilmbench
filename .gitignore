@@ -1,0 +1,46 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Local environments and build outputs
+.venv/
+venv/
+build/
+dist/
+*.egg-info/
+
+# Notebook and editor metadata
+.ipynb_checkpoints/
+.vscode/
+
+# Dataset and spreadsheet artifacts
+*.h5
+*.hdf5
+*.xlsx
+*.xls
+*.xlxs
+
+# Model checkpoints and generated training artifacts
+*-temp-weights-*
+*.pt
+*.pth
+model.json
+
+# Legacy experiment output folders/files
+Mean
+mean_folder
+onlineGRU
+seq2point
+seq2seq
+rnn
+dae
+excess
+pre-trained-mean
+prev_disaggregate
+buildsys_notebooks
