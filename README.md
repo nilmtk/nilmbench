@@ -1,10 +1,14 @@
-# NILMTK-Contrib
+# NILMBench2026
 
-NILMTK-Contrib provides NILMTK-compatible implementations of non-intrusive load monitoring (NILM) and energy disaggregation algorithms. The package is designed for use with NILMTK's rapid experimentation API and includes classical, TensorFlow, and PyTorch model backends.
+NILMBench2026 is a large-scale, reproducible benchmark for non-intrusive load monitoring (NILM) and energy disaggregation. It evaluates sixteen models across regression accuracy, event detection, computational efficiency, and generalization on public NILM datasets at both 1-minute and 15-minute resolutions.
+
+The benchmark is implemented through the modernized `nilmtk-contrib` package, which provides NILMTK-compatible disaggregation models and experiment workflows. The package is designed for use with NILMTK's rapid experimentation API and includes classical, TensorFlow, and PyTorch model backends.
+
+This repository is based on the original [`nilmtk-contrib`](https://github.com/nilmtk/nilmtk-contrib) repository and extends it for the NILMBench2026 benchmark.
 
 The repository paper is:
 
-Batra et al., "Towards Reproducible State-of-the-Art Energy Disaggregation", BuildSys 2019, DOI: https://doi.org/10.1145/3360322.3360844.
+Kuloor, Singh, Dhru, and Batra, "NILMBench2026: A Benchmark for Energy Disaggregation", BuildSys 2026, DOI: https://doi.org/10.1145/3744256.3812587.
 
 ## Runtime Requirements
 
@@ -20,31 +24,31 @@ Python 3.12 and newer are not supported by the current package metadata because 
 Minimal install for package metadata and lightweight imports:
 
 ```bash
-uv pip install git+https://github.com/nilmtk/nilmtk-contrib.git
+uv pip install git+https://github.com/sustainability-lab/nilmbench.git
 ```
 
 TensorFlow backend:
 
 ```bash
-uv pip install "nilmtk-contrib[tensorflow] @ git+https://github.com/nilmtk/nilmtk-contrib.git"
+uv pip install "nilmtk-contrib[tensorflow] @ git+https://github.com/sustainability-lab/nilmbench.git"
 ```
 
 PyTorch backend:
 
 ```bash
-uv pip install "nilmtk-contrib[torch] @ git+https://github.com/nilmtk/nilmtk-contrib.git"
+uv pip install "nilmtk-contrib[torch] @ git+https://github.com/sustainability-lab/nilmbench.git"
 ```
 
 Classical backend:
 
 ```bash
-uv pip install "nilmtk-contrib[classical] @ git+https://github.com/nilmtk/nilmtk-contrib.git"
+uv pip install "nilmtk-contrib[classical] @ git+https://github.com/sustainability-lab/nilmbench.git"
 ```
 
 All model backends:
 
 ```bash
-uv pip install "nilmtk-contrib[all] @ git+https://github.com/nilmtk/nilmtk-contrib.git"
+uv pip install "nilmtk-contrib[all] @ git+https://github.com/sustainability-lab/nilmbench.git"
 ```
 
 Development environment:
@@ -110,11 +114,12 @@ The table below lists the public model surface. "Verification" describes how the
 
 ## Research Use And Reproducibility
 
-Use the model table to choose the correct backend and citation. Generic architecture papers support architecture inspiration only; they should not be cited as NILM-specific evidence by themselves.
+Use the model table to choose the correct backend and citation. Cite NILMBench2026 for the benchmark, modernized toolkit, experiment protocol, and reported cross-model comparisons. Generic architecture papers support architecture inspiration only; they should not be cited as NILM-specific evidence by themselves.
 
 For reproducible experiments:
 
 - Record the Python version, package extras, dataset, building, appliance list, sampling period, random seed, and hardware.
+- Record the benchmark task, temporal resolution, model backend, and NILMBench2026 configuration used for each run.
 - Run backend-specific smoke tests before running full experiments.
 - Verify TensorFlow/PyTorch parity before comparing paired implementations.
 - Verify model output lengths and indices before computing NILMTK metrics.
@@ -166,10 +171,11 @@ Reference repositories:
 
 ## Usage
 
-The sample notebooks under [sample_notebooks](sample_notebooks) demonstrate the NILMTK rapid experimentation API. Install the relevant backend extra and ensure datasets are available before running them.
+The sample notebooks under [sample_notebooks](sample_notebooks) demonstrate the NILMTK rapid experimentation API used by NILMBench2026. Install the relevant backend extra and ensure datasets are available before running them.
 
 Supported experiment workflows include:
 
+- NILMBench2026 benchmark runs across accuracy, event-detection, efficiency, and generalization metrics.
 - Training and testing across multiple appliances.
 - Training and testing across multiple datasets for transfer learning.
 - Training and testing across multiple buildings.
@@ -196,23 +202,17 @@ docker run --rm -it ghcr.io/enfuego27826/nilmtk-contrib:latest bash
 
 ## Citation
 
-If you find this repository useful for your research, please cite:
+If you use NILMBench2026, the benchmark results, or the modernized toolkit in your research, please cite:
 
 ```bibtex
-@inproceedings{10.1145/3360322.3360844,
-author = {Batra, Nipun and Kukunuri, Rithwik and Pandey, Ayush and Malakar, Raktim and Kumar, Rajat and Krystalakos, Odysseas and Zhong, Mingjun and Meira, Paulo and Parson, Oliver},
-title = {Towards Reproducible State-of-the-Art Energy Disaggregation},
-year = {2019},
-isbn = {9781450370059},
-publisher = {Association for Computing Machinery},
-address = {New York, NY, USA},
-url = {https://doi.org/10.1145/3360322.3360844},
-doi = {10.1145/3360322.3360844},
-booktitle = {Proceedings of the 6th ACM International Conference on Systems for Energy-Efficient Buildings, Cities, and Transportation},
-pages = {193-202},
-numpages = {10},
-keywords = {smart meters, energy disaggregation, non-intrusive load monitoring},
-location = {New York, NY, USA},
-series = {BuildSys '19}
+@inproceedings{kuloor2026nilmbench,
+  title     = {NILMBench2026: A Benchmark for Energy Disaggregation},
+  author    = {Kuloor, Aayush and Singh, Anurag and Dhru, Harsh and Batra, Nipun},
+  booktitle = {Proceedings of the 13th ACM International Conference on Systems for
+               Energy-Efficient Buildings, Cities, and Transportation (BuildSys '26)},
+  year      = {2026},
+  doi       = {10.1145/3744256.3812587},
+  publisher = {ACM},
+  address   = {Banff, AB, Canada}
 }
 ```
