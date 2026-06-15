@@ -482,6 +482,10 @@
         .varrow { stroke: var(--text-muted); stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
         .vdash { stroke: var(--border-hover); stroke-width: 1.4; stroke-dasharray: 3 4; }
 
+        .iflag { vertical-align: -2px; border-radius: 2px; margin-right: 3px; box-shadow: 0 0 0 0.5px rgba(0,0,0,0.25); }
+        .fam-ic { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(125,140,160,0.07); border: 1px solid var(--border); margin-bottom: 0.95rem; }
+        .fam-ic svg { width: 22px; height: 22px; }
+
         /* ===== BibTeX ===== */
         .bib { position: relative; background: #0a0e15; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-top: 1.5rem; }
         .bib pre { padding: 1.5rem; overflow-x: auto; font-family: var(--mono); font-size: 0.82rem; line-height: 1.7; color: var(--text-secondary); }
@@ -960,6 +964,7 @@ experiment['test']['metrics'] = ['mae', 'f1score', 'sae', 'nep']
 
     <div class="fam-grid">
         <div class="fam-card" style="--fam:#38bdf8">
+            <div class="fam-ic"><svg viewBox="0 0 22 22" aria-hidden="true"><g fill="none" stroke="var(--fam)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19,11 a8,8 0 1 1 -2.4,-5.7"/><path d="M16.6,2.6 L16.9,6 L13.5,6.2"/></g></svg></div>
             <h3>Recurrent &amp; Hybrid</h3>
             <div class="fam-sub">Sequence memory &amp; attention gating</div>
             <div class="pills">
@@ -971,6 +976,7 @@ experiment['test']['metrics'] = ['mae', 'f1score', 'sae', 'nep']
             </div>
         </div>
         <div class="fam-card" style="--fam:#22c55e">
+            <div class="fam-ic"><svg viewBox="0 0 22 22" aria-hidden="true"><g fill="none" stroke="var(--fam)" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="10" height="10" rx="1.6"/><rect x="9" y="9" width="10" height="10" rx="1.6" fill="rgba(125,140,160,0.10)"/></g></svg></div>
             <h3>Fully Convolutional</h3>
             <div class="fam-sub">Local filters &amp; dilations</div>
             <div class="pills">
@@ -982,6 +988,7 @@ experiment['test']['metrics'] = ['mae', 'f1score', 'sae', 'nep']
             </div>
         </div>
         <div class="fam-card" style="--fam:#f5a524">
+            <div class="fam-ic"><svg viewBox="0 0 22 22" aria-hidden="true"><g stroke="var(--fam)" stroke-width="1.5"><line x1="4.5" y1="5" x2="17.5" y2="11"/><line x1="4.5" y1="5" x2="11" y2="17.5"/><line x1="17.5" y1="11" x2="11" y2="17.5"/><g fill="var(--fam)" stroke="none"><circle cx="4.5" cy="5" r="2.4"/><circle cx="17.5" cy="11" r="2.4"/><circle cx="11" cy="17.5" r="2.4"/></g></g></svg></div>
             <h3>Transformer-Based</h3>
             <div class="fam-sub">Long-range dependencies</div>
             <div class="pills">
@@ -991,6 +998,7 @@ experiment['test']['metrics'] = ['mae', 'f1score', 'sae', 'nep']
             </div>
         </div>
         <div class="fam-card" style="--fam:#ef4444">
+            <div class="fam-ic"><svg viewBox="0 0 22 22" aria-hidden="true"><g fill="none" stroke="var(--fam)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2,16 L3.6,9 L5.2,17 L6.8,8 L8.4,14"/><path d="M10.5,12 H13.5"/><path d="M12,9.8 L14.2,12 L12,14.2"/><path d="M16,12 H20"/></g></svg></div>
             <h3>Specialized NILM</h3>
             <div class="fam-sub">Denoising &amp; state modeling</div>
             <div class="pills">
@@ -1029,15 +1037,15 @@ experiment['test']['metrics'] = ['mae', 'f1score', 'sae', 'nep']
             <div class="split">Train 30d B1 → test held-out 1 week, B1</div>
         </div>
         <div class="task-card">
-            <div class="task-viz"><svg viewBox="0 0 300 116" role="img" aria-label="Train on several homes, test on a different unseen home in the same dataset.">
-  <text x="150" y="13" text-anchor="middle" class="vlab">one dataset · unseen home</text>
-  <g class="hg hg-train" transform="translate(22,34) scale(1.1)"><path class="fillbody" d="M4,13 V27 H24 V13 Z"/><path d="M2,13 L14,3 L26,13 M4,13 V27 H24 V13 M11,27 V20 H17 V27"/></g><g class="hg hg-train" transform="translate(58,34) scale(1.1)"><path class="fillbody" d="M4,13 V27 H24 V13 Z"/><path d="M2,13 L14,3 L26,13 M4,13 V27 H24 V13 M11,27 V20 H17 V27"/></g>
-  <text x="56" y="100" text-anchor="middle" class="vsub" fill="var(--accent)">TRAIN · B1, B2</text>
-  <path d="M104,58 H168" class="varrow"/><path d="M162,53 L168,58 L162,63" class="varrow"/>
-  <text x="136" y="50" text-anchor="middle" class="vlab">generalize</text>
-  <g class="hg hg-test" transform="translate(188,30) scale(1.4)" stroke-dasharray="3 3"><path d="M2,13 L14,3 L26,13 M4,13 V27 H24 V13 M11,27 V20 H17 V27"/></g>
-  <circle cx="226" cy="36" r="9" fill="#f5a524"/><text x="226" y="40" text-anchor="middle" class="vq">?</text>
-  <text x="210" y="100" text-anchor="middle" class="vsub" fill="#f5a524">TEST · B4</text>
+            <div class="task-viz"><svg viewBox="0 0 300 118" role="img" aria-label="Cross-building: train on homes B1,B2 then test on an unseen home B4 in the same country.">
+  <text x="150" y="12" text-anchor="middle" class="vlab">same dataset &amp; country · unseen home</text>
+  <svg x="34" y="20" width="20" height="13" viewBox="0 0 20 13" overflow="hidden"><rect width="20" height="13" fill="#012169"/><path d="M0,0 L20,13 M20,0 L0,13" stroke="#fff" stroke-width="2.6"/><path d="M0,0 L20,13 M20,0 L0,13" stroke="#C8102E" stroke-width="1.1"/><path d="M10,0 V13 M0,6.5 H20" stroke="#fff" stroke-width="3.4"/><path d="M10,0 V13 M0,6.5 H20" stroke="#C8102E" stroke-width="1.9"/></svg><g class="hg hg-train" transform="translate(22,40) scale(1.1)"><path class="fillbody" d="M4,13 V27 H24 V13 Z"/><path d="M2,13 L14,3 L26,13 M4,13 V27 H24 V13 M11,27 V20 H17 V27"/></g><g class="hg hg-train" transform="translate(56,40) scale(1.1)"><path class="fillbody" d="M4,13 V27 H24 V13 Z"/><path d="M2,13 L14,3 L26,13 M4,13 V27 H24 V13 M11,27 V20 H17 V27"/></g>
+  <text x="46" y="104" text-anchor="middle" class="vsub" fill="var(--accent)">TRAIN · B1, B2</text>
+  <path d="M100,60 H162" class="varrow"/><path d="M156,55 L162,60 L156,65" class="varrow"/>
+  <text x="131" y="52" text-anchor="middle" class="vlab">generalize</text>
+  <svg x="196" y="20" width="20" height="13" viewBox="0 0 20 13" overflow="hidden"><rect width="20" height="13" fill="#012169"/><path d="M0,0 L20,13 M20,0 L0,13" stroke="#fff" stroke-width="2.6"/><path d="M0,0 L20,13 M20,0 L0,13" stroke="#C8102E" stroke-width="1.1"/><path d="M10,0 V13 M0,6.5 H20" stroke="#fff" stroke-width="3.4"/><path d="M10,0 V13 M0,6.5 H20" stroke="#C8102E" stroke-width="1.9"/></svg><g class="hg hg-test" transform="translate(188,38) scale(1.45)" stroke-dasharray="3 3"><path d="M2,13 L14,3 L26,13 M4,13 V27 H24 V13 M11,27 V20 H17 V27"/></g>
+  <circle cx="228" cy="44" r="9" fill="#f5a524"/><text x="228" y="48" text-anchor="middle" class="vq">?</text>
+  <text x="214" y="104" text-anchor="middle" class="vsub" fill="#f5a524">TEST · B4</text>
 </svg></div>
             <span class="tid">T2</span>
             <h3>Cross-Building</h3>
@@ -1045,16 +1053,16 @@ experiment['test']['metrics'] = ['mae', 'f1score', 'sae', 'nep']
             <div class="split">UK-DALE: B1,B2 → B4 &nbsp;·&nbsp; REDD: B1,B2,B3 → B6</div>
         </div>
         <div class="task-card">
-            <div class="task-viz"><svg viewBox="0 0 300 116" role="img" aria-label="Zero-shot transfer between datasets and grids: REDD USA and REFIT UK.">
-  <text x="150" y="13" text-anchor="middle" class="vlab">across datasets &amp; grids</text>
-  <g class="hg hg-train" transform="translate(22,34) scale(1.05)"><path class="fillbody" d="M4,13 V27 H24 V13 Z"/><path d="M2,13 L14,3 L26,13 M4,13 V27 H24 V13 M11,27 V20 H17 V27"/></g><g class="hg hg-train" transform="translate(56,34) scale(1.05)"><path class="fillbody" d="M4,13 V27 H24 V13 Z"/><path d="M2,13 L14,3 L26,13 M4,13 V27 H24 V13 M11,27 V20 H17 V27"/></g>
-  <text x="54" y="100" text-anchor="middle" class="vsub" fill="var(--accent)">REDD · USA · 110V</text>
-  <line x1="150" y1="28" x2="150" y2="92" class="vdash"/>
-  <g class="hg hg-test" transform="translate(206,34) scale(1.05)" stroke-dasharray="3 3"><path d="M2,13 L14,3 L26,13 M4,13 V27 H24 V13 M11,27 V20 H17 V27"/></g><g class="hg hg-test" transform="translate(240,34) scale(1.05)" stroke-dasharray="3 3"><path d="M2,13 L14,3 L26,13 M4,13 V27 H24 V13 M11,27 V20 H17 V27"/></g>
-  <text x="246" y="100" text-anchor="middle" class="vsub" fill="#f5a524">REFIT · UK · 230V</text>
-  <path d="M112,60 H188" class="varrow"/>
-  <path d="M118,55 L112,60 L118,65" class="varrow"/><path d="M182,55 L188,60 L182,65" class="varrow"/>
-  <text x="150" y="50" text-anchor="middle" class="vlab">zero-shot</text>
+            <div class="task-viz"><svg viewBox="0 0 300 118" role="img" aria-label="Cross-dataset: train in the USA (REDD) and test in the UK (REFIT), different grids.">
+  <text x="150" y="12" text-anchor="middle" class="vlab">different countries &amp; grids</text>
+  <svg x="44" y="20" width="20" height="13" viewBox="0 0 20 13" overflow="hidden"><rect width="20" height="13" fill="#b22234"/><rect y="1.85" width="20" height="1.85" fill="#fff"/><rect y="5.55" width="20" height="1.85" fill="#fff"/><rect y="9.25" width="20" height="1.85" fill="#fff"/><rect width="9" height="7" fill="#3c3b6e"/><g fill="#fff"><circle cx="2" cy="1.6" r="0.5"/><circle cx="4.5" cy="1.6" r="0.5"/><circle cx="7" cy="1.6" r="0.5"/><circle cx="3.25" cy="3.5" r="0.5"/><circle cx="5.75" cy="3.5" r="0.5"/><circle cx="2" cy="5.4" r="0.5"/><circle cx="4.5" cy="5.4" r="0.5"/><circle cx="7" cy="5.4" r="0.5"/></g></svg><g class="hg hg-train" transform="translate(24,40) scale(1.05)"><path class="fillbody" d="M4,13 V27 H24 V13 Z"/><path d="M2,13 L14,3 L26,13 M4,13 V27 H24 V13 M11,27 V20 H17 V27"/></g><g class="hg hg-train" transform="translate(58,40) scale(1.05)"><path class="fillbody" d="M4,13 V27 H24 V13 Z"/><path d="M2,13 L14,3 L26,13 M4,13 V27 H24 V13 M11,27 V20 H17 V27"/></g>
+  <text x="56" y="104" text-anchor="middle" class="vsub" fill="var(--accent)">REDD · USA · 110V</text>
+  <line x1="150" y1="30" x2="150" y2="94" class="vdash"/>
+  <svg x="226" y="20" width="20" height="13" viewBox="0 0 20 13" overflow="hidden"><rect width="20" height="13" fill="#012169"/><path d="M0,0 L20,13 M20,0 L0,13" stroke="#fff" stroke-width="2.6"/><path d="M0,0 L20,13 M20,0 L0,13" stroke="#C8102E" stroke-width="1.1"/><path d="M10,0 V13 M0,6.5 H20" stroke="#fff" stroke-width="3.4"/><path d="M10,0 V13 M0,6.5 H20" stroke="#C8102E" stroke-width="1.9"/></svg><g class="hg hg-test" transform="translate(206,40) scale(1.05)" stroke-dasharray="3 3"><path d="M2,13 L14,3 L26,13 M4,13 V27 H24 V13 M11,27 V20 H17 V27"/></g><g class="hg hg-test" transform="translate(240,40) scale(1.05)" stroke-dasharray="3 3"><path d="M2,13 L14,3 L26,13 M4,13 V27 H24 V13 M11,27 V20 H17 V27"/></g>
+  <text x="244" y="104" text-anchor="middle" class="vsub" fill="#f5a524">REFIT · UK · 230V</text>
+  <path d="M112,62 H188" class="varrow"/>
+  <path d="M118,57 L112,62 L118,67" class="varrow"/><path d="M182,57 L188,62 L182,67" class="varrow"/>
+  <text x="150" y="54" text-anchor="middle" class="vlab">zero-shot</text>
 </svg></div>
             <span class="tid">T3</span>
             <h3>Cross-Dataset</h3>
@@ -1075,19 +1083,19 @@ experiment['test']['metrics'] = ['mae', 'f1score', 'sae', 'nep']
 
     <div class="ds-grid">
         <div class="ds-card">
-            <div class="ds-head"><h3>REDD</h3><span class="flag">🇺🇸 USA</span></div>
+            <div class="ds-head"><h3>REDD</h3><span class="flag"><svg width="18" height="12" viewBox="0 0 20 13" overflow="hidden" class="iflag"><rect width="20" height="13" fill="#b22234"/><rect y="1.85" width="20" height="1.85" fill="#fff"/><rect y="5.55" width="20" height="1.85" fill="#fff"/><rect y="9.25" width="20" height="1.85" fill="#fff"/><rect width="9" height="7" fill="#3c3b6e"/><g fill="#fff"><circle cx="2" cy="1.6" r="0.5"/><circle cx="4.5" cy="1.6" r="0.5"/><circle cx="7" cy="1.6" r="0.5"/><circle cx="3.25" cy="3.5" r="0.5"/><circle cx="5.75" cy="3.5" r="0.5"/><circle cx="2" cy="5.4" r="0.5"/><circle cx="4.5" cy="5.4" r="0.5"/><circle cx="7" cy="5.4" r="0.5"/></g></svg> USA</span></div>
             <div class="ds-stat"><span>Buildings</span><span>6</span></div>
             <div class="ds-stat"><span>Duration</span><span>3–19 days</span></div>
             <div class="ds-stat"><span>Appliances</span><span>10–20</span></div>
         </div>
         <div class="ds-card">
-            <div class="ds-head"><h3>UK-DALE</h3><span class="flag">🇬🇧 GBR</span></div>
+            <div class="ds-head"><h3>UK-DALE</h3><span class="flag"><svg width="18" height="12" viewBox="0 0 20 13" overflow="hidden" class="iflag"><rect width="20" height="13" fill="#012169"/><path d="M0,0 L20,13 M20,0 L0,13" stroke="#fff" stroke-width="2.6"/><path d="M0,0 L20,13 M20,0 L0,13" stroke="#C8102E" stroke-width="1.1"/><path d="M10,0 V13 M0,6.5 H20" stroke="#fff" stroke-width="3.4"/><path d="M10,0 V13 M0,6.5 H20" stroke="#C8102E" stroke-width="1.9"/></svg> UK</span></div>
             <div class="ds-stat"><span>Buildings</span><span>5</span></div>
             <div class="ds-stat"><span>Duration</span><span>655 days</span></div>
             <div class="ds-stat"><span>Appliances</span><span>5–54</span></div>
         </div>
         <div class="ds-card">
-            <div class="ds-head"><h3>REFIT</h3><span class="flag">🇬🇧 GBR</span></div>
+            <div class="ds-head"><h3>REFIT</h3><span class="flag"><svg width="18" height="12" viewBox="0 0 20 13" overflow="hidden" class="iflag"><rect width="20" height="13" fill="#012169"/><path d="M0,0 L20,13 M20,0 L0,13" stroke="#fff" stroke-width="2.6"/><path d="M0,0 L20,13 M20,0 L0,13" stroke="#C8102E" stroke-width="1.1"/><path d="M10,0 V13 M0,6.5 H20" stroke="#fff" stroke-width="3.4"/><path d="M10,0 V13 M0,6.5 H20" stroke="#C8102E" stroke-width="1.9"/></svg> UK</span></div>
             <div class="ds-stat"><span>Buildings</span><span>20</span></div>
             <div class="ds-stat"><span>Duration</span><span>2 years</span></div>
             <div class="ds-stat"><span>Appliances</span><span>9–21</span></div>
