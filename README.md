@@ -51,7 +51,7 @@ All model backends:
 uv pip install "nilmtk-contrib[all] @ git+https://github.com/sustainability-lab/nilmbench.git"
 ```
 
-Development environment:
+Local development (from a clone of this repository):
 
 ```bash
 uv sync --extra dev
@@ -63,6 +63,7 @@ Backend development examples:
 uv sync --extra dev --extra torch
 uv sync --extra dev --extra tensorflow
 uv sync --extra dev --extra classical
+uv sync --extra dev --extra all
 ```
 
 ## Dependency Extras
@@ -125,19 +126,18 @@ For reproducible experiments:
 - Verify model output lengths and indices before computing NILMTK metrics.
 - Treat notebook outputs as historical examples unless rerun in the current environment.
 
-Recommended fast checks for source validation:
+Recommended fast checks for source validation (after `uv sync --extra dev`):
 
 ```bash
-python -m compileall -q nilmtk_contrib tests
-python -m pytest -q tests/test_imports.py tests/test_params.py tests/test_preprocessing_windows.py tests/test_preprocessing_alignment.py tests/test_preprocessing_classification.py tests/test_validation.py tests/test_checkpoints.py tests/test_random_logging.py tests/test_model_runtime.py
-python -m build
+uv run python -m compileall -q nilmtk_contrib tests
+uv run python -m pytest -q tests/test_imports.py tests/test_params.py tests/test_preprocessing_windows.py tests/test_preprocessing_alignment.py tests/test_preprocessing_classification.py tests/test_validation.py tests/test_checkpoints.py tests/test_random_logging.py tests/test_model_runtime.py
 ```
 
 Backend smoke checks should be run in environments with the corresponding extras by importing the target model classes and running small dataset-specific training or prediction jobs before launching full experiments. For example:
 
 ```bash
 uv sync --extra dev --extra torch
-python -m pytest -q
+uv run python -m pytest -q
 ```
 
 ## Reference Papers And Codebases
