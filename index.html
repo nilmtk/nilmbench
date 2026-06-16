@@ -619,7 +619,7 @@
         <a href="slides/nilmbench2026.pdf" class="btn btn-secondary" target="_blank" rel="noopener">
             <i class="fas fa-person-chalkboard"></i> Slides
         </a>
-        <a href="https://github.com/nilmtk/nilmtk-contrib" class="btn btn-secondary" target="_blank" rel="noopener">
+        <a href="https://github.com/sustainability-lab/nilmbench" class="btn btn-secondary" target="_blank" rel="noopener">
             <i class="fab fa-github"></i> Code
         </a>
         <a href="#run" class="btn btn-secondary"><i class="fab fa-docker"></i> Reproduce</a>
@@ -766,7 +766,7 @@
     <div class="section-label">The utility</div>
     <h2>Reproduce every result in three commands</h2>
     <p class="lede">
-        NILMBench2026 ships as a modernized <a href="https://github.com/nilmtk/nilmtk-contrib" target="_blank" rel="noopener" style="color:var(--accent)">nilmtk-contrib</a>:
+        NILMBench2026 ships as a modernized <a href="https://github.com/sustainability-lab/nilmbench" target="_blank" rel="noopener" style="color:var(--accent)">nilmtk-contrib</a>:
         all sixteen architectures behind one PyTorch API, installable with <code style="font-family:var(--mono);color:var(--accent)">uv</code> or a pinned, GPU-ready
         Docker image. Pick a tab.
     </p>
@@ -785,9 +785,9 @@
             <button class="copy-btn" onclick="copyTerm()">Copy</button>
         </div>
         <div class="term-body">
-            <div class="term-pane active" id="p-uv"><pre class="code" data-lang="shell"># Modernized NILMTK + nilmtk-contrib — 16 models, one PyTorch API
+            <div class="term-pane active" id="p-uv"><pre class="code" data-lang="shell"># Modernized nilmtk-contrib — 16 models behind one PyTorch API
 uv venv && source .venv/bin/activate
-uv pip install git+https://github.com/nilmtk/nilmtk-contrib.git
+uv pip install "nilmtk-contrib[torch] @ git+https://github.com/sustainability-lab/nilmbench.git"
 
 # That's it. No TensorFlow 1.x, no Python 2.7, no dependency hell.</pre></div>
 
@@ -800,8 +800,8 @@ docker build -t nilmtk-contrib:all .</pre></div>
 
             <div class="term-pane" id="p-api"><pre class="code" data-lang="python">from nilmtk.api import API
 from nilmtk.disaggregate import Mean
-from nilmtk_contrib.disaggregate import (
-    Seq2Point, Seq2Seq, RNN, WindowGRU, DAE,
+from nilmtk_contrib.torch import (
+    Seq2PointTorch, Seq2Seq, RNN, WindowGRU, DAE,
     NILMFormer, TCN, ConvLSTM, MSDC, Reformer,   # +5 modern architectures
 )
 
@@ -811,7 +811,7 @@ experiment = {
   'appliances':  ['fridge', 'washing machine', 'microwave', 'kettle'],
   'methods': {
       'NILMFormer': NILMFormer({'n_epochs': 50, 'batch_size': 256}),
-      'Seq2Point':  Seq2Point({'n_epochs': 50, 'batch_size': 256}),
+      'Seq2Point':  Seq2PointTorch({'n_epochs': 50, 'batch_size': 256}),
       'TCN':        TCN({'n_epochs': 50, 'batch_size': 256}),
       'Mean':       Mean({}),
   },
@@ -941,8 +941,8 @@ experiment['test']['metrics'] = ['mae', 'f1score', 'sae', 'nep']
     </div>
 
     <div class="compete-cta">
-        <a href="https://github.com/nilmtk/nilmtk-contrib" class="btn btn-primary" target="_blank" rel="noopener"><i class="fas fa-code-branch"></i> Add your model</a>
-        <a href="https://github.com/nilmtk/nilmtk-contrib#readme" class="btn btn-secondary" target="_blank" rel="noopener"><i class="fas fa-book"></i> Contributing guide</a>
+        <a href="https://github.com/sustainability-lab/nilmbench" class="btn btn-primary" target="_blank" rel="noopener"><i class="fas fa-code-branch"></i> Add your model</a>
+        <a href="https://github.com/sustainability-lab/nilmbench#readme" class="btn btn-secondary" target="_blank" rel="noopener"><i class="fas fa-book"></i> Contributing guide</a>
         <a href="mailto:nipun.batra@iitgn.ac.in?subject=NILM%20Challenge" class="btn btn-secondary"><i class="fas fa-trophy"></i> Propose a NILM Challenge</a>
     </div>
 
@@ -1260,7 +1260,7 @@ experiment['test']['metrics'] = ['mae', 'f1score', 'sae', 'nep']
         BuildSys '26 · The 13th ACM International Conference on Systems for Energy-Efficient Buildings, Cities, and Transportation · Banff, AB, Canada
         <br><br>
         <a href="https://sustainability-lab.github.io/papers/2026/nilmbench2026_buildsys.pdf" target="_blank" rel="noopener">Paper</a> &nbsp;·&nbsp;
-        <a href="https://github.com/nilmtk/nilmtk-contrib" target="_blank" rel="noopener">nilmtk-contrib</a> &nbsp;·&nbsp;
+        <a href="https://github.com/sustainability-lab/nilmbench" target="_blank" rel="noopener">nilmtk-contrib</a> &nbsp;·&nbsp;
         <a href="https://github.com/sustainability-lab/nilmbench" target="_blank" rel="noopener">This site</a> &nbsp;·&nbsp;
         <a href="https://sustainability-lab.github.io/" target="_blank" rel="noopener">Sustainability Lab, IIT Gandhinagar</a>
         <br><br>

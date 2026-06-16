@@ -16,7 +16,7 @@
 </div>
 <div class="auth">Aayush Kuloor<span class="mk">*</span> &nbsp; Anurag Singh<span class="mk">*</span> &nbsp; Harsh Dhru<span class="mk">*</span> &nbsp; Nipun Batra<span class="mk">†</span></div>
 <div class="aff">IIT Gandhinagar &nbsp;·&nbsp; * equal contribution &nbsp; † corresponding author</div>
-<div class="links">github.com/nilmtk/nilmtk-contrib&nbsp;&nbsp;·&nbsp;&nbsp;sustainability-lab.github.io/nilmbench</div>
+<div class="links">github.com/sustainability-lab/nilmbench&nbsp;&nbsp;·&nbsp;&nbsp;sustainability-lab.github.io/nilmbench</div>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="2" data-paginate="true" data-footer="NILMBench2026 · BuildSys ’26" lang="en-IN" data-marpit-pagination="2" style="--paginate:true;--footer:NILMBench2026 · BuildSys ’26;" data-marpit-pagination-total="17" data-size="16:9">
 <h2 id="what-is-energy-disaggregation">What is energy disaggregation?</h2>
@@ -121,12 +121,12 @@
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="6" data-paginate="true" data-footer="NILMBench2026 · BuildSys ’26" lang="en-IN" data-marpit-pagination="6" style="--paginate:true;--footer:NILMBench2026 · BuildSys ’26;" data-marpit-pagination-total="17" data-size="16:9">
 <h2 id="reproduce-every-result-in-3-commands">Reproduce every result in 3 commands</h2>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-bash"><span class="hljs-comment"># install the modernized stack — 16 models, one PyTorch API</span>
-uv pip install git+https://github.com/nilmtk/nilmtk-contrib.git
+uv pip install <span class="hljs-string">&quot;nilmtk-contrib[torch] @ git+https://github.com/sustainability-lab/nilmbench.git&quot;</span>
 <span class="hljs-comment"># …or a pinned, GPU-ready container</span>
-docker run --gpus all ghcr.io/enfuego27826/nilmtk-contrib:latest bash
+docker run --gpus all ghcr.io/sustainability-lab/nilmtk-contrib:latest bash
 </code></pre>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python"><span class="hljs-keyword">from</span> nilmtk.api <span class="hljs-keyword">import</span> API
-<span class="hljs-keyword">from</span> nilmtk_contrib.disaggregate <span class="hljs-keyword">import</span> NILMFormer, Seq2Point, TCN
+<span class="hljs-keyword">from</span> nilmtk_contrib.torch <span class="hljs-keyword">import</span> NILMFormer, Seq2PointTorch, TCN
 
 experiment[<span class="hljs-string">&#x27;methods&#x27;</span>] = {<span class="hljs-string">&#x27;NILMFormer&#x27;</span>: NILMFormer({<span class="hljs-string">&#x27;n_epochs&#x27;</span>: <span class="hljs-number">50</span>}), ...}
 results = API(experiment)     <span class="hljs-comment"># trains, tests &amp; scores every model</span>
@@ -346,7 +346,7 @@ results = API(experiment)     <span class="hljs-comment"># trains, tests &amp; s
 <div class="aff">nipun.batra@iitgn.ac.in &nbsp;·&nbsp; IIT Gandhinagar</div>
 <div class="links" style="margin-top:24px">
 📄 sustainability-lab.github.io/nilmbench<br />
-💻 github.com/nilmtk/nilmtk-contrib
+💻 github.com/sustainability-lab/nilmbench
 </div>
 <footer>NILMBench2026 · BuildSys ’26</footer>
 </section>

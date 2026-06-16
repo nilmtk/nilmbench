@@ -107,7 +107,7 @@ section.sec .big{ font-size:30px; color:var(--tx2); font-family:'Inter'; font-we
 <div class="auth">Aayush Kuloor<span class="mk">*</span> &nbsp; Anurag Singh<span class="mk">*</span> &nbsp; Harsh Dhru<span class="mk">*</span> &nbsp; Nipun Batra<span class="mk">†</span></div>
 <div class="aff">IIT Gandhinagar &nbsp;·&nbsp; * equal contribution &nbsp; † corresponding author</div>
 
-<div class="links">github.com/nilmtk/nilmtk-contrib&nbsp;&nbsp;·&nbsp;&nbsp;sustainability-lab.github.io/nilmbench</div>
+<div class="links">github.com/sustainability-lab/nilmbench&nbsp;&nbsp;·&nbsp;&nbsp;sustainability-lab.github.io/nilmbench</div>
 
 ---
 
@@ -181,14 +181,14 @@ $$ y_t = \textstyle\sum_{i=1}^{N} x_{i,t} + \epsilon_t \qquad\text{\small(aggreg
 
 ```bash
 # install the modernized stack — 16 models, one PyTorch API
-uv pip install git+https://github.com/nilmtk/nilmtk-contrib.git
+uv pip install "nilmtk-contrib[torch] @ git+https://github.com/sustainability-lab/nilmbench.git"
 # …or a pinned, GPU-ready container
-docker run --gpus all ghcr.io/enfuego27826/nilmtk-contrib:latest bash
+docker run --gpus all ghcr.io/sustainability-lab/nilmtk-contrib:latest bash
 ```
 
 ```python
 from nilmtk.api import API
-from nilmtk_contrib.disaggregate import NILMFormer, Seq2Point, TCN
+from nilmtk_contrib.torch import NILMFormer, Seq2PointTorch, TCN
 
 experiment['methods'] = {'NILMFormer': NILMFormer({'n_epochs': 50}), ...}
 results = API(experiment)     # trains, tests & scores every model
@@ -390,5 +390,5 @@ The accuracy–compute trade-off is **non-monotonic**. Architectural inductive b
 
 <div class="links" style="margin-top:24px">
 📄 sustainability-lab.github.io/nilmbench<br>
-💻 github.com/nilmtk/nilmtk-contrib
+💻 github.com/sustainability-lab/nilmbench
 </div>
