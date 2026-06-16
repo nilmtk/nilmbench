@@ -7,7 +7,15 @@ math: katex
 ---
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Work+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+/* fonts embedded locally — no network needed at build time */
+@font-face{font-family:'Playfair Display';font-weight:700;font-style:normal;src:url('fonts/playfair-700.ttf')}
+@font-face{font-family:'Playfair Display';font-weight:800;font-style:normal;src:url('fonts/playfair-800.ttf')}
+@font-face{font-family:'Work Sans';font-weight:400;font-style:normal;src:url('fonts/worksans-400.ttf')}
+@font-face{font-family:'Work Sans';font-weight:500;font-style:normal;src:url('fonts/worksans-500.ttf')}
+@font-face{font-family:'Work Sans';font-weight:600;font-style:normal;src:url('fonts/worksans-600.ttf')}
+@font-face{font-family:'Work Sans';font-weight:700;font-style:normal;src:url('fonts/worksans-700.ttf')}
+@font-face{font-family:'JetBrains Mono';font-weight:400;font-style:normal;src:url('fonts/jetbrains-400.ttf')}
+@font-face{font-family:'JetBrains Mono';font-weight:500;font-style:normal;src:url('fonts/jetbrains-500.ttf')}
 
 :root{
   --ink:#1b2330; --ink2:#48515e; --mut:#8b929c;
@@ -110,8 +118,22 @@ section.sec{ display:flex; flex-direction:column; justify-content:center; }
 section.sec h1{ font-size:60px; max-width:88%; }
 section.sec .k{ font-size:24px; color:var(--ink2); max-width:78%; margin-top:6px; }
 
+.tinfo{ margin:0 0 17px; font-size:20px; color:var(--ink); line-height:1.4; }
+.tl{ font-family:'Work Sans',sans-serif; font-weight:700; font-size:12.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--acc); margin-bottom:1px; }
+.appl-row{ display:flex; flex-wrap:wrap; gap:11px 13px; margin:12px 0 14px; }
+.appl-row span{ display:inline-flex; align-items:center; gap:8px; font-size:18.5px; color:var(--ink); border:1px solid var(--line); border-radius:100px; padding:6px 15px; }
+.ai{ width:20px; height:20px; flex-shrink:0; }
 .cap{ font-size:16px; color:var(--mut); text-align:center; margin-top:10px; }
 </style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="ic-fridge" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="2.2"/><line x1="6" y1="9.5" x2="18" y2="9.5"/><line x1="9" y1="5" x2="9" y2="7"/><line x1="9" y1="12.5" x2="9" y2="15"/></g></symbol>
+<symbol id="ic-washer" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="3" width="15" height="18" rx="2.2"/><circle cx="12" cy="13.5" r="4.8"/><circle cx="12" cy="13.5" r="1.4"/><line x1="7" y1="6.2" x2="9" y2="6.2"/></g></symbol>
+<symbol id="ic-dishwasher" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><line x1="5" y1="7.5" x2="19" y2="7.5"/><line x1="8" y1="5.2" x2="11" y2="5.2"/><rect x="8.5" y="10" width="7" height="8" rx="1"/></g></symbol>
+<symbol id="ic-kettle" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 11 h9 v6.5 a2.5 2.5 0 0 1 -2.5 2.5 h-4 a2.5 2.5 0 0 1 -2.5 -2.5 z"/><path d="M16 12 l3 -2.5"/><path d="M8.5 11 a3.2 3.2 0 0 1 6 0"/><line x1="11.5" y1="7.6" x2="11.5" y2="8.6"/></g></symbol>
+<symbol id="ic-microwave" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><rect x="5" y="8.5" width="9.5" height="7" rx="1"/><circle cx="18" cy="10" r="0.9" fill="currentColor" stroke="none"/><line x1="17" y1="13" x2="19" y2="13"/></g></symbol>
+<symbol id="ic-tv" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="12.5" rx="2"/><line x1="8.5" y1="20.5" x2="15.5" y2="20.5"/><line x1="12" y1="17.5" x2="12" y2="20.5"/></g></symbol>
+</defs></svg>
 
 <!-- _class: title -->
 <!-- _paginate: false -->
@@ -361,15 +383,13 @@ First benchmark to jointly score **efficiency**, **multi-resolution**, and **cro
 
 ## T1 — Same building
 
-<div class="vc">
-<div style="flex:1"><img src="figs/task_t1.png" width="430"></div>
-<div style="flex:1">
+<div style="text-align:center; margin-top:6px"><img src="figs/task_t1.png" width="800"></div>
 
-**Setup** · disjoint time windows, one home
-**Why** · best-case baseline
-**Enables** · upper bound on accuracy; sanity check
-
-</div>
+<div class="cols" style="margin-top:24px; font-size:19px">
+<div class="col"><div class="tl">Setup</div>Disjoint time windows from one home</div>
+<div class="col"><div class="tl">Why</div>Best case — appliances seen in training</div>
+<div class="col"><div class="tl">Enables</div>Upper bound on accuracy; a sanity check</div>
+<div class="col"><div class="tl">Split</div>train 30 d (B1) → test week (B1)</div>
 </div>
 
 ---
@@ -378,15 +398,13 @@ First benchmark to jointly score **efficiency**, **multi-resolution**, and **cro
 
 ## T2 — New building
 
-<div class="vc">
-<div style="flex:1"><img src="figs/task_t2.png" width="430"></div>
-<div style="flex:1">
+<div style="text-align:center; margin-top:6px"><img src="figs/task_t2.png" width="800"></div>
 
-**Setup** · train homes → unseen home, same dataset
-**Why** · realistic deployment in a region
-**Enables** · cross-building generalization
-
-</div>
+<div class="cols" style="margin-top:24px; font-size:19px">
+<div class="col"><div class="tl">Setup</div>Train on some homes, test on an unseen home</div>
+<div class="col"><div class="tl">Why</div>Realistic deployment within a region</div>
+<div class="col"><div class="tl">Enables</div>Cross-building generalization</div>
+<div class="col"><div class="tl">Split</div>UK-DALE B1,B2 → B4 · REDD B1,B2,B3 → B6</div>
 </div>
 
 ---
@@ -395,15 +413,13 @@ First benchmark to jointly score **efficiency**, **multi-resolution**, and **cro
 
 ## T3 — New dataset
 
-<div class="vc">
-<div style="flex:1"><img src="figs/task_t3.png" width="430"></div>
-<div style="flex:1">
+<div style="text-align:center; margin-top:6px"><img src="figs/task_t3.png" width="800"></div>
 
-**Setup** · train one country → test another (REDD ↔ REFIT)
-**Why** · zero-shot domain & grid shift (110 / 230 V)
-**Enables** · true out-of-distribution transfer
-
-</div>
+<div class="cols" style="margin-top:24px; font-size:19px">
+<div class="col"><div class="tl">Setup</div>Train in one country, test in another</div>
+<div class="col"><div class="tl">Why</div>Zero-shot domain &amp; grid shift (110/230 V)</div>
+<div class="col"><div class="tl">Enables</div>True out-of-distribution transfer</div>
+<div class="col"><div class="tl">Split</div>REDD (USA) ⇄ REFIT (UK)</div>
 </div>
 
 ---
@@ -418,7 +434,16 @@ First benchmark to jointly score **efficiency**, **multi-resolution**, and **cro
 | **UK-DALE** | UK — 230 V | 5 | 655 days | 5–54 |
 | **REFIT** | UK — 230 V | 20 | 2 years | 9–21 |
 
-Six appliances · fridge · microwave · kettle · washing machine · dishwasher · television
+Six appliances span the NILM difficulty range:
+
+<div class="appl-row">
+<span><svg class="ai" viewBox="0 0 24 24" style="color:#3b6ea5"><use href="#ic-fridge"/></svg>Fridge</span>
+<span><svg class="ai" viewBox="0 0 24 24" style="color:#2a9d8f"><use href="#ic-microwave"/></svg>Microwave</span>
+<span><svg class="ai" viewBox="0 0 24 24" style="color:#c98a2b"><use href="#ic-kettle"/></svg>Kettle</span>
+<span><svg class="ai" viewBox="0 0 24 24" style="color:#c44536"><use href="#ic-washer"/></svg>Washing machine</span>
+<span><svg class="ai" viewBox="0 0 24 24" style="color:#1b3b6f"><use href="#ic-dishwasher"/></svg>Dishwasher</span>
+<span><svg class="ai" viewBox="0 0 24 24" style="color:#8a6fae"><use href="#ic-tv"/></svg>Television</span>
+</div>
 
 <div class="cap" style="text-align:left">Excluded: single-building (AMPds, iAWE, BLUED, DRED) · pay-walled (PecanStreet)</div>
 
@@ -510,42 +535,33 @@ experiment['test']['metrics'] += ['sae']
 
 ---
 
-<div class="kick">Conclusion</div>
+<div class="kick">Summary &amp; outlook</div>
 
-## A foundation for deployment
+## Summary & way forward
 
 <div class="cols">
 <div class="col">
 
-#### Benchmark
-16 models · 3 datasets · 2 resolutions · 576 configs
+#### What we built
+16 models · 3 datasets · 2 resolutions · **576** configurations — scored on accuracy, events, efficiency, and generalization.
 
-#### Finding
-Generalization, not accuracy, is the bottleneck
+#### What we found
+- No single model wins
+- **Generalization is the bottleneck**
+- MAE hides missed events → report F1
+- More compute ≠ better
 
 </div>
 <div class="col">
 
-#### Platform
-PyTorch + Docker + uv + NILMTK API
-
-#### Next
-Domain adaptation · self-supervised pre-training · edge NILM
+#### Way forward
+- Domain adaptation & transfer learning
+- Self-supervised pre-training
+- Multi-task state classification
+- Edge-ready, low-resolution NILM
+- Open, OOD-first leaderboard
 
 </div>
 </div>
 
-<div class="callout">Code &amp; project page · github.com/sustainability-lab/nilmbench &nbsp;·&nbsp; sustainability-lab.github.io/nilmbench</div>
-
----
-
-<!-- _class: sec -->
-<!-- _paginate: false -->
-
-# Thank you.
-
-<div class="k">Generalization is the bottleneck for deployable NILM — NILMBench2026 is the reproducible platform to measure and close that gap.</div>
-
-<br>
-
-<div class="note">nipun.batra@iitgn.ac.in &nbsp;·&nbsp; Sustainability Lab, IIT Gandhinagar &nbsp;·&nbsp; sustainability-lab.github.io/nilmbench</div>
+<div class="callout">Reproducible platform · PyTorch + Docker + uv &nbsp;|&nbsp; github.com/sustainability-lab/nilmbench &nbsp;·&nbsp; sustainability-lab.github.io/nilmbench &nbsp;·&nbsp; nipun.batra@iitgn.ac.in</div>
