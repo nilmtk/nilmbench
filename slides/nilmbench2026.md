@@ -7,7 +7,6 @@ math: katex
 ---
 
 <style>
-/* fonts embedded locally — no network needed at build time */
 @font-face{font-family:'Playfair Display';font-weight:700;font-style:normal;src:url('fonts/playfair-700.ttf')}
 @font-face{font-family:'Playfair Display';font-weight:800;font-style:normal;src:url('fonts/playfair-800.ttf')}
 @font-face{font-family:'Work Sans';font-weight:400;font-style:normal;src:url('fonts/worksans-400.ttf')}
@@ -22,335 +21,368 @@ math: katex
   --acc:#c44536; --navy:#1b3b6f;
   --line:#e6e8ec; --paper:#ffffff; --paper2:#f7f7f5;
 }
+
 section{
   background:var(--paper); color:var(--ink);
-  font-family:'Work Sans',sans-serif; font-size:23px; line-height:1.5;
-  padding:54px 78px 64px;
+  font-family:'Work Sans',sans-serif; font-size:22px; line-height:1.45;
+  padding:48px 72px 56px;
   display:flex; flex-direction:column; justify-content:flex-start;
+  overflow:hidden;
 }
-/* pinned header: kicker + title sit at the same spot on every content slide */
-section > .kick:first-child, section > h2:first-child{ margin-top:0; }
-.kick{ font-family:'Work Sans',sans-serif; font-weight:600; font-size:13px; letter-spacing:0.18em; text-transform:uppercase; color:var(--acc); margin:0 0 6px; }
-/* body after the title fills and centres in the remaining space */
-.vc{ margin:auto 0; }
-.fill{ margin:auto 0; width:100%; }
-section::after{ color:var(--mut); font-family:'Work Sans',sans-serif; font-size:13px; right:34px; }
-footer{ color:var(--mut); font-family:'Work Sans',sans-serif; font-size:13px; }
 
-h1{ font-family:'Playfair Display',serif; font-weight:800; font-size:46px; color:var(--ink); margin:0 0 16px; letter-spacing:-0.01em; line-height:1.08; }
-h2{ font-family:'Playfair Display',serif; font-weight:700; font-size:37px; color:var(--ink); margin:0 0 24px; letter-spacing:-0.01em;
-    padding-bottom:14px; border-bottom:1px solid var(--line); position:relative; }
-h2::after{ content:''; position:absolute; left:0; bottom:-1px; width:62px; height:3px; background:var(--acc); }
-h3{ font-family:'Work Sans',sans-serif; font-weight:700; font-size:21px; margin:0 0 5px; color:var(--ink); }
-h4{ font-family:'Work Sans',sans-serif; font-weight:600; font-size:13px; letter-spacing:0.16em; text-transform:uppercase; color:var(--acc); margin:0 0 14px; }
+section::after{ color:var(--mut); font-family:'Work Sans',sans-serif; font-size:12px; right:32px; }
+footer{ color:var(--mut); font-family:'Work Sans',sans-serif; font-size:12px; }
+
+h1{ font-family:'Playfair Display',serif; font-weight:800; font-size:44px; color:var(--ink); margin:0 0 12px; letter-spacing:-0.01em; line-height:1.08; }
+h2{ font-family:'Playfair Display',serif; font-weight:700; font-size:34px; color:var(--ink); margin:0 0 18px; letter-spacing:-0.01em;
+    padding-bottom:12px; border-bottom:1px solid var(--line); position:relative; flex-shrink:0; }
+h2::after{ content:''; position:absolute; left:0; bottom:-1px; width:58px; height:3px; background:var(--acc); }
+h3{ font-family:'Work Sans',sans-serif; font-weight:700; font-size:20px; margin:0 0 4px; color:var(--ink); }
+h4{ font-family:'Work Sans',sans-serif; font-weight:600; font-size:12px; letter-spacing:0.16em; text-transform:uppercase; color:var(--acc); margin:0 0 10px; }
 strong{ color:var(--ink); font-weight:700; }
 em{ color:var(--acc); font-style:normal; font-weight:600; }
 a{ color:var(--acc); text-decoration:none; }
-p{ margin:0 0 14px; }
+p{ margin:0 0 10px; }
 
-ul{ margin:6px 0; padding-left:0; list-style:none; }
-li{ margin:13px 0; padding-left:26px; position:relative; color:var(--ink2); }
+.kick{ font-family:'Work Sans',sans-serif; font-weight:600; font-size:12px; letter-spacing:0.18em; text-transform:uppercase; color:var(--acc); margin:0 0 4px; flex-shrink:0; }
+section > .kick:first-child, section > h2:first-child{ margin-top:0; }
+
+.slide-body{ flex:1; display:flex; flex-direction:column; justify-content:center; min-height:0; width:100%; }
+.slide-body.tight{ justify-content:flex-start; padding-top:4px; }
+
+ul{ margin:4px 0; padding-left:0; list-style:none; }
+li{ margin:10px 0; padding-left:24px; position:relative; color:var(--ink2); font-size:20px; }
 li strong{ color:var(--ink); }
-li::before{ content:''; position:absolute; left:2px; top:11px; width:7px; height:7px; border-radius:50%; border:2px solid var(--acc); }
+li::before{ content:''; position:absolute; left:2px; top:10px; width:6px; height:6px; border-radius:50%; border:2px solid var(--acc); }
 
 code{ font-family:'JetBrains Mono',monospace; font-size:.82em; color:var(--navy); background:#eef1f5; padding:2px 6px; border-radius:4px; }
-pre{ background:#f6f7f9; border:1px solid var(--line); border-radius:10px; padding:18px 22px; font-size:17px; line-height:1.65; }
+pre{ background:#f6f7f9; border:1px solid var(--line); border-radius:10px; padding:16px 20px; font-size:16px; line-height:1.6; margin:0; }
 pre code{ background:none; color:var(--ink); padding:0; font-size:1em; }
-.hljs-keyword,.hljs-built_in,.hljs-meta{ color:var(--acc); }
-.hljs-string{ color:#1f7a4d; }
-.hljs-comment{ color:#9aa1ac; font-style:italic; }
-.hljs-number,.hljs-literal{ color:var(--navy); }
-.hljs-title,.hljs-class .hljs-title,.hljs-title.class_,.hljs-title.function_{ color:#9a5b00; }
 
-table{ border-collapse:collapse; font-size:19px; width:100%; }
-th{ font-family:'Work Sans',sans-serif; font-weight:600; color:var(--ink); padding:10px 14px; text-align:left;
-    border-bottom:2px solid var(--ink); font-size:13.5px; text-transform:uppercase; letter-spacing:0.05em; }
-td{ padding:9px 14px; border-bottom:1px solid var(--line); color:var(--ink2); }
+table{ border-collapse:collapse; font-size:18px; width:100%; }
+th{ font-family:'Work Sans',sans-serif; font-weight:600; color:var(--ink); padding:8px 12px; text-align:left;
+    border-bottom:2px solid var(--ink); font-size:12.5px; text-transform:uppercase; letter-spacing:0.05em; }
+td{ padding:8px 12px; border-bottom:1px solid var(--line); color:var(--ink2); }
 tr:last-child td{ border-bottom:none; }
+table.dataset-table tr:last-child td{ border-bottom:2px solid var(--ink); }
+.dataset-wrap table tr:last-child td{ border-bottom:2px solid var(--ink); }
+
+.callout-full{ width:100%; margin-top:16px; font-size:18px; }
 td strong{ color:var(--acc); }
 
-img{ display:block; margin:0 auto; }
+img{ display:block; margin:0 auto; max-width:100%; }
+.fig{ width:100%; max-height:380px; object-fit:contain; object-position:center center; }
+.fig-lg{ width:100%; max-height:430px; object-fit:contain; }
+.fig-xl{ width:100%; max-height:480px; object-fit:contain; }
 
-.cols{ display:flex; gap:30px; align-items:flex-start; }
-.col{ flex:1; }
-.vc{ display:flex; align-items:center; gap:34px; }
-.note{ color:var(--mut); font-size:17px; }
-.kpis{ display:flex; gap:0; margin:10px 0 22px; }
-.kpi{ flex:1; padding:0 18px; border-left:1px solid var(--line); }
-.kpi:first-child{ border-left:none; padding-left:0; }
-.kpi .n{ font-family:'Playfair Display',serif; font-weight:800; font-size:52px; color:var(--ink); line-height:1; }
-.kpi .n em{ color:var(--acc); }
-.kpi .l{ color:var(--ink2); font-size:16px; margin-top:8px; }
-.lead{ font-size:25px; color:var(--ink2); max-width:90%; }
-.lead strong{ color:var(--ink); }
+.decomp-layout{ align-items:center; gap:32px; }
+.decomp-layout .fig-col{ flex:1.15; }
+.decomp-layout .txt-col{ flex:0.85; display:flex; flex-direction:column; justify-content:center; gap:14px; }
+.decomp-layout .txt-col li{ font-size:19px; }
+.decomp-aside{ font-size:15px; color:var(--mut); line-height:1.45; padding-top:8px; border-top:1px solid var(--line); margin-top:4px; }
 
-.stage{ display:flex; align-items:stretch; gap:0; margin-top:18px; }
-.stage .s{ flex:1; padding:16px 14px; border-top:3px solid var(--line); }
-.stage .s.on{ border-top-color:var(--acc); }
-.stage .s .y{ font-family:'JetBrains Mono',monospace; font-size:14px; color:var(--mut); }
-.stage .s .t{ font-weight:600; font-size:18px; color:var(--ink); margin-top:3px; }
-.stage .s .d{ font-size:14.5px; color:var(--ink2); margin-top:3px; }
+section.bench-slide{ padding-bottom:48px; padding-top:38px; }
+section.bench-slide h2{ margin-bottom:8px; padding-bottom:8px; font-size:28px; line-height:1.15; }
+section.bench-slide .kpi .n{ font-size:36px; }
+section.bench-slide .kpi .l{ font-size:13px; line-height:1.3; }
+section.bench-slide .kpis{ margin:0 0 14px; }
+section.bench-slide li{ font-size:16px; margin:5px 0; line-height:1.3; }
+section.bench-slide h4{ font-size:11px; margin-bottom:8px; letter-spacing:0.14em; }
+.bench-body{ display:flex; gap:28px; flex:1; min-height:0; align-items:flex-start; width:100%; }
+.bench-info{ flex:0.46; min-width:0; display:flex; flex-direction:column; gap:18px; }
+.bench-block ul{ margin:0; }
+.bench-shot{ flex:0.54; min-width:0; display:flex; align-items:flex-start; justify-content:center; padding-top:10px; }
+.bench-shot img{ width:86%; height:auto; object-fit:contain; object-position:center top; border:1px solid var(--line); border-radius:6px; margin:0 auto; background:#1e1e1e; transform:translate(-14px, 12px); }
+.bench-callout-full{ margin-top:14px; font-size:15px; padding:10px 14px; line-height:1.35; flex-shrink:0; }
 
-.callout{ background:var(--paper2); border:1px solid var(--line); border-left:3px solid var(--acc); border-radius:8px; padding:16px 20px; font-size:20px; color:var(--ink2); }
+.task-row .task-card .tt{ font-size:19px; }
+.task-row .task-card .meta{ font-size:16.5px; gap:8px; }
+.task-row .task-card .tl{ font-size:12px; }
+.task-row .task-card img{ height:200px; }
+
+.outlook-slide h2{ font-size:32px; }
+.outlook-slide h4{ font-size:14px; margin-bottom:14px; }
+.outlook-slide li{ font-size:22px; margin:12px 0; }
+.outlook-link{ margin-top:16px; font-size:18px; color:var(--ink2); text-align:center; }
+.outlook-link a{ font-weight:600; }
+.outlook-qr{ text-align:center; margin-top:10px; }
+.outlook-qr img{ width:96px; height:96px; margin:0 auto; display:block; }
+
+.leader-stack{ display:flex; flex-direction:column; gap:16px; width:100%; }
+.leader-stack .leader-top{ margin:0; }
+.leader-top{ align-items:flex-start; align-content:start; margin-top:0; }
+.leader-top pre{ font-size:15px; padding:14px 18px; }
+.leader-top .copy li{ font-size:20px; }
+section.platform{ padding-top:44px; }
+section.platform .slide-body{ justify-content:flex-start; padding-top:8px; }
+
+.cols{ display:flex; gap:28px; align-items:center; }
+.col{ flex:1; min-width:0; }
+.vc{ display:flex; align-items:center; gap:28px; width:100%; }
+.vc .fig-col{ flex:1.1; min-width:0; display:flex; align-items:center; justify-content:center; }
+.vc .txt-col{ flex:0.9; min-width:0; }
+
+.callout{ background:var(--paper2); border:1px solid var(--line); border-left:3px solid var(--acc); border-radius:8px; padding:14px 18px; font-size:18px; color:var(--ink2); }
 .callout strong{ color:var(--ink); }
+.cap{ font-size:14px; color:var(--mut); margin-top:6px; line-height:1.35; }
+.note{ color:var(--mut); font-size:16px; }
 
-section.title{ justify-content:flex-start; text-align:left; padding:14px 70px 24px; }
-section.title .t-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
-section.title .t-qr{ display:flex; flex-direction:column; align-items:center; width:120px; }
-section.title .t-qr img{ width:82px; height:82px; }
-section.title .t-qr span{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--mut); margin-top:4px; letter-spacing:0.03em; }
-section.title .t-lab{ height:34px; }
-section.title .t-iit{ height:76px; }
-section.title h1{ font-size:72px; margin:2px 0 6px; text-align:left; }
-section.title .t-sub{ font-family:'Playfair Display',serif; font-style:italic; font-size:25px; color:var(--ink2); margin:0 0 14px; }
-section.title .t-hr{ height:2px; background:var(--line); margin:0 0 26px; position:relative; }
-section.title .t-hr::after{ content:''; position:absolute; left:0; top:0; width:80px; height:2px; background:var(--acc); }
-section.title .authors{ display:flex; gap:24px; justify-content:center; margin-bottom:20px; }
-section.title .authors .a{ display:flex; flex-direction:column; align-items:center; width:210px; }
-section.title .authors .a img{ width:118px; height:118px; border-radius:10px; object-fit:cover; border:1px solid var(--line); }
-section.title .authors .a .n{ font-weight:700; font-size:19px; color:var(--ink); margin-top:12px; }
-section.title .authors .a .e{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--acc); margin-top:3px; }
-section.title .t-aff{ text-align:center; font-size:19px; color:var(--ink2); font-weight:500; margin-bottom:16px; }
-section.title .t-foot{ display:grid; grid-template-columns:1fr; gap:4px; text-align:center; font-size:14.5px; line-height:1.25; color:var(--mut); }
-section.title .t-foot span{ min-width:0; }
-section.title .t-foot span:last-child{ text-align:center; max-width:none; }
-section.title .t-foot b{ color:var(--acc); font-weight:600; }
+.kpis{ display:flex; gap:0; margin:8px 0 16px; }
+.kpi{ flex:1; padding:0 16px; border-left:1px solid var(--line); }
+.kpi:first-child{ border-left:none; padding-left:0; }
+.kpi .n{ font-family:'Playfair Display',serif; font-weight:800; font-size:46px; color:var(--ink); line-height:1; }
+.kpi .l{ color:var(--ink2); font-size:15px; margin-top:6px; line-height:1.35; }
 
-section.sec{ display:flex; flex-direction:column; justify-content:center; }
-section.sec h1{ font-size:60px; max-width:88%; }
-section.sec .k{ font-size:24px; color:var(--ink2); max-width:78%; margin-top:6px; }
+/* ---- title slide ---- */
+section.title{
+  padding:36px 64px 40px;
+  justify-content:space-between;
+}
+section.title h1{
+  font-size:56px; margin:0 0 6px; line-height:1.05;
+}
+.title-bar{
+  display:flex; align-items:center; gap:20px;
+  margin-bottom:18px;
+}
+.title-bar .grow{ flex:1; }
+.title-bar img.title-lab{ height:52px; width:auto; margin:0; }
+.title-bar img.title-iit{ height:88px; width:auto; margin:0; }
+.title-qr{
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+}
+.title-qr img{ width:100px; height:100px; margin:0; }
+.title-qr span{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--mut); letter-spacing:0.04em; }
+.title-sub{
+  font-family:'Playfair Display',serif; font-style:italic; font-size:21px; color:var(--ink2); margin:0 0 14px;
+}
+.title-rule{ height:2px; background:var(--line); margin:0 0 20px; position:relative; }
+.title-rule::after{ content:''; position:absolute; left:0; top:0; width:72px; height:2px; background:var(--acc); }
+.author-row{
+  display:flex; gap:18px; justify-content:center; flex-wrap:wrap;
+  margin-bottom:14px;
+}
+.author-row .a{
+  display:flex; flex-direction:column; align-items:center; width:210px;
+}
+.author-row .a img{
+  width:120px; height:120px; border-radius:10px; object-fit:cover; object-position:center top; border:1px solid var(--line); margin:0; flex-shrink:0;
+}
+.author-row .a.advisor img{ width:120px; height:120px; margin-top:0; }
+.author-row .a .n{ font-weight:700; font-size:17px; color:var(--ink); margin-top:9px; text-align:center; line-height:1.2; }
+.author-row .a .role{ font-size:13px; color:var(--ink2); margin-top:3px; text-align:center; line-height:1.35; }
+.author-row .a .e{ font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--acc); margin-top:3px; text-align:center; word-break:break-all; }
+.title-meta{
+  text-align:center; font-size:13px; color:var(--ink2); line-height:1.5; margin:0;
+}
+.title-meta b{ color:var(--acc); font-weight:600; }
 
-.tinfo{ margin:0 0 17px; font-size:20px; color:var(--ink); line-height:1.4; }
-.tl{ font-family:'Work Sans',sans-serif; font-weight:700; font-size:12.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--acc); margin-bottom:1px; }
-.appl-row{ display:flex; flex-wrap:wrap; gap:11px 13px; margin:12px 0 14px; }
-.appl-row span{ display:inline-flex; align-items:center; gap:8px; font-size:18.5px; color:var(--ink); border:1px solid var(--line); border-radius:100px; padding:6px 15px; }
-.ai{ width:20px; height:20px; flex-shrink:0; }
-.cap{ font-size:16px; color:var(--mut); text-align:center; margin-top:10px; }
+/* ---- appliance signatures (one slide) ---- */
+.sig-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; width:100%; }
+.sig-panel{ border-top:3px solid var(--line); padding-top:8px; display:flex; flex-direction:column; }
+.sig-panel:nth-child(1){ border-top-color:var(--navy); }
+.sig-panel:nth-child(2){ border-top-color:var(--acc); }
+.sig-panel:nth-child(3){ border-top-color:#2a9d8f; }
+.sig-panel img{ width:100%; height:190px; object-fit:contain; object-position:center bottom; margin:0 0 8px; }
+.sig-panel .sig-label{ font-weight:700; font-size:16px; color:var(--ink); margin-bottom:4px; }
+.sig-panel ul{ margin:0; }
+.sig-panel li{ font-size:14.5px; margin:5px 0; padding-left:18px; line-height:1.3; }
+.sig-panel li::before{ width:5px; height:5px; top:7px; border-width:1.5px; }
 
-.model-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px 22px; margin-top:4px; }
-.model-card{ display:grid; grid-template-columns:1.08fr .92fr; gap:14px; align-items:center; border-top:3px solid var(--line); padding-top:10px; }
-.model-card:nth-child(1), .model-card:nth-child(4){ border-top-color:var(--acc); }
-.model-card img{ max-width:100%; max-height:150px; object-fit:contain; }
-.model-card .mt{ font-weight:700; font-size:18px; color:var(--ink); margin-bottom:5px; }
-.model-card ul{ margin:0; }
-.model-card li{ font-size:14.8px; line-height:1.35; margin:5px 0; padding-left:17px; }
-.model-card li::before{ width:5px; height:5px; border-width:1.5px; top:7px; left:0; }
+/* ---- evolution timeline ---- */
+section.evo-slide{ padding-bottom:48px; }
+section.evo-slide h2{ margin-bottom:14px; padding-bottom:10px; font-size:32px; }
+.evo-wrap{ display:flex; flex-direction:column; gap:10px; width:100%; flex:1; min-height:0; }
+.evo-stage{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px 18px; flex:1; min-height:0; }
+.evo-step{ border-top:3px solid var(--line); padding-top:8px; display:flex; flex-direction:column; min-height:0; overflow:hidden; }
+.evo-step.on{ border-top-color:var(--acc); }
+.evo-step .era{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--mut); margin-bottom:2px; }
+.evo-step .name{ font-weight:700; font-size:16px; color:var(--ink); margin-bottom:4px; line-height:1.2; }
+.evo-step .fig-box{ flex:1; min-height:0; display:flex; align-items:center; justify-content:center; overflow:hidden; margin-bottom:4px; }
+.evo-step .fig-box img{ width:100%; max-height:138px; height:auto; object-fit:contain; margin:0; }
+.evo-step ul{ margin:0; }
+.evo-step li{ font-size:13.5px; margin:3px 0; padding-left:16px; line-height:1.25; }
+.evo-step li::before{ width:4px; height:4px; top:6px; }
+.evo-callout{ margin-top:8px; font-size:16px; padding:12px 16px; flex-shrink:0; }
 
-.task-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:6px; align-items:stretch; }
-.task-card{ border-top:3px solid var(--line); padding-top:12px; display:flex; flex-direction:column; min-height:440px; }
+/* ---- task cards ---- */
+.task-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; width:100%; }
+.task-card{ border-top:3px solid var(--line); padding-top:10px; display:flex; flex-direction:column; }
 .task-card:nth-child(2){ border-top-color:var(--acc); }
-.task-card img{ width:100%; height:190px; object-fit:contain; }
-.task-card .tt{ font-weight:700; font-size:19px; color:var(--ink); margin:12px 0 10px; }
-.task-card .meta{ display:grid; gap:8px; font-size:14.8px; line-height:1.3; color:var(--ink2); }
-.task-card .tl{ margin-right:5px; display:inline; }
+.task-card img{ width:100%; height:178px; object-fit:contain; margin:0 0 8px; }
+.task-card .tt{ font-weight:700; font-size:17px; color:var(--ink); margin-bottom:8px; }
+.task-card .meta{ display:grid; gap:6px; font-size:14px; line-height:1.3; color:var(--ink2); }
+.task-card .tl{ font-weight:700; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--acc); margin-right:4px; }
 
-.flow-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:36px; }
-.flow-box{ border-top:4px solid var(--line); padding:18px 18px 20px; min-height:215px; background:var(--paper2); border-radius:8px; }
-.flow-box:nth-child(1){ border-top-color:var(--acc); }
-.flow-box:nth-child(2){ border-top-color:var(--navy); }
-.flow-box:nth-child(3){ border-top-color:#2a9d8f; }
-.flow-box .step{ font-family:'JetBrains Mono',monospace; font-size:14px; color:var(--mut); margin-bottom:14px; }
-.flow-box .ft{ font-weight:700; font-size:23px; color:var(--ink); margin-bottom:12px; }
-.flow-box .fd{ font-size:19px; line-height:1.42; color:var(--ink2); }
-.flow-line{ margin-top:30px; font-size:24px; line-height:1.36; color:var(--ink2); text-align:center; }
-.flow-line strong{ color:var(--ink); }
+.formal-list{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:12px; }
+.formal-list .item{ border-top:3px solid var(--line); padding-top:12px; }
+.formal-list .item strong{ display:block; font-size:18px; margin-bottom:4px; }
+.formal-list .item span{ display:block; color:var(--ink2); font-size:15px; line-height:1.3; }
+
+section.demo{ justify-content:center; }
+.demo-panel{ margin:auto 0; border-left:4px solid var(--acc); padding:24px 30px; background:var(--paper2); border-radius:8px; }
+.demo-panel .big{ font-family:'Playfair Display',serif; font-size:44px; font-weight:700; line-height:1.12; color:var(--ink); margin-bottom:12px; }
+.demo-panel .sub{ font-size:22px; color:var(--ink2); line-height:1.4; }
+
+.leader{ display:grid; grid-template-columns:1.05fr .95fr; gap:28px; align-items:center; width:100%; }
+.leader .copy{ font-size:20px; color:var(--ink2); }
+.leader .copy li{ font-size:19px; }
+
+.shift-flow{ display:flex; align-items:stretch; gap:0; margin:8px 0 14px; }
+.shift-box{ flex:1; text-align:center; padding:16px 12px; border-top:3px solid var(--line); background:var(--paper2); }
+.shift-box:nth-child(1){ border-top-color:var(--navy); }
+.shift-box:nth-child(2){ border-top-color:#3b6ea5; }
+.shift-box:nth-child(3){ border-top-color:var(--acc); }
+.shift-box .lab{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--mut); }
+.shift-box .val{ font-family:'Playfair Display',serif; font-weight:800; font-size:28px; color:var(--ink); margin:4px 0; }
+.shift-box .desc{ font-size:14px; color:var(--ink2); line-height:1.3; }
+.shift-arrow{ display:flex; align-items:center; justify-content:center; width:36px; font-size:22px; color:var(--mut); flex-shrink:0; }
 </style>
-
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-<symbol id="ic-fridge" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="2.2"/><line x1="6" y1="9.5" x2="18" y2="9.5"/><line x1="9" y1="5" x2="9" y2="7"/><line x1="9" y1="12.5" x2="9" y2="15"/></g></symbol>
-<symbol id="ic-washer" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="3" width="15" height="18" rx="2.2"/><circle cx="12" cy="13.5" r="4.8"/><circle cx="12" cy="13.5" r="1.4"/><line x1="7" y1="6.2" x2="9" y2="6.2"/></g></symbol>
-<symbol id="ic-dishwasher" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><line x1="5" y1="7.5" x2="19" y2="7.5"/><line x1="8" y1="5.2" x2="11" y2="5.2"/><rect x="8.5" y="10" width="7" height="8" rx="1"/></g></symbol>
-<symbol id="ic-kettle" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 11 h9 v6.5 a2.5 2.5 0 0 1 -2.5 2.5 h-4 a2.5 2.5 0 0 1 -2.5 -2.5 z"/><path d="M16 12 l3 -2.5"/><path d="M8.5 11 a3.2 3.2 0 0 1 6 0"/><line x1="11.5" y1="7.6" x2="11.5" y2="8.6"/></g></symbol>
-<symbol id="ic-microwave" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><rect x="5" y="8.5" width="9.5" height="7" rx="1"/><circle cx="18" cy="10" r="0.9" fill="currentColor" stroke="none"/><line x1="17" y1="13" x2="19" y2="13"/></g></symbol>
-<symbol id="ic-tv" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="12.5" rx="2"/><line x1="8.5" y1="20.5" x2="15.5" y2="20.5"/><line x1="12" y1="17.5" x2="12" y2="20.5"/></g></symbol>
-</defs></svg>
 
 <!-- _class: title -->
 <!-- _paginate: false -->
 <!-- _footer: '' -->
 
-<div class="t-top">
-  <div class="t-qr"><img src="figs/qr_project.png" alt="Project page QR"><span>Project Page</span></div>
-  <img class="t-lab" src="figs/lab_logo.png" alt="Sustainability Lab">
-  <img class="t-iit" src="figs/iitgn_logo.png" alt="IIT Gandhinagar">
+<div class="title-bar">
+  <img class="title-lab" src="figs/lab_logo.png" alt="Sustainability Lab">
+  <div class="grow"></div>
+  <img class="title-iit" src="figs/iitgn_logo.png" alt="IIT Gandhinagar">
+  <div class="title-qr">
+    <img src="figs/qr_project.png" alt="Project page QR">
+    <span>Project page</span>
+  </div>
 </div>
 
 # NILMBench2026
 
-<div class="t-sub">A deployment-aware benchmark for energy disaggregation</div>
-<div class="t-hr"></div>
+<p class="title-sub">A deployment-aware benchmark for energy disaggregation</p>
+<div class="title-rule"></div>
 
-<div class="authors">
-  <div class="a"><img src="figs/au_aayush.png"><div class="n">Aayush Kuloor*</div><div class="e">aayush.kuloor@iitgn.ac.in</div></div>
-  <div class="a"><img src="figs/au_anurag.jpg"><div class="n">Anurag Singh*</div><div class="e">anurag.s@iitgn.ac.in</div></div>
-  <div class="a"><img src="figs/au_harsh.png"><div class="n">Harsh Dhru*</div><div class="e">harsh.dhru@iitgn.ac.in</div></div>
-  <div class="a"><img src="figs/au_nipun.jpg"><div class="n">Nipun Batra</div><div class="e">nipun.batra@iitgn.ac.in</div></div>
+<div class="author-row">
+  <div class="a"><img src="figs/au_aayush.png" alt=""><div class="n">Aayush Kuloor*</div><div class="role">Undergraduate Sophomore<br>IIT Gandhinagar</div><div class="e">aayush.kuloor@iitgn.ac.in</div></div>
+  <div class="a"><img src="figs/au_anurag.jpg" alt=""><div class="n">Anurag Singh*</div><div class="role">Undergraduate Sophomore<br>IIT Gandhinagar</div><div class="e">anurag.s@iitgn.ac.in</div></div>
+  <div class="a"><img src="figs/au_harsh.png" alt=""><div class="n">Harsh Dhru*</div><div class="role">Undergraduate Sophomore<br>IIT Gandhinagar</div><div class="e">harsh.dhru@iitgn.ac.in</div></div>
+  <div class="a advisor"><img src="figs/au_nipun.jpg" alt=""><div class="n">Nipun Batra</div><div class="role">Faculty advisor<br>IIT&nbsp;Gandhinagar</div><div class="e">nipun.batra@iitgn.ac.in</div></div>
 </div>
 
-<div class="t-aff">Indian Institute of Technology Gandhinagar</div>
-<div class="t-foot"><span>ACM BuildSys 2026 · Banff, Canada &nbsp;|&nbsp; <b>Best Paper Candidate</b></span><span>* These authors contributed equally to this work.</span></div>
+<p class="title-meta">ACM BuildSys 2026, Banff, Canada · <b>Best Paper Candidate</b></p>
 
 ---
 
 <div class="kick">Motivation</div>
 
-## What is NILM?
+## NILM turns one meter into appliance-level estimates
 
-**Single smart-meter signal → appliance-level estimates**
+<div class="slide-body">
 
-<img src="figs/decomposition.png" width="650">
-
-<div class="cols" style="font-size:18px; margin-top:2px">
-<div class="col">
-
-aggregate = Σ appliance powers + noise
-
+<div class="vc decomp-layout">
+<div class="fig-col">
+<img class="fig-lg" src="figs/decomposition.png" alt="UK-DALE disaggregation">
 </div>
-<div class="col">
-
-up to **15 %** savings · no per-appliance sensors
-
-</div>
-<div class="col">
-
-inverse problem · signatures vary by home
-
+<div class="txt-col">
+<ul>
+<li>Feedback can cut household use by up to 15% (Froehlich &amp; Patel 2011; Darby 2006)</li>
+<li>One aggregate signal decomposes into appliance-level power</li>
+<li>Energy feedback without per-appliance sensors</li>
+<li>Signatures vary across homes and devices</li>
+</ul>
+<p class="decomp-aside">Real data · UK-DALE house 1<br>time (x) vs power in W (y)</p>
 </div>
 </div>
 
-<div class="cap" style="text-align:left; margin-top:-12px">Real data · UK-DALE house 1 (public, via CEDA)</div>
-
----
-
-<div class="kick">Motivation · appliance signatures</div>
-
-## Fridge — periodic
-
-<div class="vc">
-<div style="flex:1.35"><img src="figs/sig_fridge2.png" width="640"></div>
-<div style="flex:.65">
-
-- Always-on, **periodic**
-- ~100–150 W compressor cycles
-- Fixed duty cycle
-- Easy to detect
-
-</div>
 </div>
 
 ---
 
-<div class="kick">Motivation · appliance signatures</div>
+<div class="kick">Motivation</div>
 
-## Washing machine — multi-stage
+## Appliance signatures differ by load type
 
-<div class="vc">
-<div style="flex:1.35"><img src="figs/sig_washer2.png" width="640"></div>
-<div style="flex:.65">
+<div class="slide-body">
 
-- **Multi-stage** cycle
-- Heat → wash → spin
-- Long, variable duration
-- Hard: many sub-states
-
+<div class="sig-grid">
+<div class="sig-panel">
+<img src="figs/sig_fridge2.png" alt="">
+<div class="sig-label">Fridge · periodic</div>
+<ul>
+<li>Compressor cycles ~80–120 W</li>
+<li><strong>Defrost spikes</strong> on longer horizon</li>
+<li>Always-on, easy to detect</li>
+</ul>
 </div>
+<div class="sig-panel">
+<img src="figs/sig_washer2.png" alt="">
+<div class="sig-label">Washing machine · multi-stage</div>
+<ul>
+<li><strong>Heat → agitate → spin</strong></li>
+<li>Long, variable duration</li>
+<li>Many sub-states</li>
+</ul>
+</div>
+<div class="sig-panel">
+<img src="figs/sig_dishwasher2.png" alt="">
+<div class="sig-label">Dishwasher · sparse / bursty</div>
+<ul>
+<li>High-power heating bursts</li>
+<li>Long idle gaps</li>
+<li><strong>MAE-deceptive</strong> when mostly off</li>
+</ul>
+</div>
+</div>
+
 </div>
 
 ---
 
-<div class="kick">Motivation · appliance signatures</div>
-
-## Dishwasher — sparse, high-power
-
-<div class="vc">
-<div style="flex:1.35"><img src="figs/sig_dishwasher2.png" width="640"></div>
-<div style="flex:.65">
-
-- **Sparse** activations
-- High-power heating bursts (~1–2 kW)
-- Long idle gaps
-- MAE-deceptive (mostly off)
-
-</div>
-</div>
-
----
+<!-- _class: evo-slide -->
 
 <div class="kick">Background</div>
 
-## 1980s–90s — Combinatorial (Hart)
+## NILM methods evolved, but evaluation did not
 
-<div class="vc">
-<div style="flex:1.25"><img src="figs/hart_edge.png" width="600"></div>
-<div style="flex:.75">
+<div class="slide-body tight">
 
-- **Event-based**
-- Detect ON/OFF edges (ΔP)
-- Match power steps to appliances
-- Breaks on variable / multi-state loads
-
+<div class="evo-wrap">
+<div class="evo-stage">
+<div class="evo-step on">
+<div class="era">1980s–90s</div>
+<div class="name">Combinatorial</div>
+<div class="fig-box"><img src="figs/hart_edge.png" alt=""></div>
+<ul><li>Edge matching</li><li>Breaks on variable loads</li></ul>
+</div>
+<div class="evo-step">
+<div class="era">2000s</div>
+<div class="name">Probabilistic</div>
+<div class="fig-box"><img src="figs/fhmm.png" alt=""></div>
+<ul><li>Hidden appliance states</li><li>Poor scaling</li></ul>
+</div>
+<div class="evo-step">
+<div class="era">2015+</div>
+<div class="name">Deep learning</div>
+<div class="fig-box"><img src="figs/seq2point.png" alt=""></div>
+<ul><li>Seq2Point CNNs</li><li>Strong same-home fit</li></ul>
+</div>
+<div class="evo-step">
+<div class="era">2020+</div>
+<div class="name">Transformers</div>
+<div class="fig-box"><img src="figs/transformer.png" alt=""></div>
+<ul><li>Long-range context</li><li>Higher compute</li></ul>
 </div>
 </div>
 
----
-
-<div class="kick">Background · evolution of NILM</div>
-
-## 2000s — Probabilistic (FHMM)
-
-<div class="vc">
-<div style="flex:1.2"><img src="figs/fhmm.png" width="560"></div>
-<div style="flex:.8">
-
-- Each appliance = **hidden Markov chain**
-- Aggregate = sum of emissions
-- Infer hidden states (Kolter et al.)
-- Scales poorly with #appliances
+<div class="callout evo-callout"><strong>Models changed — evaluation did not.</strong> Same-home accuracy became the default; cross-building and cross-dataset tests lagged behind.</div>
 
 </div>
-</div>
 
----
-
-<div class="kick">Background · evolution of NILM</div>
-
-## 2015 → Deep learning (Seq2Point)
-
-<div class="vc">
-<div style="flex:1.25"><img src="figs/seq2point.png" width="620"></div>
-<div style="flex:.75">
-
-- Kelly & Knottenbelt: NNs for NILM
-- Sliding **window → CNN → midpoint**
-- Signatures learned from data
-- Strong intra-building accuracy
-
-</div>
-</div>
-
----
-
-<div class="kick">Background · evolution of NILM</div>
-
-## 2020 → Transformers
-
-<div class="vc">
-<div style="flex:1.25"><img src="figs/transformer.png" width="620"></div>
-<div style="flex:.75">
-
-- **Self-attention** over long context
-- Handles non-stationarity (NILMFormer)
-- Robust at low resolution
-- Higher compute cost
-
-</div>
 </div>
 
 ---
 
 <div class="kick">Why a new benchmark</div>
 
-## What previous benchmarks missed
+## Existing benchmarks missed deployment readiness
+
+<div class="slide-body">
 
 | Capability | NILMTK '14 | Contrib '19 | NILMBench2026 |
 |---|---|---|---|
@@ -361,46 +393,54 @@ inverse problem · signatures vary by home
 | Cross-dataset | — | — | **yes** |
 | Stack | Python 2.7 | TF 1.x | **PyTorch + Docker + uv** |
 
-First benchmark to jointly score **efficiency**, **multi-resolution**, and **cross-domain transfer**.
+<p class="callout" style="margin-top:16px;font-size:18px">First benchmark to jointly score <strong>efficiency</strong>, <strong>multi-resolution</strong> utility settings, and <strong>cross-domain transfer</strong>.</p>
+
+</div>
 
 ---
 
+<!-- _class: bench-slide -->
+
 <div class="kick">The benchmark</div>
 
-## At a glance
+## NILMBench makes deployment tests reproducible
 
-<div class="kpis" style="margin-top:26px">
-<div class="kpi">
-<div class="n">16</div>
-<div class="l">models across <strong>4 families</strong><br>★ = 5 added here</div>
-</div>
-<div class="kpi">
-<div class="n">2</div>
-<div class="l">resolutions: <strong>1-min</strong> and <strong>15-min</strong></div>
-</div>
-<div class="kpi">
-<div class="n">576</div>
-<div class="l">benchmark configurations</div>
-</div>
+<div class="slide-body bench-slide tight">
+
+<div class="kpis">
+<div class="kpi"><div class="n">16</div><div class="l">models · <strong>4 families</strong></div></div>
+<div class="kpi"><div class="n">3</div><div class="l">datasets · UK-DALE, REDD, REFIT</div></div>
+<div class="kpi"><div class="n">2</div><div class="l">resolutions · <strong>1-min</strong> &amp; <strong>15-min</strong></div></div>
 </div>
 
-<div class="cols" style="font-size:22px; margin-top:26px; gap:42px">
-<div class="col">
+<div class="bench-body">
+<div class="bench-info">
+<div class="bench-block">
+<h4>Three evaluation tasks</h4>
+<ul>
+<li><strong>T1</strong> same building — sanity check</li>
+<li><strong>T2</strong> new building — realistic deploy</li>
+<li><strong>T3</strong> new dataset — domain shift</li>
+</ul>
+</div>
+<div class="bench-block">
+<h4>Four metric axes</h4>
+<ul>
+<li>Regression <strong>MAE</strong></li>
+<li>Event detection <strong>F1</strong></li>
+<li><strong>Parameters</strong> &amp; FLOPs</li>
+<li>Cross-domain <strong>generalization</strong></li>
+</ul>
+</div>
+</div>
+<div class="bench-shot">
+<img src="figs/github_issues.png" alt="GitHub installation issues">
+</div>
+</div>
 
-#### Resolution → application
-- **1-min** → real-time feedback, alerts
-- **15-min** → grid / utility planning
+<div class="callout bench-callout-full"><strong>Modernized tooling.</strong> Legacy NILMTK installs were brittle; we rebuilt the stack in PyTorch with <strong>Docker</strong> and <strong>uv</strong>.</div>
 
 </div>
-<div class="col">
-
-#### Scale
-16 models × 3 datasets × 2 resolutions × 6 appliances × 3 runs.
-
-</div>
-</div>
-
-<div class="callout" style="margin-top:24px">Coverage spans classical methods, probabilistic models, neural architectures, and transformer-based NILM.</div>
 
 ---
 
@@ -408,50 +448,60 @@ First benchmark to jointly score **efficiency**, **multi-resolution**, and **cro
 <!-- _paginate: false -->
 <!-- _footer: '' -->
 
+<div class="demo-panel">
+<div class="big">Live demo</div>
+<div class="sub">Run one sealed benchmark task, inspect MAE / F1 / efficiency metrics, then return to the results.</div>
+</div>
+
 ---
 
 <div class="kick">The benchmark</div>
 
-## Deployment tasks
+## Three tasks separate fitting from deployment
 
-<div class="task-grid">
+<div class="slide-body">
+
+<div class="task-row">
 <div class="task-card">
-<img src="figs/task_t1.png">
+<img src="figs/task_t1.png" alt="">
 <div class="tt">T1 · Same building</div>
 <div class="meta">
-<div><span class="tl">Setup</span>Disjoint time windows from one home</div>
-<div><span class="tl">Why</span>Best case; appliances seen in training</div>
-<div><span class="tl">Enables</span>Upper-bound accuracy sanity check</div>
-<div><span class="tl">Split</span>train 30 d (B1) → test week (B1)</div>
+<div><span class="tl">Setup</span>Disjoint time windows, one home</div>
+<div><span class="tl">Split</span>Train 30 day (B1) → test 1 week (B1)</div>
+<div><span class="tl">Role</span>Upper-bound sanity check</div>
 </div>
 </div>
 <div class="task-card">
-<img src="figs/task_t2.png">
+<img src="figs/task_t2.png" alt="">
 <div class="tt">T2 · New building</div>
 <div class="meta">
-<div><span class="tl">Setup</span>Train on homes, test on an unseen home</div>
-<div><span class="tl">Why</span>Realistic deployment within a region</div>
-<div><span class="tl">Enables</span>Cross-building generalization</div>
-<div><span class="tl">Split</span>UK-DALE B1,B2 → B4 · REDD B1,B2,B3 → B6</div>
+<div><span class="tl">Setup</span>Train on homes, test on unseen home</div>
+<div><span class="tl">Split</span>UK-DALE B1,B2 → B4 · REDD B1–B3 → B6</div>
+<div><span class="tl">Role</span>Cross-building generalization</div>
 </div>
 </div>
 <div class="task-card">
-<img src="figs/task_t3.png">
+<img src="figs/task_t3.png" alt="">
 <div class="tt">T3 · New dataset</div>
 <div class="meta">
 <div><span class="tl">Setup</span>Train in one country, test in another</div>
-<div><span class="tl">Why</span>Zero-shot domain &amp; grid shift (110/230 V)</div>
-<div><span class="tl">Enables</span>Out-of-distribution transfer</div>
-<div><span class="tl">Split</span>REDD (USA) ⇄ REFIT (UK)</div>
+<div><span class="tl">Split</span>REDD (USA, 110 V) ⇄ REFIT (UK, 230 V)</div>
+<div><span class="tl">Role</span>Zero-shot domain shift</div>
 </div>
 </div>
+</div>
+
 </div>
 
 ---
 
 <div class="kick">The benchmark · data</div>
 
-## Datasets
+## Datasets cover countries, buildings, and appliance types
+
+<div class="slide-body tight">
+
+<div class="dataset-wrap">
 
 | Dataset | Country | Buildings | Duration | Appliances |
 |---|---|---|---|---|
@@ -459,36 +509,39 @@ First benchmark to jointly score **efficiency**, **multi-resolution**, and **cro
 | **UK-DALE** | UK — 230 V | 5 | 655 days | 5–54 |
 | **REFIT** | UK — 230 V | 20 | 2 years | 9–21 |
 
-Six appliances span the NILM difficulty range:
-
-<div class="appl-row">
-<span><svg class="ai" viewBox="0 0 24 24" style="color:#3b6ea5"><use href="#ic-fridge"/></svg>Fridge</span>
-<span><svg class="ai" viewBox="0 0 24 24" style="color:#2a9d8f"><use href="#ic-microwave"/></svg>Microwave</span>
-<span><svg class="ai" viewBox="0 0 24 24" style="color:#c98a2b"><use href="#ic-kettle"/></svg>Kettle</span>
-<span><svg class="ai" viewBox="0 0 24 24" style="color:#c44536"><use href="#ic-washer"/></svg>Washing machine</span>
-<span><svg class="ai" viewBox="0 0 24 24" style="color:#1b3b6f"><use href="#ic-dishwasher"/></svg>Dishwasher</span>
-<span><svg class="ai" viewBox="0 0 24 24" style="color:#8a6fae"><use href="#ic-tv"/></svg>Television</span>
 </div>
 
-<div class="cap" style="text-align:left">Excluded: single-building (AMPds, iAWE, BLUED, DRED) · pay-walled (PecanStreet)</div>
+<div class="formal-list">
+<div class="item"><strong>Periodic</strong><span>Fridge, television</span></div>
+<div class="item"><strong>Sparse / bursty</strong><span>Microwave, kettle, dishwasher</span></div>
+<div class="item"><strong>Multi-stage</strong><span>Washing machine, dishwasher</span></div>
+</div>
+
+</div>
 
 ---
 
 <div class="kick">Results</div>
 
-## Finding 1 — Generalization is the bottleneck
+## Finding 1 — Domain shift drives the largest error jump
+
+<div class="slide-body">
 
 <div class="vc">
-<div style="flex:1.05">
-
-- Accuracy collapses **T1 → T2 → T3**
-- Home-specific signature, **not** transferable concept
-- Symmetric in both transfer directions
-
-<div class="callout" style="margin-top:14px">Right · NILMFormer tracks a trained TV (lower), <strong>fails on an unseen TV</strong> (upper).</div>
-
+<div class="fig-col">
+<img class="fig-xl" src="figs/generalization_trend.png" alt="Mean MAE across T1 T2 T3">
 </div>
-<div style="flex:.95"><img src="figs/generalization_failure.png" height="450"></div>
+<div class="txt-col">
+<ul>
+<li>Mean MAE rises from <strong>T1 → T2 → T3</strong> (UK-DALE / REDD→REFIT splits)</li>
+<li>Same-home accuracy is <strong>not</strong> a deployment metric</li>
+<li>Cross-dataset transfer is the hardest stress test</li>
+</ul>
+</div>
+</div>
+
+<div class="callout callout-full">Use T1 as a sanity check; deployment claims need <strong>T2 and T3</strong>.</div>
+
 </div>
 
 ---
@@ -497,13 +550,17 @@ Six appliances span the NILM difficulty range:
 
 ## Finding 2 — MAE hides missed events
 
-<img src="figs/microwave_miss.png" width="650">
+<div class="slide-body tight">
 
-<ul style="margin-top:-6px">
-<li>Predict ≈ 0 → <strong>low MAE</strong>, miss every activation</li>
-<li>All four models miss the microwave spikes</li>
-<li><strong>Report F1</strong> for sparse, high-power loads</li>
+<img class="fig-xl" src="figs/microwave_miss.png" alt="Microwave predictions miss spikes">
+
+<ul style="margin-top:8px">
+<li>Predict ≈ 0 during long idle periods → <strong>deceptively low MAE</strong></li>
+<li><strong>NILMFormer &amp; Seq2Seq</strong> miss every microwave spike on REFIT T2</li>
+<li>Sparse, high-power loads need <strong>F1</strong>, not MAE alone</li>
 </ul>
+
+</div>
 
 ---
 
@@ -511,73 +568,99 @@ Six appliances span the NILM difficulty range:
 
 ## Finding 3 — More compute ≠ better
 
+<div class="slide-body">
+
 <div class="vc">
-<div style="flex:1.2"><img src="figs/efficiency.png" width="640"></div>
-<div style="flex:.8">
-
-- Trade-off is **non-monotonic**
-- **TCN** (69K) ≈ heavyweights
-- **NILMFormer** (383K) strongest
-- **RNN Att. Cl.** (4.9M) expensive *and* worse
-
+<div class="fig-col">
+<img class="fig-lg" src="figs/efficiency.png" alt="MAE vs parameters">
 </div>
+<div class="txt-col">
+<ul>
+<li>Trade-off is <strong>non-monotonic</strong> — size alone does not predict deployment quality</li>
+<li><strong>TCN</strong> (69K params) matches much heavier models on T2</li>
+<li><strong>NILMFormer</strong> (383K) leads on hard generalization tasks</li>
+<li><strong>RNN Att. Cl.</strong> (4.9M) is expensive <em>and</em> worse on average</li>
+</ul>
+<div class="callout" style="margin-top:10px;font-size:17px">Architectural inductive bias matters more than parameter count.</div>
+</div>
+</div>
+
 </div>
 
 ---
+
+<!-- _class: platform -->
 
 <div class="kick">The platform</div>
 
-## Contribute a model or metric
+## A new model should take minutes to benchmark
 
-<div class="flow-grid">
-<div class="flow-box">
-<div class="step">01</div>
-<div class="ft">Add model</div>
-<div class="fd">Wrap a <strong>PyTorch</strong> class with the NILMTK-Contrib API.</div>
+<div class="slide-body tight">
+
+<div class="leader-stack">
+<div class="leader leader-top">
+<div>
+
+```python
+class PatchTSTDisaggregator(Disaggregator):
+    def partial_fit(self, train_main, train_appliances):
+        self.model.fit(train_main, train_appliances)
+
+    def disaggregate_chunk(self, mains):
+        return self.model.predict(mains)
+```
+
 </div>
-<div class="flow-box">
-<div class="step">02</div>
-<div class="ft">Add experiment</div>
-<div class="fd">Write a declarative JSON config for dataset, appliance, task, and resolution.</div>
-</div>
-<div class="flow-box">
-<div class="step">03</div>
-<div class="ft">Run benchmark</div>
-<div class="fd">Generate <strong>MAE</strong>, <strong>F1</strong>, FLOPs, and timing under the same protocol.</div>
+<div class="copy">
+<ul>
+<li>Wrap any PyTorch time-series model in the NILMTK-Contrib API</li>
+<li>Run sealed <strong>T1 / T2 / T3</strong> experiment configs</li>
+<li>Report <strong>MAE</strong>, <strong>F1</strong>, parameters, FLOPs, and runtime together</li>
+</ul>
 </div>
 </div>
 
-<div class="flow-line"><strong>NILMBench2026</strong> turns new algorithms and datasets into comparable results quickly.</div>
+<div class="callout callout-full">Code: <strong>github.com/nilmtk/nilmtk-contrib</strong> · Docker + uv for reproducible installs</div>
+
+</div>
+
+</div>
 
 ---
 
+<!-- _class: outlook-slide -->
+
 <div class="kick">Summary &amp; outlook</div>
 
-## Summary & way forward
+## Summary and future directions
 
-<div class="cols">
+<div class="slide-body outlook-slide">
+
+<div class="cols" style="align-items:flex-start">
 <div class="col">
 
-#### What we built
-16 models · 3 datasets · 2 resolutions · **576** configurations — scored on accuracy, events, efficiency, and generalization.
-
-#### What we found
-- No single model wins
-- **Generalization is the bottleneck**
-- MAE hides missed events → report F1
-- More compute ≠ better
+<h4>What we learned</h4>
+<ul>
+<li>Same-home accuracy is not enough</li>
+<li>MAE can reward missed sparse events</li>
+<li>More parameters do not guarantee better deployment</li>
+</ul>
 
 </div>
 <div class="col">
 
-#### Way forward
-- Domain adaptation & transfer learning
-- Self-supervised pre-training
-- Multi-task state classification
-- Edge-ready, low-resolution NILM
-- Open, OOD-first leaderboard
+<h4>Proposed future directions</h4>
+<ul>
+<li>Public, OOD-first leaderboard for the community</li>
+<li><strong>KDD-Cup-style</strong> NILM challenge</li>
+<li>Agent-assisted model onboarding</li>
+<li>Domain adaptation for new homes</li>
+</ul>
 
 </div>
 </div>
 
-<div class="callout">Reproducible platform · PyTorch + Docker + uv &nbsp;|&nbsp; github.com/sustainability-lab/nilmbench &nbsp;·&nbsp; sustainability-lab.github.io/nilmbench &nbsp;·&nbsp; nipun.batra@iitgn.ac.in</div>
+<p class="outlook-link">Project page · <a href="https://sustainability-lab.github.io/nilmbench/">sustainability-lab.github.io/nilmbench</a></p>
+<div class="outlook-qr"><img src="figs/qr_project.png" alt="Project page QR code"></div>
+
+</div>

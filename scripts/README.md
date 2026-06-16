@@ -27,8 +27,8 @@ vector step first. To use a different house/day or a local `ukdale.h5`, edit the
 constants at the top of `figures.py`.
 
 > Data: UK-DALE (Kelly & Knottenbelt, 2015, CC-BY). The paper's result figures
-> (`generalization_failure.png`, `microwave_miss.png`) come from the paper's own
-> runs and are not regenerated here.
+> (`generalization_failure.png`, `microwave_miss.png`, `github_issues.png`) come from the paper's own
+> runs / repo and are not regenerated here.
 
 ## Rebuild the deck
 ```bash
