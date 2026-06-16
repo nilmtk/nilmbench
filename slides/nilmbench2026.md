@@ -166,7 +166,7 @@ inverse problem · signatures vary by home
 </div>
 </div>
 
-<div class="cap" style="text-align:left; margin-top:0">Real data: AMPds2 (public dataset)</div>
+<div class="cap" style="text-align:left; margin-top:0">Real data · UK-DALE house 1 (public, via CEDA)</div>
 
 ---
 
