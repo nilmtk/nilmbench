@@ -188,6 +188,15 @@ section.title h1{
 .sig-panel ul{ margin:0; }
 .sig-panel li{ font-size:14.5px; margin:5px 0; padding-left:18px; line-height:1.3; }
 .sig-panel li::before{ width:5px; height:5px; top:7px; border-width:1.5px; }
+/* slide-3 spotlight build: dim future panels, lift the active one */
+.sig-panel{ opacity:.24; filter:grayscale(.5);
+  transition:opacity .35s ease, filter .35s ease, box-shadow .35s ease, transform .35s ease, border-top-width .35s ease; }
+.sig-panel.seen{ opacity:1; filter:none; }
+.sig-panel.on{ opacity:1; filter:none; border-top-width:4px; transform:translateY(-3px);
+  box-shadow:0 12px 28px -16px rgba(27,35,48,.45);
+  background:linear-gradient(180deg, rgba(27,35,48,.045), rgba(27,35,48,0) 58%); border-radius:0 0 8px 8px; }
+/* generic reveal utility: not-yet-spoken content fades back */
+.fade{ opacity:.16; transition:opacity .4s ease; }
 
 /* ---- evolution timeline ---- */
 section.evo-slide{ padding-bottom:48px; }
@@ -276,6 +285,33 @@ section.demo{ justify-content:center; }
 
 ---
 
+<!-- Slide 2 is a 2-step build: aggregate signal first, then the full
+     disaggregation. Edit both copies to keep them in sync. -->
+<div class="kick">Motivation</div>
+
+## NILM turns one meter into appliance-level estimates
+
+<div class="slide-body">
+
+<div class="vc decomp-layout">
+<div class="fig-col">
+<img class="fig-lg" src="figs/decomposition_agg.png" alt="UK-DALE disaggregation">
+</div>
+<div class="txt-col">
+<ul>
+<li><strong>One</strong> aggregate smart-meter signal — all that is measured at deployment</li>
+<li class="fade">Disaggregates into appliance-level power — no per-appliance sensors</li>
+<li class="fade">Feedback can cut household use by up to 15% (Froehlich &amp; Patel 2011; Darby 2006)</li>
+<li class="fade">Signatures vary across homes and devices</li>
+</ul>
+<p class="decomp-aside">Real data · UK-DALE house 1<br>time (x) vs power in W (y)</p>
+</div>
+</div>
+
+</div>
+
+---
+
 <div class="kick">Motivation</div>
 
 ## NILM turns one meter into appliance-level estimates
@@ -288,9 +324,9 @@ section.demo{ justify-content:center; }
 </div>
 <div class="txt-col">
 <ul>
+<li><strong>One</strong> aggregate smart-meter signal — all that is measured at deployment</li>
+<li>Disaggregates into appliance-level power — no per-appliance sensors</li>
 <li>Feedback can cut household use by up to 15% (Froehlich &amp; Patel 2011; Darby 2006)</li>
-<li>One aggregate signal decomposes into appliance-level power</li>
-<li>Energy feedback without per-appliance sensors</li>
 <li>Signatures vary across homes and devices</li>
 </ul>
 <p class="decomp-aside">Real data · UK-DALE house 1<br>time (x) vs power in W (y)</p>
@@ -301,6 +337,8 @@ section.demo{ justify-content:center; }
 
 ---
 
+<!-- Slide 3 is a 3-step build: spotlight fridge -> washer -> dishwasher.
+     Edit all three copies to keep them in sync. -->
 <div class="kick">Motivation</div>
 
 ## Appliance signatures differ by load type
@@ -308,7 +346,7 @@ section.demo{ justify-content:center; }
 <div class="slide-body">
 
 <div class="sig-grid">
-<div class="sig-panel">
+<div class="sig-panel on">
 <img src="figs/sig_fridge2.png" alt="">
 <div class="sig-label">Fridge · periodic</div>
 <ul>
@@ -327,6 +365,86 @@ section.demo{ justify-content:center; }
 </ul>
 </div>
 <div class="sig-panel">
+<img src="figs/sig_dishwasher2.png" alt="">
+<div class="sig-label">Dishwasher · sparse / bursty</div>
+<ul>
+<li>High-power heating bursts</li>
+<li>Long idle gaps</li>
+<li><strong>MAE-deceptive</strong> when mostly off</li>
+</ul>
+</div>
+</div>
+
+</div>
+
+---
+
+<div class="kick">Motivation</div>
+
+## Appliance signatures differ by load type
+
+<div class="slide-body">
+
+<div class="sig-grid">
+<div class="sig-panel seen">
+<img src="figs/sig_fridge2.png" alt="">
+<div class="sig-label">Fridge · periodic</div>
+<ul>
+<li>Compressor cycles ~80–120 W</li>
+<li><strong>Defrost spikes</strong> on longer horizon</li>
+<li>Always-on, easy to detect</li>
+</ul>
+</div>
+<div class="sig-panel on">
+<img src="figs/sig_washer2.png" alt="">
+<div class="sig-label">Washing machine · multi-stage</div>
+<ul>
+<li><strong>Heat → agitate → spin</strong></li>
+<li>Long, variable duration</li>
+<li>Many sub-states</li>
+</ul>
+</div>
+<div class="sig-panel">
+<img src="figs/sig_dishwasher2.png" alt="">
+<div class="sig-label">Dishwasher · sparse / bursty</div>
+<ul>
+<li>High-power heating bursts</li>
+<li>Long idle gaps</li>
+<li><strong>MAE-deceptive</strong> when mostly off</li>
+</ul>
+</div>
+</div>
+
+</div>
+
+---
+
+<div class="kick">Motivation</div>
+
+## Appliance signatures differ by load type
+
+<div class="slide-body">
+
+<div class="sig-grid">
+<div class="sig-panel seen">
+<img src="figs/sig_fridge2.png" alt="">
+<div class="sig-label">Fridge · periodic</div>
+<ul>
+<li>Compressor cycles ~80–120 W</li>
+<li><strong>Defrost spikes</strong> on longer horizon</li>
+<li>Always-on, easy to detect</li>
+</ul>
+</div>
+<div class="sig-panel seen">
+<img src="figs/sig_washer2.png" alt="">
+<div class="sig-label">Washing machine · multi-stage</div>
+<ul>
+<li><strong>Heat → agitate → spin</strong></li>
+<li>Long, variable duration</li>
+<li>Many sub-states</li>
+</ul>
+</div>
+<div class="sig-panel on">
 <img src="figs/sig_dishwasher2.png" alt="">
 <div class="sig-label">Dishwasher · sparse / bursty</div>
 <ul>

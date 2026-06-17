@@ -57,30 +57,48 @@ def arr(a, b, y):
 def seq2point():
     s=f'<svg width="780" height="300" viewBox="0 0 780 300" font-family="Work Sans,sans-serif"><defs>{ARROW}{SYMBOLS}</defs>'
     s+=f'<text x="390" y="22" text-anchor="middle" font-size="14" fill="{MUT}">aggregate <tspan fill="{INK}" font-weight="700">window</tspan> (L) &#8594; one <tspan fill="{INK}" font-weight="700">appliance</tspan> at the centre</text>'
-    s+=use("meter",14,118,30,INK)
-    s+=f'<rect x="54" y="100" width="86" height="86" rx="5" fill="#f6f7f9" stroke="{LINE}"/>'
-    s+='<polyline points="60,168 70,166 80,128 90,168 100,166 110,118 120,166 134,160" fill="none" stroke="'+INK+'" stroke-width="1.5"/>'
-    s+=f'<text x="97" y="202" text-anchor="middle" font-size="11.5" fill="{MUT}">L &#215; 1</text>'
-    for (bx,ch),bw,bh in zip([(175,"30"),(255,"40"),(340,"50")],[26,24,22],[96,84,72]):
+    # --- input: a window of the aggregate signal ---
+    s+=use("meter",6,130,26,INK)
+    ix,iy,iw,ih=44,98,100,92
+    s+=f'<rect x="{ix}" y="{iy}" width="{iw}" height="{ih}" rx="6" fill="#f6f7f9" stroke="{LINE}"/>'
+    wf="52,176 63,172 74,142 85,176 95,156 105,124 116,170 127,166 136,168"
+    s+=f'<polygon points="52,184 {wf} 136,184" fill="{NAVY}" opacity="0.07"/>'
+    s+=f'<polyline points="{wf}" fill="none" stroke="{INK}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>'
+    s+=f'<line x1="{ix+iw/2}" y1="103" x2="{ix+iw/2}" y2="184" stroke="{GRY}" stroke-width="1" stroke-dasharray="3 3" opacity="0.7"/>'
+    s+=f'<text x="{ix+iw/2}" y="208" text-anchor="middle" font-size="11.5" fill="{MUT}">L samples</text>'
+    # --- conv stack ---
+    for (bx,ch),bw,bh in zip([(178,"30"),(258,"40"),(340,"50")],[26,24,22],[96,84,72]):
         by=100+(96-bh)//2+10
         s+=block3d(bx,by,bw,bh,12,"url(#gC)",NAVY)
         s+=f'<text x="{bx+bw/2+6}" y="{by+bh+18}" text-anchor="middle" font-size="11" fill="{NAVY}">conv</text><text x="{bx+bw/2+6}" y="{by+bh+31}" text-anchor="middle" font-size="11" fill="{MUT}">{ch}</text>'
     s+=block3d(420,108,12,84,10,"url(#gD)",NAVY)+f'<text x="430" y="212" text-anchor="middle" font-size="11" fill="{MUT}">flatten</text>'
     s+=f'<rect x="470" y="120" width="48" height="60" rx="5" fill="url(#gD)" stroke="{NAVY}" stroke-width="1.1"/><text x="494" y="155" text-anchor="middle" font-size="11.5" fill="{NAVY}">dense</text>'
-    s+=f'<rect x="560" y="100" width="180" height="86" rx="5" fill="#f6f7f9" stroke="{LINE}"/><line x1="572" y1="170" x2="730" y2="170" stroke="{LINE}"/>'
-    s+=f'<circle cx="650" cy="126" r="6.5" fill="{ACC}"/><line x1="650" y1="132" x2="650" y2="170" stroke="{ACC}" stroke-width="1.2" stroke-dasharray="3 3"/>'
-    s+=use("fridge",486,86,26,BLUE)+f'<text x="650" y="204" text-anchor="middle" font-size="11.5" fill="{BLUE}">&#375;(centre)</text>'
-    for a,b in [(144,170),(372,416),(518,556)]: s+=arr(a,b,150)
+    # --- output: a single appliance value at the window centre ---
+    ox,oy,ow,oh=560,98,172,92
+    s+=f'<rect x="{ox}" y="{oy}" width="{ow}" height="{oh}" rx="6" fill="#f6f7f9" stroke="{LINE}"/>'
+    s+=use("fridge",ox+9,oy+9,21,BLUE)
+    owf="572,174 588,172 604,150 620,176 636,160 645,128 660,172 686,170 720,170"
+    s+=f'<polyline points="{owf}" fill="none" stroke="{GRY}" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" opacity="0.5"/>'
+    s+=f'<line x1="645" y1="106" x2="645" y2="126" stroke="{ACC}" stroke-width="1.1" stroke-dasharray="3 3"/>'
+    s+=f'<rect x="642" y="128" width="6" height="54" rx="2.5" fill="{ACC}"/>'
+    s+=f'<circle cx="645" cy="128" r="6.5" fill="{ACC}"/>'
+    s+=f'<text x="{ox+ow/2}" y="208" text-anchor="middle" font-size="11.5" fill="{BLUE}">&#375; · power at centre</text>'
+    for a,b in [(146,174),(376,416),(520,556)]: s+=arr(a,b,150)
     return s+"</svg>"
 
 # ---- Transformer encoder -----------------------------------------------------
 def transformer():
     s=f'<svg width="780" height="330" viewBox="0 0 780 330" font-family="Work Sans,sans-serif"><defs>{ARROW}{SYMBOLS}</defs>'
     s+=f'<text x="390" y="20" text-anchor="middle" font-size="14" fill="{MUT}">aggregate <tspan fill="{INK}" font-weight="700">sequence</tspan> &#8594; appliance <tspan fill="{INK}" font-weight="700">sequence</tspan></text>'
-    s+=use("meter",22,150,28,INK)
-    for i in range(6): s+=f'<rect x="{60+i*16}" y="152" width="12" height="24" rx="2.5" fill="#e7ecf3" stroke="{NAVY}" stroke-width="1.1"/>'
-    s+=f'<text x="108" y="196" text-anchor="middle" font-size="11" fill="{MUT}">tokens</text>'
-    s+=f'<circle cx="178" cy="164" r="9" fill="#fff" stroke="{NAVY}" stroke-width="1.3"/><text x="178" y="168" text-anchor="middle" font-size="13" fill="{NAVY}">+</text><text x="178" y="190" text-anchor="middle" font-size="10" fill="{MUT}">pos.</text>'
+    # --- input: aggregate signal sampled into a token sequence ---
+    s+=use("meter",20,150,28,INK)
+    in_h=[11,17,14,22,15,19]
+    for i,h in enumerate(in_h):
+        tx=58+i*16
+        s+=f'<rect x="{tx}" y="150" width="13" height="30" rx="3" fill="#eef2f8" stroke="{NAVY}" stroke-width="1.1"/>'
+        s+=f'<rect x="{tx+3.5}" y="{179-h}" width="6" height="{h}" rx="1.5" fill="{BLUE}"/>'
+    s+=f'<text x="108" y="198" text-anchor="middle" font-size="11" fill="{MUT}">aggregate</text>'
+    s+=f'<circle cx="178" cy="165" r="9" fill="#fff" stroke="{NAVY}" stroke-width="1.3"/><text x="178" y="169" text-anchor="middle" font-size="13" fill="{NAVY}">+</text><text x="178" y="192" text-anchor="middle" font-size="10" fill="{MUT}">pos.</text>'
     bx,by,bw,bh=230,58,330,210
     s+=f'<rect x="{bx}" y="{by}" width="{bw}" height="{bh}" rx="10" fill="none" stroke="{NAVY}" stroke-width="1.4" stroke-dasharray="5 4"/><text x="{bx+bw-8}" y="{by+18}" text-anchor="end" font-size="11.5" fill="{MUT}">encoder &#215; N</text>'
     def lyr(y,h,label,fill,tcol):
@@ -92,10 +110,15 @@ def transformer():
     s+=f'<path d="M{bx+22},150 C{bx+8},150 {bx+8},99 {bx+28},99" fill="none" stroke="{ACC}" stroke-width="1.4" marker-end="url(#ah)"/>'
     s+=f'<path d="M{bx+22},241 C{bx+8},241 {bx+8},197 {bx+28},197" fill="none" stroke="{ACC}" stroke-width="1.4" marker-end="url(#ah)"/>'
     s+=f'<text x="{bx+6}" y="175" font-size="10" fill="{ACC}" transform="rotate(-90 {bx+6} 175)">residual</text>'
+    # --- output: predicted appliance power sequence (an activation event) ---
     s+=use("fridge",600,150,26,BLUE)
-    for i in range(6): s+=f'<rect x="{636+i*16}" y="152" width="12" height="24" rx="2.5" fill="#fbeeec" stroke="{ACC}" stroke-width="1.1"/>'
-    s+=f'<text x="684" y="196" text-anchor="middle" font-size="11" fill="{BLUE}">appliance</text>'
-    s+=f'<line x1="190" y1="164" x2="226" y2="164" stroke="{GRY}" stroke-width="1.6" marker-end="url(#ah)"/><line x1="564" y1="164" x2="598" y2="164" stroke="{GRY}" stroke-width="1.6" marker-end="url(#ah)"/>'
+    out_h=[4,5,8,24,21,6]
+    for i,h in enumerate(out_h):
+        tx=636+i*16
+        s+=f'<rect x="{tx}" y="150" width="13" height="30" rx="3" fill="#fbeeec" stroke="{ACC}" stroke-width="1.1"/>'
+        s+=f'<rect x="{tx+3.5}" y="{179-h}" width="6" height="{h}" rx="1.5" fill="{ACC}"/>'
+    s+=f'<text x="684" y="198" text-anchor="middle" font-size="11" fill="{BLUE}">appliance</text>'
+    s+=f'<line x1="190" y1="165" x2="226" y2="165" stroke="{GRY}" stroke-width="1.6" marker-end="url(#ah)"/><line x1="564" y1="165" x2="598" y2="165" stroke="{GRY}" stroke-width="1.6" marker-end="url(#ah)"/>'
     return s+"</svg>"
 
 # ---- FHMM (graphical model) --------------------------------------------------

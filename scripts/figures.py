@@ -4,7 +4,8 @@ Generate the deck's data figures from REAL UK-DALE house 1 (streamed from CEDA,
 no full download) plus the Hart edge-detection and efficiency plots.
 
 Outputs (to slides/figs/):
-    decomposition.png      mains -> fridge / washer / dishwasher / kettle
+    decomposition.png      mains -> fridge / washer / dishwasher
+    decomposition_agg.png  same frame, appliances greyed (slide-2 build step 1)
     sig_fridge2.png        per-appliance signature (periodic)
     sig_washer2.png        per-appliance signature (multi-stage)
     sig_dishwasher2.png    per-appliance signature (high-power bursts)
@@ -76,26 +77,36 @@ def pick_day(df):
              g["dishwasher"].apply(lambda s: (s > 50).sum()))[ok]
     return str(score.sort_values(ascending=False).index[0])
 
-def decomposition(df, day):
-    d = df.loc[day]
-    series = [("mains","Aggregate mains",INK,"meter"),("fridge","Fridge",BLUE,"fridge"),
-              ("washer","Washing machine",ACC,"washer"),("dishwasher","Dishwasher",TEAL,"dishwasher")]
+def _decomp_fig(d, series, fname, dim_appliances=False):
+    """Render the 4-panel disaggregation figure. With dim_appliances=True the
+    three appliance panels are greyed (used as the 'aggregate-first' build step
+    on slide 2); the layout is identical so the two frames swap without jumping."""
+    FADE = "#c3c8d0"
     fig, axes = plt.subplots(4, 1, figsize=(11, 5.8), dpi=200, sharex=True,
                              gridspec_kw={"height_ratios": [2.2,1,1,1], "hspace": 0.34})
-    for ax,(c,name,col,ic) in zip(axes, series):
-        ax.fill_between(d.index, d[c], color=col, alpha=0.14, zorder=2)
-        ax.plot(d.index, d[c], color=col, lw=1.3, zorder=3)
+    for i,(ax,(c,name,col,ic)) in enumerate(zip(axes, series)):
+        faded = dim_appliances and i > 0
+        pcol = FADE if faded else col
+        ax.fill_between(d.index, d[c], color=pcol, alpha=0.07 if faded else 0.14, zorder=2)
+        ax.plot(d.index, d[c], color=pcol, lw=1.0 if faded else 1.3, zorder=3)
         img = _icon(ic)
         if img is not None:
-            ax.add_artist(AnnotationBbox(OffsetImage(img, zoom=0.05), (0.012, 0.84),
-                          xycoords="axes fraction", frameon=False, box_alignment=(0, 0.5)))
+            ax.add_artist(AnnotationBbox(OffsetImage(img, zoom=0.05, alpha=0.35 if faded else 1.0),
+                          (0.012, 0.84), xycoords="axes fraction", frameon=False, box_alignment=(0, 0.5)))
         ax.text(0.042 if img is not None else 0.012, 0.84, name, transform=ax.transAxes,
-                color=col, fontsize=12, fontweight="bold", va="center")
+                color=pcol, fontsize=12, fontweight="bold", va="center", alpha=0.55 if faded else 1.0)
         _style(ax); ax.set_ylim(0, max(d[c].max()*1.3, 30))
     axes[0].set_ylabel("power (W)", color=INK, fontsize=11)
     axes[-1].xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
     axes[-1].xaxis.set_major_locator(mdates.HourLocator(interval=3))
-    fig.savefig(os.path.join(FIGS, "decomposition.png"), bbox_inches="tight", facecolor="white"); plt.close(fig)
+    fig.savefig(os.path.join(FIGS, fname), bbox_inches="tight", facecolor="white"); plt.close(fig)
+
+def decomposition(df, day):
+    d = df.loc[day]
+    series = [("mains","Aggregate mains",INK,"meter"),("fridge","Fridge",BLUE,"fridge"),
+              ("washer","Washing machine",ACC,"washer"),("dishwasher","Dishwasher",TEAL,"dishwasher")]
+    _decomp_fig(d, series, "decomposition_agg.png", dim_appliances=True)   # build step 1: aggregate only
+    _decomp_fig(d, series, "decomposition.png",     dim_appliances=False)  # build step 2: full disaggregation
 
 def signature(df, col, color, icon, fname, win, desc, headroom=1.7, annotate=None):
     d = df.loc[win[0]:win[1], col]
