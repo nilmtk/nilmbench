@@ -194,8 +194,14 @@ section.evo-slide{ padding-bottom:48px; }
 section.evo-slide h2{ margin-bottom:14px; padding-bottom:10px; font-size:32px; }
 .evo-wrap{ display:flex; flex-direction:column; gap:10px; width:100%; flex:1; min-height:0; }
 .evo-stage{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px 18px; flex:1; min-height:0; }
-.evo-step{ border-top:3px solid var(--line); padding-top:8px; display:flex; flex-direction:column; min-height:0; overflow:hidden; }
-.evo-step.on{ border-top-color:var(--acc); }
+.evo-step{ border-top:3px solid var(--line); padding-top:8px; display:flex; flex-direction:column; min-height:0; overflow:hidden;
+  opacity:.24; filter:grayscale(.55); transition:opacity .35s ease, filter .35s ease, border-color .35s ease, box-shadow .35s ease, transform .35s ease; }
+.evo-step.seen{ opacity:1; filter:none; }
+.evo-step.on{ opacity:1; filter:none; border-top-color:var(--acc);
+  background:linear-gradient(180deg, rgba(196,69,54,.08), rgba(196,69,54,0) 62%);
+  box-shadow:0 10px 26px -16px rgba(27,35,48,.45); transform:translateY(-2px); border-radius:0 0 8px 8px; }
+.evo-step.on .era{ color:var(--acc); }
+.evo-step.on .name{ color:var(--acc); }
 .evo-step .era{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--mut); margin-bottom:2px; }
 .evo-step .name{ font-weight:700; font-size:16px; color:var(--ink); margin-bottom:4px; line-height:1.2; }
 .evo-step .fig-box{ flex:1; min-height:0; display:flex; align-items:center; justify-content:center; overflow:hidden; margin-bottom:4px; }
@@ -203,7 +209,8 @@ section.evo-slide h2{ margin-bottom:14px; padding-bottom:10px; font-size:32px; }
 .evo-step ul{ margin:0; }
 .evo-step li{ font-size:13.5px; margin:3px 0; padding-left:16px; line-height:1.25; }
 .evo-step li::before{ width:4px; height:4px; top:6px; }
-.evo-callout{ margin-top:8px; font-size:16px; padding:12px 16px; flex-shrink:0; }
+.evo-callout{ margin-top:8px; font-size:16px; padding:12px 16px; flex-shrink:0; opacity:.22; transition:opacity .4s ease; }
+.evo-callout.on{ opacity:1; }
 
 /* ---- task cards ---- */
 .task-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; width:100%; }
@@ -334,6 +341,10 @@ section.demo{ justify-content:center; }
 
 ---
 
+<!-- Slide 4 is a 4-step build: the spotlight moves across the four eras
+     (Combinatorial → Probabilistic → Deep learning → Transformers) as you
+     speak. Edit the era text in ALL FOUR copies below to keep them in sync. -->
+
 <!-- _class: evo-slide -->
 
 <div class="kick">Background</div>
@@ -371,6 +382,138 @@ section.demo{ justify-content:center; }
 </div>
 
 <div class="callout evo-callout"><strong>Models changed — evaluation did not.</strong> Same-home accuracy became the default; cross-building and cross-dataset tests lagged behind.</div>
+
+</div>
+
+</div>
+
+---
+
+<!-- _class: evo-slide -->
+
+<div class="kick">Background</div>
+
+## NILM methods evolved, but evaluation did not
+
+<div class="slide-body tight">
+
+<div class="evo-wrap">
+<div class="evo-stage">
+<div class="evo-step seen">
+<div class="era">1980s–90s</div>
+<div class="name">Combinatorial</div>
+<div class="fig-box"><img src="figs/hart_edge.png" alt=""></div>
+<ul><li>Edge matching</li><li>Breaks on variable loads</li></ul>
+</div>
+<div class="evo-step on">
+<div class="era">2000s</div>
+<div class="name">Probabilistic</div>
+<div class="fig-box"><img src="figs/fhmm.png" alt=""></div>
+<ul><li>Hidden appliance states</li><li>Poor scaling</li></ul>
+</div>
+<div class="evo-step">
+<div class="era">2015+</div>
+<div class="name">Deep learning</div>
+<div class="fig-box"><img src="figs/seq2point.png" alt=""></div>
+<ul><li>Seq2Point CNNs</li><li>Strong same-home fit</li></ul>
+</div>
+<div class="evo-step">
+<div class="era">2020+</div>
+<div class="name">Transformers</div>
+<div class="fig-box"><img src="figs/transformer.png" alt=""></div>
+<ul><li>Long-range context</li><li>Higher compute</li></ul>
+</div>
+</div>
+
+<div class="callout evo-callout"><strong>Models changed — evaluation did not.</strong> Same-home accuracy became the default; cross-building and cross-dataset tests lagged behind.</div>
+
+</div>
+
+</div>
+
+---
+
+<!-- _class: evo-slide -->
+
+<div class="kick">Background</div>
+
+## NILM methods evolved, but evaluation did not
+
+<div class="slide-body tight">
+
+<div class="evo-wrap">
+<div class="evo-stage">
+<div class="evo-step seen">
+<div class="era">1980s–90s</div>
+<div class="name">Combinatorial</div>
+<div class="fig-box"><img src="figs/hart_edge.png" alt=""></div>
+<ul><li>Edge matching</li><li>Breaks on variable loads</li></ul>
+</div>
+<div class="evo-step seen">
+<div class="era">2000s</div>
+<div class="name">Probabilistic</div>
+<div class="fig-box"><img src="figs/fhmm.png" alt=""></div>
+<ul><li>Hidden appliance states</li><li>Poor scaling</li></ul>
+</div>
+<div class="evo-step on">
+<div class="era">2015+</div>
+<div class="name">Deep learning</div>
+<div class="fig-box"><img src="figs/seq2point.png" alt=""></div>
+<ul><li>Seq2Point CNNs</li><li>Strong same-home fit</li></ul>
+</div>
+<div class="evo-step">
+<div class="era">2020+</div>
+<div class="name">Transformers</div>
+<div class="fig-box"><img src="figs/transformer.png" alt=""></div>
+<ul><li>Long-range context</li><li>Higher compute</li></ul>
+</div>
+</div>
+
+<div class="callout evo-callout"><strong>Models changed — evaluation did not.</strong> Same-home accuracy became the default; cross-building and cross-dataset tests lagged behind.</div>
+
+</div>
+
+</div>
+
+---
+
+<!-- _class: evo-slide -->
+
+<div class="kick">Background</div>
+
+## NILM methods evolved, but evaluation did not
+
+<div class="slide-body tight">
+
+<div class="evo-wrap">
+<div class="evo-stage">
+<div class="evo-step seen">
+<div class="era">1980s–90s</div>
+<div class="name">Combinatorial</div>
+<div class="fig-box"><img src="figs/hart_edge.png" alt=""></div>
+<ul><li>Edge matching</li><li>Breaks on variable loads</li></ul>
+</div>
+<div class="evo-step seen">
+<div class="era">2000s</div>
+<div class="name">Probabilistic</div>
+<div class="fig-box"><img src="figs/fhmm.png" alt=""></div>
+<ul><li>Hidden appliance states</li><li>Poor scaling</li></ul>
+</div>
+<div class="evo-step seen">
+<div class="era">2015+</div>
+<div class="name">Deep learning</div>
+<div class="fig-box"><img src="figs/seq2point.png" alt=""></div>
+<ul><li>Seq2Point CNNs</li><li>Strong same-home fit</li></ul>
+</div>
+<div class="evo-step on">
+<div class="era">2020+</div>
+<div class="name">Transformers</div>
+<div class="fig-box"><img src="figs/transformer.png" alt=""></div>
+<ul><li>Long-range context</li><li>Higher compute</li></ul>
+</div>
+</div>
+
+<div class="callout evo-callout on"><strong>Models changed — evaluation did not.</strong> Same-home accuracy became the default; cross-building and cross-dataset tests lagged behind.</div>
 
 </div>
 
