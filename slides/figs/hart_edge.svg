@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1622 717" width="1622" height="717">
+<defs>
+  <style>
+    .font{font-family:'Work Sans',Arial,sans-serif}
+    .title{font-size:32px;fill:#5a626e}
+    .axis{stroke:#c9cfd7;stroke-width:2}
+    .grid{stroke:#e9edf2;stroke-width:2}
+    .tick{font-size:26px;fill:#5a626e}
+    .label{font-size:34px;fill:#1b2330}
+    .line{fill:none;stroke:#1b2330;stroke-width:4;stroke-linejoin:round;stroke-linecap:round}
+    .noise{fill:none;stroke:#1b2330;stroke-width:2;opacity:.85}
+    .blue{fill:#3569a8;font-size:28px;font-weight:700}
+    .red{fill:#c44536;font-size:28px;font-weight:700}
+    .teal{fill:#2a9d8f;font-size:28px;font-weight:700}
+  </style>
+</defs>
+
+<rect width="1622" height="717" fill="#ffffff"/>
+<g class="font">
+  <text x="811" y="42" text-anchor="middle" class="title">detect ON/OFF edges (ΔP), then attribute each step to an appliance</text>
+
+  <g>
+    <line x1="212" y1="70" x2="212" y2="609" class="grid"/>
+    <line x1="477" y1="70" x2="477" y2="609" class="grid"/>
+    <line x1="742" y1="70" x2="742" y2="609" class="grid"/>
+    <line x1="1007" y1="70" x2="1007" y2="609" class="grid"/>
+    <line x1="1272" y1="70" x2="1272" y2="609" class="grid"/>
+    <line x1="1538" y1="70" x2="1538" y2="609" class="grid"/>
+
+    <line x1="145" y1="578" x2="1604" y2="578" class="grid"/>
+    <line x1="145" y1="474" x2="1604" y2="474" class="grid"/>
+    <line x1="145" y1="371" x2="1604" y2="371" class="grid"/>
+    <line x1="145" y1="267" x2="1604" y2="267" class="grid"/>
+    <line x1="145" y1="163" x2="1604" y2="163" class="grid"/>
+
+    <line x1="145" y1="70" x2="145" y2="609" class="axis"/>
+    <line x1="145" y1="609" x2="1604" y2="609" class="axis"/>
+
+    <text x="212" y="649" text-anchor="middle" class="tick">0</text>
+    <text x="477" y="649" text-anchor="middle" class="tick">20</text>
+    <text x="742" y="649" text-anchor="middle" class="tick">40</text>
+    <text x="1007" y="649" text-anchor="middle" class="tick">60</text>
+    <text x="1272" y="649" text-anchor="middle" class="tick">80</text>
+    <text x="1538" y="649" text-anchor="middle" class="tick">100</text>
+
+    <text x="124" y="587" text-anchor="end" class="tick">0</text>
+    <text x="124" y="483" text-anchor="end" class="tick">500</text>
+    <text x="124" y="380" text-anchor="end" class="tick">1000</text>
+    <text x="124" y="276" text-anchor="end" class="tick">1500</text>
+    <text x="124" y="172" text-anchor="end" class="tick">2000</text>
+
+    <text x="811" y="690" text-anchor="middle" class="label">time</text>
+    <text x="42" y="340" text-anchor="middle" transform="rotate(-90 42 340)" class="label">aggregate power (W)</text>
+  </g>
+
+  <polyline class="line" points="
+    212,565 365,565 370,540 662,540 663,565 769,565 770,172 835,172 836,565
+    979,565 980,358 1086,358 1087,565 1192,565 1193,540 1484,540 1485,565 1538,565"/>
+  <path class="noise" d="M215,565 C245,568 280,566 318,566 C342,566 356,565 366,565"/>
+  <path class="noise" d="M374,540 C436,539 505,541 575,540 C612,540 640,540 660,541"/>
+  <path class="noise" d="M772,172 C790,170 816,172 835,172"/>
+  <path class="noise" d="M984,358 C1014,356 1058,358 1085,358"/>
+  <path class="noise" d="M1198,540 C1270,539 1370,541 1480,540"/>
+
+  <line x1="371" y1="566" x2="371" y2="548" stroke="#3569a8" stroke-width="4" stroke-linecap="round"/>
+  <path d="M362,557 L371,548 L380,557" fill="none" stroke="#3569a8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="389" y="560" class="blue">+120 W</text>
+
+  <line x1="768" y1="565" x2="768" y2="185" stroke="#c44536" stroke-width="4" stroke-linecap="round"/>
+  <path d="M759,194 L768,185 L777,194" fill="none" stroke="#c44536" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="785" y="376" class="red">+1900 W</text>
+
+  <line x1="980" y1="565" x2="980" y2="372" stroke="#2a9d8f" stroke-width="4" stroke-linecap="round"/>
+  <path d="M971,381 L980,372 L989,381" fill="none" stroke="#2a9d8f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="998" y="470" class="teal">+1000 W</text>
+</g>
+</svg>

@@ -103,6 +103,11 @@ section.bench-slide h4{ font-size:11px; margin-bottom:8px; letter-spacing:0.14em
 .outlook-slide h2{ font-size:32px; }
 .outlook-slide h4{ font-size:14px; margin-bottom:14px; }
 .outlook-slide li{ font-size:22px; margin:12px 0; }
+.outlook-grid{ display:grid; grid-template-columns:0.43fr 0.57fr; gap:26px; align-items:start; width:100%; flex:1; min-height:0; }
+.outlook-copy{ display:grid; grid-template-columns:1fr; gap:18px; align-content:start; }
+.outlook-grid h4{ font-size:13px; margin-bottom:10px; }
+.outlook-grid li{ font-size:18px; margin:8px 0; line-height:1.32; }
+.outlook-leaderboard{ width:100%; border:1px solid var(--line); border-radius:8px; box-shadow:0 16px 34px -26px rgba(27,35,48,.45); }
 .outlook-link{ margin-top:16px; font-size:18px; color:var(--ink2); text-align:center; }
 .outlook-link a{ font-weight:600; }
 .outlook-qr{ text-align:center; margin-top:10px; }
@@ -521,25 +526,25 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 <div class="evo-step on">
 <div class="era">1980s–90s</div>
 <div class="name">Combinatorial</div>
-<div class="fig-box"><img src="figs/hart_edge.png" alt=""></div>
+<div class="fig-box"><img src="figs/hart_edge.svg" alt=""></div>
 <ul><li>Edge matching</li><li>Breaks on variable loads</li></ul>
 </div>
 <div class="evo-step">
 <div class="era">2000s</div>
 <div class="name">Probabilistic</div>
-<div class="fig-box"><img src="figs/fhmm.png" alt=""></div>
+<div class="fig-box"><img src="figs/fhmm.svg" alt=""></div>
 <ul><li>Hidden appliance states</li><li>Poor scaling</li></ul>
 </div>
 <div class="evo-step">
 <div class="era">2015+</div>
 <div class="name">Deep learning</div>
-<div class="fig-box"><img src="figs/seq2point.png" alt=""></div>
+<div class="fig-box"><img src="figs/seq2point.svg" alt=""></div>
 <ul><li>Seq2Point CNNs</li><li>Strong same-home fit</li></ul>
 </div>
 <div class="evo-step">
 <div class="era">2020+</div>
 <div class="name">Transformers</div>
-<div class="fig-box"><img src="figs/transformer.png" alt=""></div>
+<div class="fig-box"><img src="figs/transformer.svg" alt=""></div>
 <ul><li>Long-range context</li><li>Higher compute</li></ul>
 </div>
 </div>
@@ -565,25 +570,25 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 <div class="evo-step seen">
 <div class="era">1980s–90s</div>
 <div class="name">Combinatorial</div>
-<div class="fig-box"><img src="figs/hart_edge.png" alt=""></div>
+<div class="fig-box"><img src="figs/hart_edge.svg" alt=""></div>
 <ul><li>Edge matching</li><li>Breaks on variable loads</li></ul>
 </div>
 <div class="evo-step on">
 <div class="era">2000s</div>
 <div class="name">Probabilistic</div>
-<div class="fig-box"><img src="figs/fhmm.png" alt=""></div>
+<div class="fig-box"><img src="figs/fhmm.svg" alt=""></div>
 <ul><li>Hidden appliance states</li><li>Poor scaling</li></ul>
 </div>
 <div class="evo-step">
 <div class="era">2015+</div>
 <div class="name">Deep learning</div>
-<div class="fig-box"><img src="figs/seq2point.png" alt=""></div>
+<div class="fig-box"><img src="figs/seq2point.svg" alt=""></div>
 <ul><li>Seq2Point CNNs</li><li>Strong same-home fit</li></ul>
 </div>
 <div class="evo-step">
 <div class="era">2020+</div>
 <div class="name">Transformers</div>
-<div class="fig-box"><img src="figs/transformer.png" alt=""></div>
+<div class="fig-box"><img src="figs/transformer.svg" alt=""></div>
 <ul><li>Long-range context</li><li>Higher compute</li></ul>
 </div>
 </div>
@@ -609,25 +614,25 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 <div class="evo-step seen">
 <div class="era">1980s–90s</div>
 <div class="name">Combinatorial</div>
-<div class="fig-box"><img src="figs/hart_edge.png" alt=""></div>
+<div class="fig-box"><img src="figs/hart_edge.svg" alt=""></div>
 <ul><li>Edge matching</li><li>Breaks on variable loads</li></ul>
 </div>
 <div class="evo-step seen">
 <div class="era">2000s</div>
 <div class="name">Probabilistic</div>
-<div class="fig-box"><img src="figs/fhmm.png" alt=""></div>
+<div class="fig-box"><img src="figs/fhmm.svg" alt=""></div>
 <ul><li>Hidden appliance states</li><li>Poor scaling</li></ul>
 </div>
 <div class="evo-step on">
 <div class="era">2015+</div>
 <div class="name">Deep learning</div>
-<div class="fig-box"><img src="figs/seq2point.png" alt=""></div>
+<div class="fig-box"><img src="figs/seq2point.svg" alt=""></div>
 <ul><li>Seq2Point CNNs</li><li>Strong same-home fit</li></ul>
 </div>
 <div class="evo-step">
 <div class="era">2020+</div>
 <div class="name">Transformers</div>
-<div class="fig-box"><img src="figs/transformer.png" alt=""></div>
+<div class="fig-box"><img src="figs/transformer.svg" alt=""></div>
 <ul><li>Long-range context</li><li>Higher compute</li></ul>
 </div>
 </div>
@@ -653,25 +658,25 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 <div class="evo-step seen">
 <div class="era">1980s–90s</div>
 <div class="name">Combinatorial</div>
-<div class="fig-box"><img src="figs/hart_edge.png" alt=""></div>
+<div class="fig-box"><img src="figs/hart_edge.svg" alt=""></div>
 <ul><li>Edge matching</li><li>Breaks on variable loads</li></ul>
 </div>
 <div class="evo-step seen">
 <div class="era">2000s</div>
 <div class="name">Probabilistic</div>
-<div class="fig-box"><img src="figs/fhmm.png" alt=""></div>
+<div class="fig-box"><img src="figs/fhmm.svg" alt=""></div>
 <ul><li>Hidden appliance states</li><li>Poor scaling</li></ul>
 </div>
 <div class="evo-step seen">
 <div class="era">2015+</div>
 <div class="name">Deep learning</div>
-<div class="fig-box"><img src="figs/seq2point.png" alt=""></div>
+<div class="fig-box"><img src="figs/seq2point.svg" alt=""></div>
 <ul><li>Seq2Point CNNs</li><li>Strong same-home fit</li></ul>
 </div>
 <div class="evo-step on">
 <div class="era">2020+</div>
 <div class="name">Transformers</div>
-<div class="fig-box"><img src="figs/transformer.png" alt=""></div>
+<div class="fig-box"><img src="figs/transformer.svg" alt=""></div>
 <ul><li>Long-range context</li><li>Higher compute</li></ul>
 </div>
 </div>
@@ -1170,8 +1175,9 @@ class PatchTSTDisaggregator(Disaggregator):
 
 <div class="slide-body outlook-slide">
 
-<div class="cols" style="align-items:flex-start">
-<div class="col">
+<div class="outlook-grid">
+<div class="outlook-copy">
+<div>
 
 <h4>What we learned</h4>
 <ul>
@@ -1181,7 +1187,7 @@ class PatchTSTDisaggregator(Disaggregator):
 </ul>
 
 </div>
-<div class="col">
+<div>
 
 <h4>Proposed future directions</h4>
 <ul>
@@ -1191,6 +1197,10 @@ class PatchTSTDisaggregator(Disaggregator):
 <li>Domain adaptation for new homes</li>
 </ul>
 
+</div>
+</div>
+<div>
+<img class="outlook-leaderboard" src="figs/leaderboard_ood.svg" alt="OOD-first NILM leaderboard concept">
 </div>
 </div>
 
