@@ -290,6 +290,13 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 .design-goal .goal-title{ font-weight:700; font-size:19px; color:var(--ink); line-height:1.25; margin:0; }
 .design-goal .goal-block h4{ margin-bottom:4px; }
 .design-goal li{ font-size:16.5px; margin:5px 0; line-height:1.35; }
+/* goals 2/3 spotlight build: dim the inactive goal, lift the active one */
+.design-goal{ opacity:.24; filter:grayscale(.45);
+  transition:opacity .35s ease, filter .35s ease, box-shadow .35s ease, transform .35s ease, border-top-width .35s ease; }
+.design-goal.seen{ opacity:1; filter:none; }
+.design-goal.on{ opacity:1; filter:none; border-top-width:4px; transform:translateY(-3px);
+  box-shadow:0 12px 28px -16px rgba(27,35,48,.45);
+  background:linear-gradient(180deg, rgba(196,69,54,.07), rgba(196,69,54,0) 58%); border-radius:0 0 8px 8px; }
 </style>
 
 <!-- _class: title -->
@@ -724,6 +731,8 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 
 ---
 
+<!-- Goals 2/3 is a 2-step build: spotlight relevance, then coverage.
+     Edit both copies to keep them in sync. -->
 <!-- _class: design-slide -->
 
 <div class="kick">The benchmark · design</div>
@@ -768,7 +777,7 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 <div class="slide-body">
 
 <div class="design-duo">
-<div class="design-goal">
+<div class="design-goal on">
 <p class="goal-title">2 · Real-world relevance</p>
 <div class="goal-block">
 <h4>Motivation</h4>
@@ -787,6 +796,57 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 </div>
 </div>
 <div class="design-goal">
+<p class="goal-title">3 · Comprehensive coverage</p>
+<div class="goal-block">
+<h4>Motivation</h4>
+<ul>
+<li>Prior work: few models, <strong>accuracy only</strong></li>
+<li>Deployment needs efficiency &amp; event detection too</li>
+</ul>
+</div>
+<div class="goal-block">
+<h4>What we do</h4>
+<ul>
+<li><strong>16 models</strong> · recurrent, conv, attention, hybrid</li>
+<li><strong>MAE</strong>, <strong>F1</strong>, <strong>parameters</strong>, <strong>FLOPs</strong> — one protocol</li>
+<li>First to combine multi-resolution, efficiency &amp; transfer</li>
+</ul>
+</div>
+</div>
+</div>
+
+</div>
+
+---
+
+<!-- _class: design-slide -->
+
+<div class="kick">The benchmark · design</div>
+
+## Design goals 2 &amp; 3 — What we evaluate
+
+<div class="slide-body">
+
+<div class="design-duo">
+<div class="design-goal seen">
+<p class="goal-title">2 · Real-world relevance</p>
+<div class="goal-block">
+<h4>Motivation</h4>
+<ul>
+<li>NILM at <strong>user-feedback</strong> and <strong>utility-scale</strong> timescales</li>
+<li>Deployment = new homes, regions, grid conditions</li>
+</ul>
+</div>
+<div class="goal-block">
+<h4>What we do</h4>
+<ul>
+<li><strong>1-min</strong> &amp; <strong>15-min</strong> on REDD, UK-DALE, REFIT</li>
+<li>Sealed <strong>cross-building</strong> &amp; <strong>cross-dataset</strong> splits</li>
+<li>Regression <strong>MAE</strong> + event <strong>F1</strong> for sparse loads</li>
+</ul>
+</div>
+</div>
+<div class="design-goal on">
 <p class="goal-title">3 · Comprehensive coverage</p>
 <div class="goal-block">
 <h4>Motivation</h4>
@@ -831,7 +891,7 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 
 <div class="task-row">
 <div class="task-card on">
-<img src="figs/task_t1.png" alt="">
+<img src="figs/task_t1.svg" alt="">
 <div class="tt">T1 · Same building</div>
 <div class="meta">
 <div><span class="tl">Setup</span>Disjoint time windows, one home</div>
@@ -840,7 +900,7 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 </div>
 </div>
 <div class="task-card">
-<img src="figs/task_t2.png" alt="">
+<img src="figs/task_t2.svg" alt="">
 <div class="tt">T2 · New building</div>
 <div class="meta">
 <div><span class="tl">Setup</span>Train on homes, test on unseen home</div>
@@ -849,7 +909,7 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 </div>
 </div>
 <div class="task-card">
-<img src="figs/task_t3.png" alt="">
+<img src="figs/task_t3.svg" alt="">
 <div class="tt">T3 · New dataset</div>
 <div class="meta">
 <div><span class="tl">Setup</span>Train in one country, test in another</div>
@@ -871,7 +931,7 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 
 <div class="task-row">
 <div class="task-card seen">
-<img src="figs/task_t1.png" alt="">
+<img src="figs/task_t1.svg" alt="">
 <div class="tt">T1 · Same building</div>
 <div class="meta">
 <div><span class="tl">Setup</span>Disjoint time windows, one home</div>
@@ -880,7 +940,7 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 </div>
 </div>
 <div class="task-card on">
-<img src="figs/task_t2.png" alt="">
+<img src="figs/task_t2.svg" alt="">
 <div class="tt">T2 · New building</div>
 <div class="meta">
 <div><span class="tl">Setup</span>Train on homes, test on unseen home</div>
@@ -889,7 +949,7 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 </div>
 </div>
 <div class="task-card">
-<img src="figs/task_t3.png" alt="">
+<img src="figs/task_t3.svg" alt="">
 <div class="tt">T3 · New dataset</div>
 <div class="meta">
 <div><span class="tl">Setup</span>Train in one country, test in another</div>
@@ -911,7 +971,7 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 
 <div class="task-row">
 <div class="task-card seen">
-<img src="figs/task_t1.png" alt="">
+<img src="figs/task_t1.svg" alt="">
 <div class="tt">T1 · Same building</div>
 <div class="meta">
 <div><span class="tl">Setup</span>Disjoint time windows, one home</div>
@@ -920,7 +980,7 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 </div>
 </div>
 <div class="task-card seen">
-<img src="figs/task_t2.png" alt="">
+<img src="figs/task_t2.svg" alt="">
 <div class="tt">T2 · New building</div>
 <div class="meta">
 <div><span class="tl">Setup</span>Train on homes, test on unseen home</div>
@@ -929,7 +989,7 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 </div>
 </div>
 <div class="task-card on">
-<img src="figs/task_t3.png" alt="">
+<img src="figs/task_t3.svg" alt="">
 <div class="tt">T3 · New dataset</div>
 <div class="meta">
 <div><span class="tl">Setup</span>Train in one country, test in another</div>

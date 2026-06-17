@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 118" width="600" height="236">
+<text x="150" y="12" text-anchor="middle" font-family="Work Sans,Arial,sans-serif" font-size="10.5" fill="#6a7280">same dataset &amp; country · unseen home</text>
+
+<g transform="translate(34,20)">
+<rect width="20" height="13" fill="#012169"/>
+<path d="M0,0 L20,13 M20,0 L0,13" stroke="#fff" stroke-width="2.6"/>
+<path d="M0,0 L20,13 M20,0 L0,13" stroke="#C8102E" stroke-width="1.1"/>
+<path d="M10,0 V13 M0,6.5 H20" stroke="#fff" stroke-width="3.4"/>
+<path d="M10,0 V13 M0,6.5 H20" stroke="#C8102E" stroke-width="1.9"/>
+</g>
+
+<g transform="translate(22,40) scale(1.1)" fill="none" stroke="#2a3340" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round">
+<path d="M4,13 V27 H24 V13 Z" fill="rgba(20,28,40,0.05)" stroke="none"/>
+<path d="M2,13 L14,3 L26,13 M4,13 V27 H24 V13 M11,27 V20 H17 V27"/>
+</g>
+<g transform="translate(56,40) scale(1.1)" fill="none" stroke="#2a3340" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round">
+<path d="M4,13 V27 H24 V13 Z" fill="rgba(20,28,40,0.05)" stroke="none"/>
+<path d="M2,13 L14,3 L26,13 M4,13 V27 H24 V13 M11,27 V20 H17 V27"/>
+</g>
+<text x="46" y="104" text-anchor="middle" font-family="Work Sans,Arial,sans-serif" font-size="10.5" font-weight="700" fill="#1b3b6f">TRAIN · B1, B2</text>
+
+<path d="M100,60 H162" fill="none" stroke="#8b929c" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M156,55 L162,60 L156,65" fill="none" stroke="#8b929c" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="131" y="52" text-anchor="middle" font-family="Work Sans,Arial,sans-serif" font-size="10.5" fill="#6a7280">generalize</text>
+
+<g transform="translate(196,20)">
+<rect width="20" height="13" fill="#012169"/>
+<path d="M0,0 L20,13 M20,0 L0,13" stroke="#fff" stroke-width="2.6"/>
+<path d="M0,0 L20,13 M20,0 L0,13" stroke="#C8102E" stroke-width="1.1"/>
+<path d="M10,0 V13 M0,6.5 H20" stroke="#fff" stroke-width="3.4"/>
+<path d="M10,0 V13 M0,6.5 H20" stroke="#C8102E" stroke-width="1.9"/>
+</g>
+<g transform="translate(188,38) scale(1.45)" fill="none" stroke="#c44536" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="3 3">
+<path d="M2,13 L14,3 L26,13 M4,13 V27 H24 V13 M11,27 V20 H17 V27"/>
+</g>
+<circle cx="228" cy="44" r="9" fill="#c44536"/>
+<text x="228" y="48" text-anchor="middle" font-family="Work Sans,Arial,sans-serif" font-size="11" font-weight="800" fill="#fff">?</text>
+<text x="214" y="104" text-anchor="middle" font-family="Work Sans,Arial,sans-serif" font-size="10.5" font-weight="700" fill="#c44536">TEST · B4</text>
+</svg>

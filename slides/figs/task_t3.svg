@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 118" width="600" height="236">
+<text x="150" y="12" text-anchor="middle" font-family="Work Sans,Arial,sans-serif" font-size="10.5" fill="#6a7280">different countries &amp; grids</text>
+
+<g transform="translate(44,20)">
+<rect width="20" height="13" fill="#b22234"/>
+<rect y="1.85" width="20" height="1.85" fill="#fff"/>
+<rect y="5.55" width="20" height="1.85" fill="#fff"/>
+<rect y="9.25" width="20" height="1.85" fill="#fff"/>
+<rect width="9" height="7" fill="#3c3b6e"/>
+<g fill="#fff">
+<circle cx="2" cy="1.6" r="0.5"/><circle cx="4.5" cy="1.6" r="0.5"/><circle cx="7" cy="1.6" r="0.5"/>
+<circle cx="3.25" cy="3.5" r="0.5"/><circle cx="5.75" cy="3.5" r="0.5"/>
+<circle cx="2" cy="5.4" r="0.5"/><circle cx="4.5" cy="5.4" r="0.5"/><circle cx="7" cy="5.4" r="0.5"/>
+</g>
+</g>
+
+<g transform="translate(24,40) scale(1.05)" fill="none" stroke="#2a3340" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round">
+<path d="M4,13 V27 H24 V13 Z" fill="rgba(20,28,40,0.05)" stroke="none"/>
+<path d="M2,13 L14,3 L26,13 M4,13 V27 H24 V13 M11,27 V20 H17 V27"/>
+</g>
+<g transform="translate(58,40) scale(1.05)" fill="none" stroke="#2a3340" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round">
+<path d="M4,13 V27 H24 V13 Z" fill="rgba(20,28,40,0.05)" stroke="none"/>
+<path d="M2,13 L14,3 L26,13 M4,13 V27 H24 V13 M11,27 V20 H17 V27"/>
+</g>
+<text x="54" y="104" text-anchor="middle" font-family="Work Sans,Arial,sans-serif" font-size="10.5" font-weight="700" fill="#1b3b6f">REDD · USA · 110V</text>
+
+<line x1="150" y1="30" x2="150" y2="94" stroke="#c9ccd3" stroke-width="1.3" stroke-dasharray="3 4"/>
+
+<g transform="translate(226,20)">
+<rect width="20" height="13" fill="#012169"/>
+<path d="M0,0 L20,13 M20,0 L0,13" stroke="#fff" stroke-width="2.6"/>
+<path d="M0,0 L20,13 M20,0 L0,13" stroke="#C8102E" stroke-width="1.1"/>
+<path d="M10,0 V13 M0,6.5 H20" stroke="#fff" stroke-width="3.4"/>
+<path d="M10,0 V13 M0,6.5 H20" stroke="#C8102E" stroke-width="1.9"/>
+</g>
+<g transform="translate(206,40) scale(1.05)" fill="none" stroke="#c44536" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="3 3">
+<path d="M2,13 L14,3 L26,13 M4,13 V27 H24 V13 M11,27 V20 H17 V27"/>
+</g>
+<g transform="translate(240,40) scale(1.05)" fill="none" stroke="#c44536" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="3 3">
+<path d="M2,13 L14,3 L26,13 M4,13 V27 H24 V13 M11,27 V20 H17 V27"/>
+</g>
+<text x="244" y="104" text-anchor="middle" font-family="Work Sans,Arial,sans-serif" font-size="10.5" font-weight="700" fill="#c44536">REFIT · UK · 230V</text>
+
+<path d="M112,62 H188" fill="none" stroke="#8b929c" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M118,57 L112,62 L118,67" fill="none" stroke="#8b929c" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M182,57 L188,62 L182,67" fill="none" stroke="#8b929c" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="150" y="54" text-anchor="middle" font-family="Work Sans,Arial,sans-serif" font-size="10.5" fill="#6a7280">zero-shot</text>
+</svg>

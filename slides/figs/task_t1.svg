@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 118" width="600" height="236">
+<style>
+text{font-family:'Work Sans',Arial,sans-serif}
+.hg{fill:none;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round;stroke:#2a3340}
+.hg .fillbody{fill:rgba(20,28,40,0.05);stroke:none}
+.lab{font-size:10.5px;fill:#6a7280}
+.sub{font-size:10.5px;font-weight:700}
+.dash{stroke:#c9ccd3;stroke-width:1.3;stroke-dasharray:3 4}
+</style>
+<text x="150" y="13" text-anchor="middle" class="lab">Building 1 · same home</text>
+<g class="hg" transform="translate(136,18) scale(1.2)">
+<path class="fillbody" d="M4,13 V27 H24 V13 Z"/>
+<path d="M2,13 L14,3 L26,13 M4,13 V27 H24 V13 M11,27 V20 H17 V27"/>
+</g>
+<line x1="150" y1="54" x2="150" y2="66" class="dash"/>
+<rect x="30" y="68" width="240" height="16" rx="8" fill="#f3f4f6" stroke="#d8dbe0"/>
+<rect x="34" y="71" width="158" height="10" rx="5" fill="#1b3b6f"/>
+<rect x="220" y="71" width="46" height="10" rx="5" fill="#c44536"/>
+<line x1="206" y1="66" x2="206" y2="86" class="dash"/>
+<text x="113" y="103" text-anchor="middle" class="sub" fill="#1b3b6f">TRAIN · 30 d</text>
+<text x="243" y="103" text-anchor="middle" class="sub" fill="#c44536">TEST · 1 wk</text>
+</svg>
