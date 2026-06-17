@@ -965,7 +965,7 @@ section.demo{ justify-content:center; }
 
 <div class="slide-body tight">
 
-<img class="fig-xl" src="figs/microwave_miss.png" alt="Microwave predictions miss spikes">
+<img class="fig-xl" src="figs/microwave_miss.svg" alt="Microwave predictions miss spikes">
 
 <ul style="margin-top:8px">
 <li>Predict ≈ 0 during long idle periods → <strong>deceptively low MAE</strong></li>
