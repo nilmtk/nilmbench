@@ -399,6 +399,32 @@ section.demo{ justify-content:center; }
 
 ---
 
+<div class="kick">The benchmark · data</div>
+
+## Datasets cover countries, buildings, and appliance types
+
+<div class="slide-body tight">
+
+<div class="dataset-wrap">
+
+| Dataset | Country | Buildings | Duration | Appliances |
+|---|---|---|---|---|
+| **REDD** | USA — 110 V | 6 | 3–19 days | 10–20 |
+| **UK-DALE** | UK — 230 V | 5 | 655 days | 5–54 |
+| **REFIT** | UK — 230 V | 20 | 2 years | 9–21 |
+
+</div>
+
+<div class="formal-list">
+<div class="item"><strong>Periodic</strong><span>Fridge, television</span></div>
+<div class="item"><strong>Sparse / bursty</strong><span>Microwave, kettle, dishwasher</span></div>
+<div class="item"><strong>Multi-stage</strong><span>Washing machine, dishwasher</span></div>
+</div>
+
+</div>
+
+---
+
 <!-- _class: bench-slide -->
 
 <div class="kick">The benchmark</div>
@@ -489,32 +515,6 @@ section.demo{ justify-content:center; }
 <div><span class="tl">Role</span>Zero-shot domain shift</div>
 </div>
 </div>
-</div>
-
-</div>
-
----
-
-<div class="kick">The benchmark · data</div>
-
-## Datasets cover countries, buildings, and appliance types
-
-<div class="slide-body tight">
-
-<div class="dataset-wrap">
-
-| Dataset | Country | Buildings | Duration | Appliances |
-|---|---|---|---|---|
-| **REDD** | USA — 110 V | 6 | 3–19 days | 10–20 |
-| **UK-DALE** | UK — 230 V | 5 | 655 days | 5–54 |
-| **REFIT** | UK — 230 V | 20 | 2 years | 9–21 |
-
-</div>
-
-<div class="formal-list">
-<div class="item"><strong>Periodic</strong><span>Fridge, television</span></div>
-<div class="item"><strong>Sparse / bursty</strong><span>Microwave, kettle, dishwasher</span></div>
-<div class="item"><strong>Multi-stage</strong><span>Washing machine, dishwasher</span></div>
 </div>
 
 </div>

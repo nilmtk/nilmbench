@@ -176,84 +176,7 @@
 </div>
 <footer>NILMBench2026 — BuildSys 2026</footer>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="6" data-paginate="true" data-footer="NILMBench2026 — BuildSys 2026" data-class="bench-slide" lang="en-US" class="bench-slide" data-marpit-pagination="6" style="--paginate:true;--footer:NILMBench2026 — BuildSys 2026;--class:bench-slide;" data-marpit-pagination-total="14" data-size="16:9"><div class="kick">The benchmark</div>
-<h2 id="nilmbench-makes-deployment-tests-reproducible">NILMBench makes deployment tests reproducible</h2>
-<div class="slide-body bench-slide tight">
-<div class="kpis">
-<div class="kpi"><div class="n">16</div><div class="l">models · <strong>4 families</strong></div></div>
-<div class="kpi"><div class="n">3</div><div class="l">datasets · UK-DALE, REDD, REFIT</div></div>
-<div class="kpi"><div class="n">2</div><div class="l">resolutions · <strong>1-min</strong> &amp; <strong>15-min</strong></div></div>
-</div>
-<div class="bench-body">
-<div class="bench-info">
-<div class="bench-block">
-<h4>Three evaluation tasks</h4>
-<ul>
-<li><strong>T1</strong> same building — sanity check</li>
-<li><strong>T2</strong> new building — realistic deploy</li>
-<li><strong>T3</strong> new dataset — domain shift</li>
-</ul>
-</div>
-<div class="bench-block">
-<h4>Four metric axes</h4>
-<ul>
-<li>Regression <strong>MAE</strong></li>
-<li>Event detection <strong>F1</strong></li>
-<li><strong>Parameters</strong> &amp; FLOPs</li>
-<li>Cross-domain <strong>generalization</strong></li>
-</ul>
-</div>
-</div>
-<div class="bench-shot">
-<img src="figs/github_issues.png" alt="GitHub installation issues" />
-</div>
-</div>
-<div class="callout bench-callout-full"><strong>Modernized tooling.</strong> Legacy NILMTK installs were brittle; we rebuilt the stack in PyTorch with <strong>Docker</strong> and <strong>uv</strong>.</div>
-</div>
-<footer>NILMBench2026 — BuildSys 2026</footer>
-</section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="7" data-class="demo" lang="en-US" class="demo" style="--class:demo;" data-size="16:9"><div class="demo-panel">
-<div class="big">Live demo</div>
-<div class="sub">Run one sealed benchmark task, inspect MAE / F1 / efficiency metrics, then return to the results.</div>
-</div>
-</section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="8" data-paginate="true" data-footer="NILMBench2026 — BuildSys 2026" lang="en-US" data-marpit-pagination="8" style="--paginate:true;--footer:NILMBench2026 — BuildSys 2026;" data-marpit-pagination-total="14" data-size="16:9">
-<div class="kick">The benchmark</div>
-<h2 id="three-tasks-separate-fitting-from-deployment">Three tasks separate fitting from deployment</h2>
-<div class="slide-body">
-<div class="task-row">
-<div class="task-card">
-<img src="figs/task_t1.png" alt="" />
-<div class="tt">T1 · Same building</div>
-<div class="meta">
-<div><span class="tl">Setup</span>Disjoint time windows, one home</div>
-<div><span class="tl">Split</span>Train 30 day (B1) → test 1 week (B1)</div>
-<div><span class="tl">Role</span>Upper-bound sanity check</div>
-</div>
-</div>
-<div class="task-card">
-<img src="figs/task_t2.png" alt="" />
-<div class="tt">T2 · New building</div>
-<div class="meta">
-<div><span class="tl">Setup</span>Train on homes, test on unseen home</div>
-<div><span class="tl">Split</span>UK-DALE B1,B2 → B4 · REDD B1–B3 → B6</div>
-<div><span class="tl">Role</span>Cross-building generalization</div>
-</div>
-</div>
-<div class="task-card">
-<img src="figs/task_t3.png" alt="" />
-<div class="tt">T3 · New dataset</div>
-<div class="meta">
-<div><span class="tl">Setup</span>Train in one country, test in another</div>
-<div><span class="tl">Split</span>REDD (USA, 110 V) ⇄ REFIT (UK, 230 V)</div>
-<div><span class="tl">Role</span>Zero-shot domain shift</div>
-</div>
-</div>
-</div>
-</div>
-<footer>NILMBench2026 — BuildSys 2026</footer>
-</section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="9" data-paginate="true" data-footer="NILMBench2026 — BuildSys 2026" lang="en-US" data-marpit-pagination="9" style="--paginate:true;--footer:NILMBench2026 — BuildSys 2026;" data-marpit-pagination-total="14" data-size="16:9">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="6" data-paginate="true" data-footer="NILMBench2026 — BuildSys 2026" lang="en-US" data-marpit-pagination="6" style="--paginate:true;--footer:NILMBench2026 — BuildSys 2026;" data-marpit-pagination-total="14" data-size="16:9">
 <div class="kick">The benchmark · data</div>
 <h2 id="datasets-cover-countries-buildings-and-appliance-types">Datasets cover countries, buildings, and appliance types</h2>
 <div class="slide-body tight">
@@ -297,6 +220,83 @@
 <div class="item"><strong>Periodic</strong><span>Fridge, television</span></div>
 <div class="item"><strong>Sparse / bursty</strong><span>Microwave, kettle, dishwasher</span></div>
 <div class="item"><strong>Multi-stage</strong><span>Washing machine, dishwasher</span></div>
+</div>
+</div>
+<footer>NILMBench2026 — BuildSys 2026</footer>
+</section>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="7" data-paginate="true" data-footer="NILMBench2026 — BuildSys 2026" data-class="bench-slide" lang="en-US" class="bench-slide" data-marpit-pagination="7" style="--paginate:true;--footer:NILMBench2026 — BuildSys 2026;--class:bench-slide;" data-marpit-pagination-total="14" data-size="16:9"><div class="kick">The benchmark</div>
+<h2 id="nilmbench-makes-deployment-tests-reproducible">NILMBench makes deployment tests reproducible</h2>
+<div class="slide-body bench-slide tight">
+<div class="kpis">
+<div class="kpi"><div class="n">16</div><div class="l">models · <strong>4 families</strong></div></div>
+<div class="kpi"><div class="n">3</div><div class="l">datasets · UK-DALE, REDD, REFIT</div></div>
+<div class="kpi"><div class="n">2</div><div class="l">resolutions · <strong>1-min</strong> &amp; <strong>15-min</strong></div></div>
+</div>
+<div class="bench-body">
+<div class="bench-info">
+<div class="bench-block">
+<h4>Three evaluation tasks</h4>
+<ul>
+<li><strong>T1</strong> same building — sanity check</li>
+<li><strong>T2</strong> new building — realistic deploy</li>
+<li><strong>T3</strong> new dataset — domain shift</li>
+</ul>
+</div>
+<div class="bench-block">
+<h4>Four metric axes</h4>
+<ul>
+<li>Regression <strong>MAE</strong></li>
+<li>Event detection <strong>F1</strong></li>
+<li><strong>Parameters</strong> &amp; FLOPs</li>
+<li>Cross-domain <strong>generalization</strong></li>
+</ul>
+</div>
+</div>
+<div class="bench-shot">
+<img src="figs/github_issues.png" alt="GitHub installation issues" />
+</div>
+</div>
+<div class="callout bench-callout-full"><strong>Modernized tooling.</strong> Legacy NILMTK installs were brittle; we rebuilt the stack in PyTorch with <strong>Docker</strong> and <strong>uv</strong>.</div>
+</div>
+<footer>NILMBench2026 — BuildSys 2026</footer>
+</section>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="8" data-class="demo" lang="en-US" class="demo" style="--class:demo;" data-size="16:9"><div class="demo-panel">
+<div class="big">Live demo</div>
+<div class="sub">Run one sealed benchmark task, inspect MAE / F1 / efficiency metrics, then return to the results.</div>
+</div>
+</section>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="9" data-paginate="true" data-footer="NILMBench2026 — BuildSys 2026" lang="en-US" data-marpit-pagination="9" style="--paginate:true;--footer:NILMBench2026 — BuildSys 2026;" data-marpit-pagination-total="14" data-size="16:9">
+<div class="kick">The benchmark</div>
+<h2 id="three-tasks-separate-fitting-from-deployment">Three tasks separate fitting from deployment</h2>
+<div class="slide-body">
+<div class="task-row">
+<div class="task-card">
+<img src="figs/task_t1.png" alt="" />
+<div class="tt">T1 · Same building</div>
+<div class="meta">
+<div><span class="tl">Setup</span>Disjoint time windows, one home</div>
+<div><span class="tl">Split</span>Train 30 day (B1) → test 1 week (B1)</div>
+<div><span class="tl">Role</span>Upper-bound sanity check</div>
+</div>
+</div>
+<div class="task-card">
+<img src="figs/task_t2.png" alt="" />
+<div class="tt">T2 · New building</div>
+<div class="meta">
+<div><span class="tl">Setup</span>Train on homes, test on unseen home</div>
+<div><span class="tl">Split</span>UK-DALE B1,B2 → B4 · REDD B1–B3 → B6</div>
+<div><span class="tl">Role</span>Cross-building generalization</div>
+</div>
+</div>
+<div class="task-card">
+<img src="figs/task_t3.png" alt="" />
+<div class="tt">T3 · New dataset</div>
+<div class="meta">
+<div><span class="tl">Setup</span>Train in one country, test in another</div>
+<div><span class="tl">Split</span>REDD (USA, 110 V) ⇄ REFIT (UK, 230 V)</div>
+<div><span class="tl">Role</span>Zero-shot domain shift</div>
+</div>
+</div>
 </div>
 </div>
 <footer>NILMBench2026 — BuildSys 2026</footer>
