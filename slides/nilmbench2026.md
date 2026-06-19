@@ -66,6 +66,12 @@ td{ padding:8px 12px; border-bottom:1px solid var(--line); color:var(--ink2); }
 tr:last-child td{ border-bottom:none; }
 table.dataset-table tr:last-child td{ border-bottom:2px solid var(--ink); }
 .dataset-wrap table tr:last-child td{ border-bottom:2px solid var(--ink); }
+.benchmark-compare{ justify-content:flex-start; padding-top:0; }
+.benchmark-compare table{ font-size:16.5px; line-height:1.25; }
+.benchmark-compare th{ padding:5px 10px; font-size:11.5px; line-height:1.2; }
+.benchmark-compare td{ padding:5.5px 10px; }
+.benchmark-compare tr:last-child td{ border-bottom:2px solid var(--ink); }
+.benchmark-compare .callout{ margin-top:10px; font-size:16.5px; padding:12px 16px; line-height:1.35; }
 
 .callout-full{ width:100%; margin-top:16px; font-size:18px; }
 td strong{ color:var(--acc); }
@@ -702,7 +708,7 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 
 ## Existing benchmarks missed deployment readiness
 
-<div class="slide-body">
+<div class="slide-body benchmark-compare">
 
 | Capability | NILMTK<br><span class="note">e-Energy 2014</span> | NILMTK-Contrib<br><span class="note">BuildSys 2019</span> | NILMBench2026<br><span class="note">BuildSys 2026</span> |
 |---|---|---|---|
@@ -713,7 +719,7 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 | Cross-dataset | — | — | **yes** |
 | Stack | Python 2.7 | TF 1.x | **PyTorch + Docker + uv** |
 
-<p class="callout" style="margin-top:16px;font-size:18px">First benchmark to jointly score <strong>efficiency</strong>, <strong>multi-resolution</strong> utility settings, and <strong>cross-domain transfer</strong>.</p>
+<p class="callout">First benchmark to jointly score <strong>efficiency</strong>, <strong>multi-resolution</strong> utility settings, and <strong>cross-domain transfer</strong>.</p>
 
 </div>
 
