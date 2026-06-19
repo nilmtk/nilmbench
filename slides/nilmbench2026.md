@@ -1224,7 +1224,7 @@ class PatchTSTDisaggregator(Disaggregator):
 <!-- _footer: '' -->
 
 <div class="demo-panel">
-<div class="big">Live demo</div>
+<div class="big">Demo</div>
 <div class="sub">Run one sealed benchmark task, inspect MAE / F1 / efficiency metrics, then return to the results.</div>
 </div>
 
@@ -1234,7 +1234,7 @@ class PatchTSTDisaggregator(Disaggregator):
 <!-- _paginate: false -->
 <!-- _footer: '' -->
 
-<div class="demo-video-wrap">
+<!-- <div class="demo-video-wrap">
 
 <video class="demo-video" src="nilmbench_demo_v4_kore.mp4" controls playsinline preload="auto"></video>
 
@@ -1273,9 +1273,8 @@ class PatchTSTDisaggregator(Disaggregator):
     });
   });
 })();
-</script>
+</script> -->
 
----
 
 <!-- _class: outlook-slide -->
 
