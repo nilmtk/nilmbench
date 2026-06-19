@@ -290,6 +290,12 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 .design-panel .fig-box{ flex:1; min-height:0; display:flex; align-items:center; justify-content:center; margin-top:4px; }
 .design-panel .fig-box img{ width:100%; max-height:300px; object-fit:contain; border:1px solid var(--line); border-radius:6px; background:#1e1e1e; margin:0; }
 .design-callout{ margin-top:14px; font-size:17px; }
+.design-panel{ opacity:.24; filter:grayscale(.45);
+  transition:opacity .35s ease, filter .35s ease, box-shadow .35s ease, transform .35s ease, border-top-width .35s ease; }
+.design-panel.seen{ opacity:1; filter:none; }
+.design-panel.on{ opacity:1; filter:none; border-top-width:4px; transform:translateY(-3px);
+  box-shadow:0 12px 28px -16px rgba(27,35,48,.45);
+  background:linear-gradient(180deg, rgba(196,69,54,.07), rgba(196,69,54,0) 58%); border-radius:0 0 8px 8px; }
 .design-duo{ display:flex; gap:28px; align-items:stretch; width:100%; flex:1; min-height:0; }
 .design-goal{ flex:1; min-width:0; border-top:3px solid var(--line); padding-top:12px; display:flex; flex-direction:column; gap:12px; }
 .design-goal:nth-child(1){ border-top-color:var(--navy); }
@@ -330,7 +336,7 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 <div class="author-row">
   <div class="a"><img src="figs/au_aayush.png" alt=""><div class="n">Aayush Kuloor*</div><div class="role">Undergraduate Sophomore<br>IIT Gandhinagar</div><div class="e">aayush.kuloor@iitgn.ac.in</div></div>
   <div class="a"><img src="figs/au_anurag.jpg" alt=""><div class="n">Anurag Singh*</div><div class="role">Undergraduate Sophomore<br>IIT Gandhinagar</div><div class="e">anurag.s@iitgn.ac.in</div></div>
-  <div class="a"><img src="figs/au_harsh.png" alt=""><div class="n">Harsh Dhru*</div><div class="role">Undergraduate Sophomore<br>IIT Gandhinagar</div><div class="e">harsh.dhru@iitgn.ac.in</div></div>
+  <div class="a"><img src="figs/au_harsh.jpeg" alt=""><div class="n">Harsh Dhru*</div><div class="role">Undergraduate Sophomore<br>IIT Gandhinagar</div><div class="e">harsh.dhru@iitgn.ac.in</div></div>
   <div class="a advisor"><img src="figs/au_nipun.jpg" alt=""><div class="n">Nipun Batra</div><div class="role">Faculty advisor<br>IIT&nbsp;Gandhinagar</div><div class="e">nipun.batra@iitgn.ac.in</div></div>
 </div>
 
@@ -730,7 +736,7 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 </div>
 
 <div class="formal-list">
-<div class="item"><strong>Periodic</strong><span>Fridge, television</span></div>
+<div class="item"><strong>Periodic</strong><span>Fridge</span></div>
 <div class="item"><strong>Sparse / bursty</strong><span>Microwave, kettle, dishwasher</span></div>
 <div class="item"><strong>Multi-stage</strong><span>Washing machine, dishwasher</span></div>
 </div>
@@ -739,7 +745,7 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 
 ---
 
-<!-- Goals 2/3 is a 2-step build: spotlight relevance, then coverage.
+<!-- Goal 1 is a 2-step build: spotlight motivation, then implementation.
      Edit both copies to keep them in sync. -->
 <!-- _class: design-slide -->
 
@@ -750,7 +756,7 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 <div class="slide-body">
 
 <div class="design-body">
-<div class="design-panel">
+<div class="design-panel on">
 <h4>Motivation</h4>
 <ul>
 <li>Legacy NILMTK stacks were brittle — Python&nbsp;2.7, TensorFlow&nbsp;1.x, broken installs</li>
@@ -776,6 +782,43 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 
 ---
 
+<!-- _class: design-slide -->
+
+<div class="kick">The benchmark · design</div>
+
+## Design goal 1 — Reproducible ML tooling
+
+<div class="slide-body">
+
+<div class="design-body">
+<div class="design-panel seen">
+<h4>Motivation</h4>
+<ul>
+<li>Legacy NILMTK stacks were brittle — Python&nbsp;2.7, TensorFlow&nbsp;1.x, broken installs</li>
+<li>Hard to reproduce published numbers or compare new models fairly</li>
+</ul>
+<div class="fig-box">
+<img src="figs/github_issues.png" alt="GitHub installation issues for legacy NILMTK">
+</div>
+</div>
+<div class="design-panel do on">
+<h4>What we do</h4>
+<ul>
+<li>Re-implement legacy models in <strong>PyTorch</strong> under a unified API</li>
+<li>Ship sealed runs with <strong>Docker</strong> and <strong>uv</strong></li>
+<li>Extend the NILMTK Experiment API so every model follows the same train / test protocol</li>
+</ul>
+</div>
+</div>
+
+<div class="callout design-callout"><strong>Goal:</strong> a new architecture should take <strong>minutes to benchmark</strong>, not days to debug the install.</div>
+
+</div>
+
+---
+
+<!-- Goals 2/3 is a 2-step build: spotlight relevance, then coverage.
+     Edit both copies to keep them in sync. -->
 <!-- _class: design-slide -->
 
 <div class="kick">The benchmark · design</div>
