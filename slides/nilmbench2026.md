@@ -265,10 +265,21 @@ section.evo-slide h2{ margin-bottom:14px; padding-bottom:10px; font-size:32px; }
 .formal-list .item strong{ display:block; font-size:18px; margin-bottom:4px; }
 .formal-list .item span{ display:block; color:var(--ink2); font-size:15px; line-height:1.3; }
 
-section.demo{ justify-content:center; }
+section.demo{ justify-content:center; padding:34px 54px 44px; }
 .demo-panel{ margin:auto 0; border-left:4px solid var(--acc); padding:24px 30px; background:var(--paper2); border-radius:8px; }
 .demo-panel .big{ font-family:'Playfair Display',serif; font-size:44px; font-weight:700; line-height:1.12; color:var(--ink); margin-bottom:12px; }
 .demo-panel .sub{ font-size:22px; color:var(--ink2); line-height:1.4; }
+.demo-video-wrap{ width:100%; height:100%; display:flex; flex-direction:column; justify-content:center; gap:14px; }
+.demo-video-wrap h2{ margin-bottom:0; }
+.demo-video{
+  width:100%;
+  max-height:580px;
+  object-fit:contain;
+  background:#000;
+  border:1px solid var(--line);
+  border-radius:8px;
+  box-shadow:0 18px 42px -30px rgba(27,35,48,.7);
+}
 
 .leader{ display:grid; grid-template-columns:1.05fr .95fr; gap:28px; align-items:center; width:100%; }
 .leader .copy{ font-size:20px; color:var(--ink2); }
@@ -927,17 +938,6 @@ section.design-slide h2{ font-size:30px; margin-bottom:14px; }
 
 ---
 
-<!-- _class: demo -->
-<!-- _paginate: false -->
-<!-- _footer: '' -->
-
-<div class="demo-panel">
-<div class="big">Live demo</div>
-<div class="sub">Run one sealed benchmark task, inspect MAE / F1 / efficiency metrics, then return to the results.</div>
-</div>
-
----
-
 <!-- T1/T2/T3 is a 3-step build: spotlight T1 -> T2 -> T3.
      Edit all three copies to keep them in sync. -->
 <div class="kick">The benchmark</div>
@@ -1216,6 +1216,64 @@ class PatchTSTDisaggregator(Disaggregator):
 </div>
 
 </div>
+
+---
+
+<!-- _class: demo -->
+<!-- _paginate: false -->
+<!-- _footer: '' -->
+
+<div class="demo-panel">
+<div class="big">Live demo</div>
+<div class="sub">Run one sealed benchmark task, inspect MAE / F1 / efficiency metrics, then return to the results.</div>
+</div>
+
+---
+
+<!-- _class: demo -->
+<!-- _paginate: false -->
+<!-- _footer: '' -->
+
+<div class="demo-video-wrap">
+
+<video class="demo-video" src="nilmbench_demo_v4_kore.mp4" controls playsinline preload="auto"></video>
+
+</div>
+
+<script>
+(() => {
+  const syncDemoVideo = () => {
+    document.querySelectorAll('video.demo-video').forEach((video) => {
+      const slide = video.closest('svg[data-marpit-svg]');
+      const isActive = slide?.classList.contains('bespoke-marp-active');
+
+      if (isActive) {
+        if (!video.dataset.demoStarted) {
+          video.currentTime = 0;
+          video.dataset.demoStarted = 'true';
+        }
+        video.play().catch(() => {});
+      } else {
+        video.pause();
+        if (video.dataset.demoStarted) {
+          video.currentTime = 0;
+          delete video.dataset.demoStarted;
+        }
+      }
+    });
+  };
+
+  window.addEventListener('load', () => {
+    syncDemoVideo();
+    const deck = document.getElementById(':$p') || document.body;
+    new MutationObserver(syncDemoVideo).observe(deck, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class']
+    });
+  });
+})();
+</script>
 
 ---
 
