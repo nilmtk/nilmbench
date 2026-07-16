@@ -1,0 +1,55 @@
+services:
+  cpu-smoke:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.cpu
+      additional_contexts:
+        contrib: ${NILMTK_CONTRIB_CONTEXT:-../nilmtk-contrib}
+    image: nilmbench:cpu
+    command:
+      - run
+      - --task
+      - corrected-t1-redd
+      - --model
+      - PatchTST
+      - --appliance
+      - fridge
+      - --epochs
+      - "1"
+      - --max-samples
+      - "1024"
+      - --device
+      - cpu
+      - --results
+      - /results
+    volumes:
+      - ${NILMBENCH_DATA_DIR:-./data}:/data:ro
+      - ${NILMBENCH_RESULTS_DIR:-./results}:/results
+
+  cuda-benchmark:
+    profiles: ["cuda"]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.cuda
+      additional_contexts:
+        contrib: ${NILMTK_CONTRIB_CONTEXT:-../nilmtk-contrib}
+    image: nilmbench:cuda
+    command:
+      - run
+      - --task
+      - corrected-t1-redd
+      - --model
+      - PatchTST
+      - --seed
+      - "42"
+      - --trials
+      - "20"
+      - --device
+      - cuda
+      - --results
+      - /results
+    gpus: all
+    shm_size: 8gb
+    volumes:
+      - ${NILMBENCH_DATA_DIR:-./data}:/data:ro
+      - ${NILMBENCH_RESULTS_DIR:-./results}:/results

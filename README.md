@@ -1,7 +1,6 @@
-# NILMBench2026 — project website
+# NILMbench
 
-Source for the **[NILMBench2026](https://sustainability-lab.github.io/nilmbench/)** project page —
-*A Benchmark for Energy Disaggregation* (BuildSys '26, **Best Paper Candidate**).
+Reproducible runner and project website for **[NILMBench2026](https://sustainability-lab.github.io/nilmbench/)** — *A Benchmark for Energy Disaggregation* (BuildSys '26, **Best Paper Candidate**).
 
 > One aggregate power signal in. Appliance-level estimates out. We benchmark **16 NILM models**
 > across **3 datasets** and **2 resolutions** — on accuracy, efficiency, and generalization —
@@ -16,28 +15,120 @@ Source for the **[NILMBench2026](https://sustainability-lab.github.io/nilmbench/
 - 💻 **Code (modernized NILMTK):** https://github.com/nilmtk/nilmtk-contrib
 - 🌐 **Website:** https://sustainability-lab.github.io/nilmbench/
 
-## About this repo
+## What is reproducible here
 
-A single self-contained `index.html` (no build step) deployed to GitHub Pages via GitHub Actions.
+The benchmark is now an installable command-line application rather than a set of order-dependent notebooks. It provides:
 
-```
-index.html              # the entire site (HTML + CSS + JS inline)
-static/images/          # paper figures (real UK-DALE / REDD / REFIT predictions)
-.github/workflows/      # GitHub Pages deploy workflow
-```
+- typed TOML definitions for the paper's T1/T2/T3 protocols;
+- explicit `historical-*` profiles reconstructed from the executed notebooks;
+- strict corrected profiles that reject silently truncated data windows;
+- deterministic seeds and persistent, resumable Optuna SQLite studies;
+- deterministic Torch algorithms with an explicit cuBLAS workspace policy;
+- structured JSON and CSV results with source, dataset, runtime, parameter/FLOP, and container provenance;
+- separate CPU-smoke and CUDA-benchmark containers.
 
-- **Theme:** dark/light toggle, an "energy / power-spectrum" palette.
-- **Hero:** animated SVG of the disaggregation task (aggregate mains → fridge / washing machine / microwave / kettle).
-- **Results explorer:** the paper's tables, heat-mapped (green = good, red = bad), with best/second highlighting.
-- **Extend & Compete:** how to add a model / metric, and the leaderboard vision — *NILM's ImageNet*.
+The REDD, UK-DALE, and REFIT data are not redistributed. The runner expects user-provided NILMTK HDF5 conversions and verifies them against the recorded file sizes and SHA-256 digests.
 
-## Develop locally
+## Install for development
 
-Just open `index.html` in a browser, or serve the folder:
+Use Python 3.11, which is the version currently supported by nilmtk-contrib:
 
 ```bash
-python3 -m http.server 8000   # then visit http://localhost:8000
+git clone https://github.com/nilmtk/nilmtk-contrib.git
+git clone https://github.com/sustainability-lab/nilmbench.git
+cd nilmbench
+
+uv venv --python 3.11
+source .venv/bin/activate
+UV_TORCH_BACKEND=cpu uv pip install -e "../nilmtk-contrib[torch]" -e ".[runtime,dev]"
+nilmbench list
+pytest
 ```
+
+For a non-editable install after the PatchTST nilmtk-contrib release is available:
+
+```bash
+uv venv --python 3.11
+source .venv/bin/activate
+UV_TORCH_BACKEND=cpu uv pip install ".[benchmark]"
+```
+
+## Data
+
+Place the three converted datasets in one directory with these names:
+
+```text
+data/
+├── redd.h5
+├── refit.h5
+└── ukdale.h5
+```
+
+Alternatively, set `NILMBENCH_REDD`, `NILMBENCH_REFIT`, and `NILMBENCH_UKDALE` to their full paths. Check the files before a long run:
+
+```bash
+nilmbench doctor --checksums
+nilmbench validate --task corrected-t1-redd --check-data
+```
+
+The dataset mounts in `compose.yaml` are read-only. Results are written to a separate `/results` mount.
+
+## CPU smoke and CUDA benchmark
+
+Container builds take nilmtk-contrib as a named BuildKit context. The default Compose configuration expects the two repositories to be sibling directories; set `NILMTK_CONTRIB_CONTEXT` to override that location.
+
+Published images pin their nilmtk-contrib build context to the exact PatchTST commit rather than a moving branch. Update that pin deliberately when a reviewed model release is adopted.
+
+The CPU path is deliberately small and is suitable for CI or a laptop:
+
+```bash
+export NILMBENCH_DATA_DIR=/absolute/path/to/data
+export NILMBENCH_RESULTS_DIR=/absolute/path/to/results
+docker compose run --rm cpu-smoke
+```
+
+The real benchmark path uses the pinned PyTorch 2.6.0 / CUDA 12.4 image and all visible NVIDIA GPUs:
+
+```bash
+docker compose --profile cuda run --rm cuda-benchmark
+```
+
+To run one inspectable A100 smoke before spending on 20 trials:
+
+```bash
+docker compose --profile cuda run --rm cuda-benchmark \
+  run --task corrected-t1-redd --model PatchTST --appliance fridge \
+  --seed 42 --epochs 1 --max-samples 1024 --device cuda --results /results
+```
+
+For the full paper matrix, repeat each task at 60 and 900 seconds for seeds 10, 20, and 42. Optuna studies live under `results/optuna/` and resume to the requested total trial count. Their identity hashes the task config, model, seed, appliance subset, resolution, and smoke overrides, preventing incompatible runs from sharing a study.
+
+## Historical versus corrected protocols
+
+The recovered notebooks requested REDD building 1 from 1–30 April 2011, although this converted file starts on 18 April. `historical-t1-redd` retains that request and emits a coverage warning. Two other historical definitions request unavailable appliance/building pairs; validation reports those explicitly. Historical tasks also retain the legacy joint appliance alignment, where a missing sample for any appliance removes that timestamp from every appliance.
+
+The eight `corrected-*` tasks form a runnable T1/T2/T3 matrix. They enforce dataset/meter coverage, select appliances present in every participating building, use full 30/7-day splits where the data permit, and align each appliance independently. Corrected profiles are the basis for new leaderboard claims; historical profiles are retained only for forensic reproduction.
+
+## Repository layout
+
+```text
+configs/                 # dataset manifests and T1/T2/T3 task definitions
+src/nilmbench/           # CLI, data loading, registry, runner, provenance
+docker/                  # separate CPU-only and CUDA 12.4 images
+tests/                   # dependency-light runner/config tests
+index.html               # self-contained project website
+static/images/           # paper figures
+```
+
+The website still has no build step:
+
+```bash
+python3 -m http.server 8000
+```
+
+## Add a model
+
+Models belong in nilmtk-contrib. Once a model has its own tests and lazy export there, add a small entry and search space in `src/nilmbench/registry.py`; task/data logic should not be copied into model notebooks. PatchTST is the first model using this route.
 
 ## Cite
 
