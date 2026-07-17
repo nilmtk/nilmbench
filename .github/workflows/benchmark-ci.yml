@@ -1,0 +1,37 @@
+name: Benchmark runner CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  cpu-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.11.28"
+          enable-cache: true
+      - name: Create environment
+        run: uv venv --python 3.11
+      - name: Install test dependencies
+        run: uv pip install -e ".[dev]"
+      - name: Lint
+        run: uv run ruff check src tests
+      - name: Test
+        run: uv run pytest
+      - name: Validate CPU smoke specification
+        run: >-
+          uv run nilmbench run
+          --task corrected-t1-redd
+          --model PatchTST
+          --appliance fridge
+          --epochs 1
+          --max-samples 1024
+          --device cpu
+          --dry-run

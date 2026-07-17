@@ -1,0 +1,15 @@
+# The historical policy reproduces nilmtk.losses.f1score as executed by the
+# recovered benchmark notebooks. The paper policy follows Section 3.5 and the
+# standard appliance thresholds used by the NILM literature cited there.
+
+[[metric_policy]]
+id = "legacy-nilmtk-10w"
+description = "Fixed 10 W activation threshold used by the recovered NILMTK notebooks"
+source_url = "https://github.com/nilmtk/nilmtk/blob/master/nilmtk/losses.py"
+thresholds = { fridge = 10.0, "washing machine" = 10.0, microwave = 10.0, "dish washer" = 10.0, kettle = 10.0, television = 10.0 }
+
+[[metric_policy]]
+id = "paper-appliance-thresholds"
+description = "Appliance-specific activation thresholds described in NILMBench2026 Section 3.5"
+source_url = "https://sustainability-lab.github.io/papers/2026/nilmbench2026_buildsys.pdf"
+thresholds = { fridge = 50.0, "washing machine" = 20.0, microwave = 200.0, "dish washer" = 10.0, kettle = 2000.0, television = 10.0 }
