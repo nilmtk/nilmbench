@@ -4,16 +4,26 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
+import re
 import tomllib
 from dataclasses import asdict, dataclass
+from datetime import datetime
 from importlib.resources import files
+from numbers import Real
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 
 class ConfigError(ValueError):
     """Raised when a benchmark configuration is incomplete or inconsistent."""
+
+
+_ID_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*\Z")
+_ENV_PATTERN = re.compile(r"[A-Z][A-Z0-9_]*\Z")
+_SHA256_PATTERN = re.compile(r"[0-9a-fA-F]{64}\Z")
 
 
 @dataclass(frozen=True)
@@ -68,8 +78,10 @@ class TaskConfig:
     coverage_policy: str
     alignment_policy: str
     shared_meter_policy: str
+    target_data_access: str
     train: tuple[WindowConfig, ...]
     test: tuple[WindowConfig, ...]
+    target_label_fraction: float | None = None
 
 
 @dataclass(frozen=True)
@@ -125,6 +137,29 @@ def _config_root(config_dir: str | Path | None) -> Path:
     return Path(__file__).resolve().parents[2] / "configs"
 
 
+def _table_entries(document: dict[str, Any], key: str, path: Path) -> list[Any]:
+    entries = document.get(key)
+    if not isinstance(entries, list) or not entries:
+        raise ConfigError(f"{path} must define at least one [[{key}]] table")
+    return entries
+
+
+def _valid_id(value: Any) -> bool:
+    return isinstance(value, str) and _ID_PATTERN.fullmatch(value) is not None
+
+
+def _parse_window_time(value: Any, task_id: str) -> datetime:
+    if not isinstance(value, str):
+        raise ConfigError(f"Task {task_id} window timestamps must be strings")
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError as exc:
+        raise ConfigError(f"Task {task_id} has invalid timestamp {value!r}") from exc
+    if parsed.tzinfo is not None:
+        raise ConfigError(f"Task {task_id} window timestamps must be timezone-naive")
+    return parsed
+
+
 def load_config(config_dir: str | Path | None = None) -> BenchmarkConfig:
     """Load the built-in or user-supplied TOML benchmark configuration."""
     root = _config_root(config_dir)
@@ -133,46 +168,93 @@ def load_config(config_dir: str | Path | None = None) -> BenchmarkConfig:
     task_doc = _read_toml(root / "tasks.toml")
 
     datasets: dict[str, DatasetConfig] = {}
-    for source in dataset_doc.get("dataset", []):
-        raw = dict(source)
-        mains_ac_types = tuple(raw.pop("mains_ac_types"))
-        appliance_ac_types = tuple(raw.pop("appliance_ac_types"))
-        dataset = DatasetConfig(
-            **raw,
-            mains_ac_types=mains_ac_types,
-            appliance_ac_types=appliance_ac_types,
-        )
-        if len(dataset.sha256) != 64:
+    for source in _table_entries(dataset_doc, "dataset", root / "datasets.toml"):
+        try:
+            raw = dict(source)
+            mains_ac_types = tuple(raw.pop("mains_ac_types"))
+            appliance_ac_types = tuple(raw.pop("appliance_ac_types"))
+            dataset = DatasetConfig(
+                **raw,
+                mains_ac_types=mains_ac_types,
+                appliance_ac_types=appliance_ac_types,
+            )
+        except (KeyError, TypeError) as exc:
+            raise ConfigError(f"Invalid dataset entry: {exc}") from exc
+        if not _valid_id(dataset.id):
+            raise ConfigError(f"Dataset has an invalid id {dataset.id!r}")
+        if _SHA256_PATTERN.fullmatch(dataset.sha256) is None:
             raise ConfigError(f"Dataset {dataset.id} has an invalid SHA-256 digest")
+        if (
+            isinstance(dataset.size_bytes, bool)
+            or not isinstance(dataset.size_bytes, int)
+            or dataset.size_bytes <= 0
+        ):
+            raise ConfigError(f"Dataset {dataset.id} has an invalid size_bytes")
+        if _ENV_PATTERN.fullmatch(dataset.path_env) is None:
+            raise ConfigError(f"Dataset {dataset.id} has an invalid path_env")
+        if not dataset.default_path:
+            raise ConfigError(f"Dataset {dataset.id} has no default_path")
+        try:
+            ZoneInfo(dataset.timezone)
+        except (TypeError, ZoneInfoNotFoundError) as exc:
+            raise ConfigError(f"Dataset {dataset.id} has an invalid timezone") from exc
         if dataset.id in datasets:
             raise ConfigError(f"Duplicate dataset id {dataset.id}")
-        if not dataset.mains_ac_types or not dataset.appliance_ac_types:
+        ac_types = (*dataset.mains_ac_types, *dataset.appliance_ac_types)
+        if (
+            not dataset.mains_ac_types
+            or not dataset.appliance_ac_types
+            or any(not isinstance(value, str) or not value for value in ac_types)
+            or len(set(dataset.mains_ac_types)) != len(dataset.mains_ac_types)
+            or len(set(dataset.appliance_ac_types))
+            != len(dataset.appliance_ac_types)
+        ):
             raise ConfigError(f"Dataset {dataset.id} has no AC type preferences")
         datasets[dataset.id] = dataset
 
     metric_policies: dict[str, MetricPolicyConfig] = {}
-    for raw in metric_doc.get("metric_policy", []):
-        policy = MetricPolicyConfig(**raw)
-        if not policy.id or not policy.thresholds:
+    for raw in _table_entries(
+        metric_doc, "metric_policy", root / "metrics.toml"
+    ):
+        try:
+            policy = MetricPolicyConfig(**raw)
+        except TypeError as exc:
+            raise ConfigError(f"Invalid metric policy entry: {exc}") from exc
+        if not _valid_id(policy.id) or not isinstance(policy.thresholds, dict) or not policy.thresholds:
             raise ConfigError("Metric policies need an id and thresholds")
-        if any(value <= 0 for value in policy.thresholds.values()):
-            raise ConfigError(f"Metric policy {policy.id} has a non-positive threshold")
+        for appliance, value in policy.thresholds.items():
+            if not isinstance(appliance, str) or not appliance:
+                raise ConfigError(f"Metric policy {policy.id} has an invalid appliance")
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, Real)
+                or not math.isfinite(value)
+                or value <= 0
+            ):
+                raise ConfigError(
+                    f"Metric policy {policy.id} has an invalid threshold"
+                )
         if policy.id in metric_policies:
             raise ConfigError(f"Duplicate metric policy id {policy.id}")
         metric_policies[policy.id] = policy
 
     tasks: dict[str, TaskConfig] = {}
-    for source in task_doc.get("task", []):
-        raw = dict(source)
-        train = tuple(WindowConfig(**item) for item in raw.pop("train"))
-        test = tuple(WindowConfig(**item) for item in raw.pop("test"))
-        appliances = tuple(raw.pop("appliances"))
-        task = TaskConfig(
-            **raw,
-            appliances=appliances,
-            train=train,
-            test=test,
-        )
+    for source in _table_entries(task_doc, "task", root / "tasks.toml"):
+        try:
+            raw = dict(source)
+            train = tuple(WindowConfig(**item) for item in raw.pop("train"))
+            test = tuple(WindowConfig(**item) for item in raw.pop("test"))
+            appliances = tuple(raw.pop("appliances"))
+            task = TaskConfig(
+                **raw,
+                appliances=appliances,
+                train=train,
+                test=test,
+            )
+        except (KeyError, TypeError) as exc:
+            raise ConfigError(f"Invalid task entry: {exc}") from exc
+        if not _valid_id(task.id):
+            raise ConfigError(f"Task has an invalid id {task.id!r}")
         if task.id in tasks:
             raise ConfigError(f"Duplicate task id {task.id}")
         if task.family not in {"T1", "T2", "T3"}:
@@ -183,19 +265,63 @@ def load_config(config_dir: str | Path | None = None) -> BenchmarkConfig:
             raise ConfigError(f"Task {task.id} has invalid alignment_policy")
         if task.shared_meter_policy not in {"allow", "warn", "strict"}:
             raise ConfigError(f"Task {task.id} has invalid shared_meter_policy")
+        if task.family == "T3":
+            if task.target_data_access not in {
+                "none",
+                "unlabeled_target_mains",
+                "labeled_target_appliances",
+            }:
+                raise ConfigError(f"Task {task.id} has invalid target_data_access")
+        elif task.target_data_access != "not_applicable":
+            raise ConfigError(
+                f"Non-transfer task {task.id} cannot access target-domain data"
+            )
+        if task.target_data_access == "labeled_target_appliances":
+            if task.target_label_fraction is None or not (
+                0 < task.target_label_fraction <= 1
+            ):
+                raise ConfigError(
+                    f"Task {task.id} needs a target_label_fraction in (0, 1]"
+                )
+        elif task.target_label_fraction is not None:
+            raise ConfigError(
+                f"Task {task.id} has a target_label_fraction without labeled access"
+            )
         if task.metric_policy not in metric_policies:
             raise ConfigError(
                 f"Task {task.id} references unknown metric policy {task.metric_policy}"
             )
-        if task.sample_period <= 0 or not task.appliances:
+        if (
+            isinstance(task.sample_period, bool)
+            or not isinstance(task.sample_period, int)
+            or task.sample_period <= 0
+            or not task.appliances
+            or any(
+                not isinstance(appliance, str) or not appliance
+                for appliance in task.appliances
+            )
+            or len(set(task.appliances)) != len(task.appliances)
+            or not task.train
+            or not task.test
+        ):
             raise ConfigError(f"Task {task.id} has invalid sampling or appliances")
         for window in (*task.train, *task.test):
+            if (
+                isinstance(window.building, bool)
+                or not isinstance(window.building, int)
+                or window.building <= 0
+            ):
+                raise ConfigError(f"Task {task.id} has an invalid building")
             if window.dataset not in datasets:
                 raise ConfigError(
                     f"Task {task.id} references unknown dataset {window.dataset}"
                 )
-            if window.start >= window.end:
+            if _parse_window_time(window.start, task.id) >= _parse_window_time(
+                window.end, task.id
+            ):
                 raise ConfigError(f"Task {task.id} has a non-positive window")
+        if len(set(task.train)) != len(task.train) or len(set(task.test)) != len(task.test):
+            raise ConfigError(f"Task {task.id} contains duplicate windows")
         policy = metric_policies[task.metric_policy]
         for appliance in task.appliances:
             policy.threshold(appliance)
