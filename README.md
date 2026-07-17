@@ -181,13 +181,15 @@ SHA-256 so consumers can reject a partially updated artifact pair.
 Every aggregate is separated by task/config revision, model revision, runner
 revision, container digest, hardware, resolution, appliance, target-data access,
 smoke/full scope, and a digest of every protocol override. Context length,
-epochs, and sample limits remain visible in the generated table.
-The website's rank groups use a separate comparison-protocol digest covering
-effective context length and epochs, tuning method/trial budget/selection
-protocol, and the immutable runner, contrib, container, and hardware tuple. It
-intentionally excludes model-specific selected parameters and the study digest,
-so different models remain comparable and evaluation seeds from one frozen
-study can still aggregate. A corrected
+epochs, sample limits, tuning records, and runtime provenance remain visible in
+the generated artifacts.
+
+Public rank is generated once, in Python, within an evaluation cohort defined by
+task/config revision, profile, resolution, appliance, sample limit, target-data
+access, and smoke/full scope. Architecture choices such as context length and
+epoch count, and provenance changes such as a later container build, do not
+reset rank. The complete comparison-protocol digest still records those details
+for audit and exact reproduction. A corrected
 full run becomes `full-verified`, and a smoke run becomes `smoke-verified`, only
 after the required seeds 10, 20, and 42 pass source, container, and dataset
 provenance checks. Incomplete clean smoke matrices are labelled `smoke-partial`.

@@ -13,15 +13,12 @@ def test_site_loads_generated_leaderboard_and_discloses_smoke_protocol():
     assert "entry.trainable_parameters_mean" in source
     assert "entry.elapsed_seconds_mean" in source
     assert "entry.peak_accelerator_memory_bytes_mean" in source
-    assert "comparisonKey(entry)" in source
-    comparison_key = source.split("function comparisonKey(entry) {", 1)[1].split(
-        "}", 1
-    )[0]
-    assert "entry.comparison_protocol_sha256" in comparison_key
-    assert "entry.tuning_study_digest" not in comparison_key
-    assert "entry.model_params_sha256" not in comparison_key
+    assert "ranking_protocol_sha256" in source
+    assert "Number.isInteger(entry.rank)" in source
+    assert "comparisonKey(entry)" not in source
+    assert "const ranks = new Map()" not in source
     assert "entry.max_samples_per_window ?? 'full'" not in source
-    assert "Group rank" in source
+    assert "<th>Rank</th>" in source
     assert "entries.slice(0, 25)" not in source
     assert (
         "nilmbench[benchmark] @ git+https://github.com/sustainability-lab/nilmbench.git"

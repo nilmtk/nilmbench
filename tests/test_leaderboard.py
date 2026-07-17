@@ -480,6 +480,10 @@ def test_different_container_digests_are_never_aggregated(tmp_path):
         len({entry["comparison_protocol_sha256"] for entry in leaderboard["entries"]})
         == 2
     )
+    assert (
+        len({entry["ranking_protocol_sha256"] for entry in leaderboard["entries"]})
+        == 1
+    )
 
 
 def test_smoke_protocol_overrides_are_never_aggregated(tmp_path):
@@ -506,6 +510,37 @@ def test_smoke_protocol_overrides_are_never_aggregated(tmp_path):
     assert len({entry["comparison_protocol_sha256"] for entry in entries}) == 2
 
 
+def test_model_sequence_length_does_not_reset_public_rank(tmp_path):
+    for seed in (10, 20, 42):
+        _write_result(
+            tmp_path / "short-sequence",
+            seed,
+            scope="smoke",
+            sequence_length=99,
+            max_samples=1024,
+            mae=40.0,
+        )
+        _write_result(
+            tmp_path / "long-sequence",
+            seed,
+            scope="smoke",
+            sequence_length=299,
+            max_samples=1024,
+            mae=50.0,
+        )
+
+    entries = _build(tmp_path)["entries"]
+
+    assert [entry["sequence_length"] for entry in entries] == [99, 299]
+    assert len({entry["comparison_protocol_sha256"] for entry in entries}) == 2
+    assert len({entry["ranking_protocol_sha256"] for entry in entries}) == 1
+    assert [entry["rank"] for entry in entries] == [1, 2]
+    ranking_protocol = entries[0]["ranking_protocol"]
+    assert ranking_protocol["max_samples_per_window"] == 1024
+    assert "effective_sequence_length" not in ranking_protocol
+    assert "runtime" not in ranking_protocol
+
+
 def test_json_and_csv_artifacts_are_deterministic(tmp_path):
     for seed in (10, 20, 42):
         _write_result(tmp_path / "results", seed)
@@ -522,6 +557,8 @@ def test_json_and_csv_artifacts_are_deterministic(tmp_path):
     assert csv_path.read_bytes() == first_csv
     assert b"full-verified" in first_json
     assert b"full-verified" in first_csv
+    assert b"ranking_protocol_sha256" in first_csv
+    assert b",rank," in first_csv
     payload = json.loads(first_json)
     assert payload["artifacts"]["csv_name"] == "leaderboard.csv"
     assert payload["artifacts"]["csv_sha256"] == hashlib.sha256(first_csv).hexdigest()
