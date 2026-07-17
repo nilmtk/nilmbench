@@ -49,7 +49,8 @@ nilmbench list
 pytest
 ```
 
-For a non-editable install after the PatchTST nilmtk-contrib release is available:
+For a non-editable install using the exact PatchTST revision pinned by this
+repository:
 
 ```bash
 uv venv --python 3.11

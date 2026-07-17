@@ -19,7 +19,7 @@ runtime = [
   "pandas>=2,<3",
 ]
 benchmark = [
-  "nilmtk-contrib[torch] @ git+https://github.com/nilmtk/nilmtk-contrib.git",
+  "nilmtk-contrib[torch] @ git+https://github.com/nilmtk/nilmtk-contrib.git@f152f9f1783161bced09da7239d7ad57f4196a9b",
   "numpy>=1.26,<2",
   "optuna>=4,<5",
   "pandas>=2,<3",

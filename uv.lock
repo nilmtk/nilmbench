@@ -620,7 +620,7 @@ runtime = [
 
 [package.metadata]
 requires-dist = [
-    { name = "nilmtk-contrib", extras = ["torch"], marker = "extra == 'benchmark'", git = "https://github.com/nilmtk/nilmtk-contrib.git" },
+    { name = "nilmtk-contrib", extras = ["torch"], marker = "extra == 'benchmark'", git = "https://github.com/nilmtk/nilmtk-contrib.git?rev=f152f9f1783161bced09da7239d7ad57f4196a9b" },
     { name = "numpy", marker = "extra == 'benchmark'", specifier = ">=1.26,<2" },
     { name = "numpy", marker = "extra == 'dev'", specifier = ">=1.26,<2" },
     { name = "numpy", marker = "extra == 'runtime'", specifier = ">=1.26,<2" },
@@ -657,7 +657,7 @@ dependencies = [
 [[package]]
 name = "nilmtk-contrib"
 version = "0.1.2"
-source = { git = "https://github.com/nilmtk/nilmtk-contrib.git#c1d5b6979e8797b86a1702fe695135b40b27d939" }
+source = { git = "https://github.com/nilmtk/nilmtk-contrib.git?rev=f152f9f1783161bced09da7239d7ad57f4196a9b#f152f9f1783161bced09da7239d7ad57f4196a9b" }
 
 [package.optional-dependencies]
 torch = [
