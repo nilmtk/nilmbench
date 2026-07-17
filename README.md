@@ -151,6 +151,11 @@ nilmbench leaderboard --results results/published \
 git diff -- leaderboard.json leaderboard.csv
 ```
 
+Those immutable, hashable JSON bundles are the scientific source of truth.
+SQLite is reserved for mutable coordination such as resumable Optuna studies;
+an optional SQLite query index may be generated later, but it must always be
+rebuildable from the result bundles and never replace them.
+
 Every aggregate is separated by task/config revision, model revision, runner
 revision, container digest, hardware, resolution, appliance, target-data access,
 smoke/full scope, and a digest of every protocol override. Context length,

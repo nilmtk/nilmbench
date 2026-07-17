@@ -13,3 +13,12 @@ def test_site_loads_generated_leaderboard_and_discloses_smoke_protocol():
     assert "entry.trainable_parameters_mean" in source
     assert "entry.elapsed_seconds_mean" in source
     assert "entry.peak_accelerator_memory_bytes_mean" in source
+    assert "nilmbench[benchmark] @ git+https://github.com/sustainability-lab/nilmbench.git" in source
+    assert "--build-context contrib=../nilmtk-contrib" in source
+    assert "nilmbench run --task corrected-t1-redd" in source
+    assert (
+        "nilmtk-contrib[torch] @ git+https://github.com/sustainability-lab/nilmbench.git"
+        not in source
+    )
+    assert "ghcr.io/sustainability-lab/nilmtk-contrib" not in source
+    assert "run_benchmark.py" not in source

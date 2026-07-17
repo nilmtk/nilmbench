@@ -20,10 +20,12 @@ def atomic_write_text(path: Path, content: str) -> None:
             delete=False,
         ) as handle:
             handle.write(content)
+            handle.flush()
+            os.fsync(handle.fileno())
             temporary = Path(handle.name)
+        temporary.chmod(0o644)
         os.replace(temporary, path)
         temporary = None
-        path.chmod(0o644)
     finally:
         if temporary is not None:
             temporary.unlink(missing_ok=True)

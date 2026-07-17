@@ -767,9 +767,10 @@
     <div class="section-label">The utility</div>
     <h2>Reproduce every result in three commands</h2>
     <p class="lede">
-        NILMBench2026 ships as a modernized <a href="https://github.com/sustainability-lab/nilmbench" target="_blank" rel="noopener" style="color:var(--accent)">nilmtk-contrib</a>:
-        all sixteen architectures behind one PyTorch API, installable with <code style="font-family:var(--mono);color:var(--accent)">uv</code> or a pinned, GPU-ready
-        Docker image. Pick a tab.
+        NILMBench2026 is the benchmark runner around <a href="https://github.com/nilmtk/nilmtk" target="_blank" rel="noopener" style="color:var(--accent)">NILMTK</a>
+        data and <a href="https://github.com/nilmtk/nilmtk-contrib" target="_blank" rel="noopener" style="color:var(--accent)">nilmtk-contrib</a> models.
+        It freezes real-data protocols, provenance and leaderboard generation behind one CLI. Use <code style="font-family:var(--mono);color:var(--accent)">uv</code>
+        for development or build the pinned CPU/CUDA container family. Pick a tab.
     </p>
 
     <div class="term-tabs">
@@ -786,18 +787,19 @@
             <button class="copy-btn" onclick="copyTerm()">Copy</button>
         </div>
         <div class="term-body">
-            <div class="term-pane active" id="p-uv"><pre class="code" data-lang="shell"># Modernized nilmtk-contrib — 16 models behind one PyTorch API
-uv venv && source .venv/bin/activate
-uv pip install "nilmtk-contrib[torch] @ git+https://github.com/sustainability-lab/nilmbench.git"
+            <div class="term-pane active" id="p-uv"><pre class="code" data-lang="shell"># Python 3.11 benchmark environment
+uv venv --python 3.11
+source .venv/bin/activate
+uv pip install "nilmbench[benchmark] @ git+https://github.com/sustainability-lab/nilmbench.git"
+nilmbench list</pre></div>
 
-# That's it. No TensorFlow 1.x, no Python 2.7, no dependency hell.</pre></div>
-
-            <div class="term-pane" id="p-docker"><pre class="code" data-lang="shell"># Pinned, GPU-ready container — published on every release
-docker pull ghcr.io/sustainability-lab/nilmtk-contrib:latest
-docker run --rm -it --gpus all ghcr.io/sustainability-lab/nilmtk-contrib:latest bash
-
-# ...or build it locally
-docker build -t nilmtk-contrib:all .</pre></div>
+            <div class="term-pane" id="p-docker"><pre class="code" data-lang="shell"># Until the first public image release, build the pinned CUDA runner locally
+git clone https://github.com/nilmtk/nilmtk-contrib.git
+git clone https://github.com/sustainability-lab/nilmbench.git
+cd nilmbench
+docker buildx build --load --build-context contrib=../nilmtk-contrib \
+  -f docker/Dockerfile.cuda -t nilmbench:cuda .
+docker run --rm --gpus all nilmbench:cuda doctor</pre></div>
 
             <div class="term-pane" id="p-api"><pre class="code" data-lang="python">from nilmtk.api import API
 from nilmtk.disaggregate import Mean
@@ -825,19 +827,14 @@ experiment = {
 
 results = API(experiment)   # trains, tests &amp; scores every model — cross-building (T2)</pre></div>
 
-            <div class="term-pane" id="p-out"><pre class="code" data-lang="out">$ python run_benchmark.py --task T2 --dataset ukdale --resolution 60
-⚡ NILMBench2026 · UK-DALE · T2 cross-building · 60s · 3 runs
-─────────────────────────────────────────────────────────────
-model          MAE↓     F1↑     GFLOPs    params    infer
-NILMFormer     15.42    0.53    134.96     383K     354    ★ best MAE / F1
-Seq2Point      18.43    0.45     72.02     3.6M      39
-MSDC           19.23    0.41     25.42    12.7M     395
-ResNet         20.16    0.39     26.30     669K      62
-TCN            20.84    0.34     20.45      69K     317    ★ most efficient
-...            ...      ...      ...        ...      ...
-Mean (base)    34.08    0.17       —         —        —
-─────────────────────────────────────────────────────────────
-✓ 576 configs scored  ·  results → results/ukdale_T2.csv</pre></div>
+            <div class="term-pane" id="p-out"><pre class="code" data-lang="shell"># One provenance-recorded real-data smoke
+nilmbench run --task corrected-t1-redd --model Seq2Point \
+  --appliance fridge --seed 42 --epochs 3 --max-samples 8192 \
+  --sequence-length 299 --device cuda --results results
+
+# Generate the site artifacts only from immutable result bundles
+nilmbench leaderboard --results results \
+  --output leaderboard.json --csv leaderboard.csv</pre></div>
         </div>
     </div>
 
