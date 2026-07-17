@@ -2,6 +2,7 @@ import json
 
 import pytest
 
+from nilmbench import cli
 from nilmbench.cli import main
 
 
@@ -96,3 +97,42 @@ def test_leaderboard_command_generates_empty_artifacts(capsys, tmp_path):
     assert json.loads(json_path.read_text(encoding="utf-8"))["entries"] == []
     assert csv_path.read_text(encoding="utf-8").startswith("task,family,profile")
     assert str(json_path) in capsys.readouterr().out
+
+
+def test_leaderboard_command_forwards_custom_config_dir(monkeypatch, tmp_path):
+    sentinel = object()
+    observed = {}
+    config_dir = tmp_path / "private-config"
+
+    def fake_load_config(path):
+        observed["config_dir"] = path
+        return sentinel
+
+    def fake_build(results, *, config):
+        observed["results"] = results
+        observed["config"] = config
+        return {"entries": []}
+
+    monkeypatch.setattr(cli, "load_config", fake_load_config)
+    monkeypatch.setattr(cli, "build_leaderboard", fake_build)
+    monkeypatch.setattr(cli, "write_leaderboard", lambda *args: None)
+
+    assert (
+        main(
+            [
+                "--config-dir",
+                str(config_dir),
+                "leaderboard",
+                "--results",
+                str(tmp_path / "results"),
+                "--output",
+                str(tmp_path / "leaderboard.json"),
+            ]
+        )
+        == 0
+    )
+    assert observed == {
+        "config_dir": config_dir,
+        "results": tmp_path / "results",
+        "config": sentinel,
+    }

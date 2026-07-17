@@ -37,10 +37,10 @@ jobs:
           context: .
           file: docker/Dockerfile.${{ matrix.target }}
           build-contexts: |
-            contrib=https://github.com/nilmtk/nilmtk-contrib.git#f152f9f1783161bced09da7239d7ad57f4196a9b
+            contrib=https://github.com/nilmtk/nilmtk-contrib.git#2b686a5b779a17ac94dedd706355d013d2cc63fb
           build-args: |
             SOURCE_REVISION=${{ github.sha }}
-            NILMTK_CONTRIB_REVISION=f152f9f1783161bced09da7239d7ad57f4196a9b
+            NILMTK_CONTRIB_REVISION=2b686a5b779a17ac94dedd706355d013d2cc63fb
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

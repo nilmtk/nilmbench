@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 import math
 import os
@@ -13,6 +12,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from nilmbench._contracts import (
+    HPO_SELECTION_PROTOCOL,
+    HPO_TUNING_SEED,
+    VALIDATION_PROTOCOL,
+    canonical_digest,
+    strict_json_loads,
+    validate_persistent_hpo_provenance,
+    validate_trial_record,
+)
 from nilmbench._io import atomic_write_text, immutable_write_text
 from nilmbench.config import BenchmarkConfig, TaskConfig
 from nilmbench.data import LoadedSplit, load_split, verify_dataset
@@ -20,24 +28,11 @@ from nilmbench.provenance import runtime_provenance
 from nilmbench.registry import get_model
 
 
-_VALIDATION_PROTOCOL = {
-    "id": "source-train-blocked-holdout-v1",
-    "source": "task.train",
-    "strategy": "last 20 percent of each source training window",
-    "validation_fraction": 0.2,
-    "task_test_access": "forbidden",
-}
+_VALIDATION_PROTOCOL = VALIDATION_PROTOCOL
 
 
 def _canonical_digest(payload: Any) -> str:
-    return hashlib.sha256(
-        json.dumps(
-            payload,
-            sort_keys=True,
-            separators=(",", ":"),
-            allow_nan=False,
-        ).encode()
-    ).hexdigest()
+    return canonical_digest(payload)
 
 
 def metrics(truth: Any, prediction: Any, threshold: float = 10.0) -> dict[str, float]:
@@ -442,7 +437,7 @@ def _study_spec(
     task: TaskConfig,
     model_name: str,
     model_entry: Any,
-    seed: int,
+    tuning_seed: int,
     appliances: tuple[str, ...],
     sample_period: int,
     max_samples: int | None,
@@ -486,7 +481,8 @@ def _study_spec(
             "task_config_sha256": config.digest(task.id),
             "target_data_access": task.target_data_access,
             "model": model_name,
-            "seed": seed,
+            "selection_protocol": HPO_SELECTION_PROTOCOL,
+            "tuning_seed": tuning_seed,
             "appliances": list(appliances),
             "sample_period": sample_period,
             "max_samples_per_window": max_samples,
@@ -500,7 +496,7 @@ def _study_spec(
                 "version": optuna_version,
                 "direction": "minimize",
                 "sampler": "TPESampler",
-                "sampler_seed": seed,
+                "sampler_seed": tuning_seed,
             },
         },
         "source_dataset_identities": source_dataset_identities,
@@ -508,10 +504,10 @@ def _study_spec(
 
 
 def _study_identity(
-    task_id: str, model_name: str, seed: int, spec: dict[str, Any]
+    task_id: str, model_name: str, tuning_seed: int, spec: dict[str, Any]
 ) -> tuple[str, str]:
     digest = _canonical_digest(spec)
-    return digest, f"{task_id}--{model_name}--seed{seed}--{digest}"
+    return digest, f"{task_id}--{model_name}--tune-seed{tuning_seed}--{digest}"
 
 
 def _assert_resume_compatible(study: Any, spec: dict[str, Any], digest: str) -> None:
@@ -592,29 +588,29 @@ def _load_completed_trial_records(
             continue
         path = _trial_record_path(audit_dir, trial.number)
         try:
-            record = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError) as exc:
+            record = strict_json_loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError, ValueError) as exc:
             raise RuntimeError(
                 f"Completed trial {trial.number} has no valid immutable JSON audit "
                 f"record at {path}"
             ) from exc
-        record_without_id = {
-            key: value for key, value in record.items() if key != "record_id"
-        }
-        if (
-            record.get("record_id") != _canonical_digest(record_without_id)
-            or record.get("study_identity_sha256") != study_digest
-            or record.get("study_spec") != study_spec
-            or record.get("study_name") != study.study_name
-            or record.get("trial_number") != trial.number
-            or record.get("state") != "COMPLETE"
-            or record.get("parameters", {}).get("suggested") != trial.params
-            or record.get("validation", {}).get("objective_mae") != trial.value
-        ):
+        try:
+            validate_trial_record(
+                record,
+                study_name=study.study_name,
+                study_digest=study_digest,
+                study_spec=study_spec,
+                expected_trial_number=trial.number,
+                expected_suggestions=trial.params,
+                expected_objective=trial.value,
+            )
+            if trial.user_attrs.get("audit_record_id") != record["record_id"]:
+                raise ValueError("persistent trial is not bound to its audit record")
+        except (KeyError, TypeError, ValueError) as exc:
             raise RuntimeError(
                 f"Completed trial {trial.number} has an incompatible or modified "
                 "JSON audit record"
-            )
+            ) from exc
         records.append(record)
     return records
 
@@ -661,21 +657,31 @@ def run_benchmark(
         raise ValueError(
             f"Task {task.id} does not include: {', '.join(sorted(unknown))}"
         )
-    resolved_period = sample_period or task.sample_period
-    if resolved_period <= 0:
-        raise ValueError("sample_period must be positive")
-    if max_samples is not None and max_samples <= 0:
-        raise ValueError("max_samples must be positive")
-    if epochs is not None and epochs <= 0:
-        raise ValueError("epochs must be positive")
+    if sample_period is not None and (
+        isinstance(sample_period, bool)
+        or not isinstance(sample_period, int)
+        or sample_period <= 0
+    ):
+        raise ValueError("sample_period must be a positive integer")
+    resolved_period = sample_period if sample_period is not None else task.sample_period
+    if max_samples is not None and (
+        isinstance(max_samples, bool)
+        or not isinstance(max_samples, int)
+        or max_samples <= 0
+    ):
+        raise ValueError("max_samples must be a positive integer")
+    if epochs is not None and (
+        isinstance(epochs, bool) or not isinstance(epochs, int) or epochs <= 0
+    ):
+        raise ValueError("epochs must be a positive integer")
     if sequence_length is not None and (
         isinstance(sequence_length, bool)
         or not isinstance(sequence_length, int)
         or sequence_length <= 0
     ):
         raise ValueError("sequence_length must be a positive integer")
-    if trials < 0:
-        raise ValueError("trials must be non-negative")
+    if isinstance(trials, bool) or not isinstance(trials, int) or trials < 0:
+        raise ValueError("trials must be a non-negative integer")
     if not model_entry.supports_training_overrides and (
         trials
         or epochs is not None
@@ -699,6 +705,8 @@ def run_benchmark(
 
     root = Path(__file__).resolve().parents[2]
     provenance = runtime_provenance(root)
+    if trials > 0:
+        validate_persistent_hpo_provenance(provenance)
     all_dataset_names = sorted({w.dataset for w in (*task.train, *task.test)})
     source_dataset_names = sorted({window.dataset for window in task.train})
     dataset_identities: dict[str, dict[str, Any]] | None = None
@@ -728,7 +736,7 @@ def run_benchmark(
             task,
             model_name,
             model_entry,
-            seed,
+            HPO_TUNING_SEED,
             chosen_appliances,
             resolved_period,
             max_samples,
@@ -740,7 +748,7 @@ def run_benchmark(
             optuna.__version__,
         )
         study_digest, study_name = _study_identity(
-            task_id, model_name, seed, study_spec
+            task_id, model_name, HPO_TUNING_SEED, study_spec
         )
         storage_path = storage_dir / f"{study_name}.sqlite3"
         storage = f"sqlite:///{storage_path.resolve()}"
@@ -748,7 +756,7 @@ def run_benchmark(
         study = optuna.create_study(
             study_name=study_name,
             direction="minimize",
-            sampler=optuna.samplers.TPESampler(seed=seed),
+            sampler=optuna.samplers.TPESampler(seed=HPO_TUNING_SEED),
             storage=storage,
             load_if_exists=True,
         )
@@ -773,7 +781,7 @@ def run_benchmark(
                 config,
                 task,
                 model_name,
-                seed,
+                HPO_TUNING_SEED,
                 params,
                 chosen_appliances,
                 resolved_period,
@@ -810,6 +818,8 @@ def run_benchmark(
             "study_name": study.study_name,
             "study_spec": study_spec,
             "study_digest": study_digest,
+            "selection_protocol": HPO_SELECTION_PROTOCOL,
+            "tuning_seed": HPO_TUNING_SEED,
             "coordination": {
                 "backend": "sqlite",
                 "storage": storage_path.relative_to(output_root).as_posix(),
@@ -843,9 +853,7 @@ def run_benchmark(
         resolved_period,
         max_samples,
     )
-    model_params_sha256 = hashlib.sha256(
-        json.dumps(base_params, sort_keys=True, separators=(",", ":")).encode()
-    ).hexdigest()
+    model_params_sha256 = _canonical_digest(base_params)
     result = {
         "schema_version": "1.2",
         "created_at": datetime.now(timezone.utc).isoformat(),
@@ -870,7 +878,9 @@ def run_benchmark(
         "appliances": chosen_appliances,
         "max_samples_per_window": max_samples,
         "run_scope": "smoke"
-        if max_samples is not None or epochs is not None
+        if max_samples is not None
+        or epochs is not None
+        or chosen_appliances != task.appliances
         else "full",
         "protocol_overrides": {
             "max_samples_per_window": max_samples,
@@ -886,6 +896,8 @@ def run_benchmark(
             if trial_metadata is None
             else {
                 "method": "optuna-tpe",
+                "selection_protocol": HPO_SELECTION_PROTOCOL,
+                "tuning_seed": HPO_TUNING_SEED,
                 "study_identity_sha256": trial_metadata["study_digest"],
                 "completed_trials": trial_metadata["completed_trials"],
                 "validation_protocol": _VALIDATION_PROTOCOL["id"],
@@ -898,10 +910,6 @@ def run_benchmark(
     }
     if not math.isfinite(run["objective_mae"]):
         raise RuntimeError("Benchmark produced a non-finite objective")
-    result["result_id"] = hashlib.sha256(
-        json.dumps(
-            result, sort_keys=True, separators=(",", ":"), allow_nan=False
-        ).encode()
-    ).hexdigest()
+    result["result_id"] = _canonical_digest(result)
     _write_result(result, output_dir)
     return output_dir

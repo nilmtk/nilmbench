@@ -1560,12 +1560,8 @@ function memoryInMiB(value) {
 }
 function comparisonKey(entry) {
   return [
-    entry.task_config_sha256,
-    entry.sample_period,
+    entry.comparison_protocol_sha256,
     entry.appliance,
-    entry.scope,
-    entry.target_data_access,
-    entry.max_samples_per_window ?? 'full',
   ].join('|');
 }
 async function loadLiveLeaderboard() {

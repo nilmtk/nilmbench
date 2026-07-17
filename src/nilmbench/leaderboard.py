@@ -10,9 +10,23 @@ import math
 import statistics
 from collections import defaultdict
 from dataclasses import asdict
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Iterable
 
+from nilmbench._contracts import (
+    HPO_SELECTION_PROTOCOL,
+    HPO_TUNING_SEED,
+    VALIDATION_PROTOCOL,
+    alignment_groups,
+    canonical_digest,
+    is_git_sha,
+    is_sha256,
+    strict_json_loads,
+    validate_persistent_hpo_provenance,
+    validate_resolved_parameters,
+    validate_trial_record,
+)
 from nilmbench._io import atomic_write_text
 from nilmbench.config import BenchmarkConfig, load_config
 from nilmbench.registry import MODELS
@@ -32,24 +46,352 @@ def _expect(mapping: dict[str, Any], key: str, path: Path) -> Any:
 
 
 def _is_sha(value: Any) -> bool:
-    return (
-        isinstance(value, str)
-        and len(value) == 40
-        and all(character in "0123456789abcdef" for character in value.lower())
-    )
+    return is_git_sha(value)
 
 
 def _is_sha256(value: Any) -> bool:
-    return (
-        isinstance(value, str)
-        and len(value) == 64
-        and all(character in "0123456789abcdef" for character in value.lower())
-    )
+    return is_sha256(value)
 
 
 def _json_value(value: Any) -> Any:
     """Normalize dataclass tuples to their serialized JSON representation."""
     return json.loads(json.dumps(value, sort_keys=True))
+
+
+def _expected_window_samples(window: Any, sample_period: int, limit: int | None) -> int:
+    requested_seconds = (
+        datetime.fromisoformat(window.end) - datetime.fromisoformat(window.start)
+    ).total_seconds()
+    expected = max(1, int(requested_seconds // sample_period))
+    return min(expected, limit) if limit is not None else expected
+
+
+def _comparison_protocol(result: dict[str, Any]) -> dict[str, Any]:
+    """Return only evaluation controls under which models may be ranked together."""
+    overrides = result["protocol_overrides"]
+    task = result["task"]
+    runtime = result["runtime"]
+    selection = overrides["model_selection"]
+    return {
+        "schema": "nilmbench.comparison-protocol.v1",
+        "task_id": task["id"],
+        "task_config_sha256": result["task_config_sha256"],
+        "sample_period": result["sample_period"],
+        "appliances": sorted(result["appliances"]),
+        "max_samples_per_window": overrides["max_samples_per_window"],
+        "epochs_override": overrides["epochs"],
+        "effective_epochs": result["model_params"].get("n_epochs"),
+        "effective_sequence_length": result["model_params"].get("sequence_length"),
+        "model_selection": None
+        if selection is None
+        else {
+            "method": selection["method"],
+            "selection_protocol": selection["selection_protocol"],
+            "tuning_seed": selection["tuning_seed"],
+            "completed_trials": selection["completed_trials"],
+            "validation_protocol": selection["validation_protocol"],
+        },
+        "runtime": {
+            "nilmbench_git_sha": runtime.get("nilmbench_git_sha"),
+            "nilmtk_contrib_git_sha": runtime.get("nilmtk_contrib_git_sha"),
+            "container_image": runtime.get("container_image"),
+            "container_digest": runtime.get("container_digest"),
+            "hardware": runtime.get("gpu") or runtime.get("cpu"),
+            "torch": runtime.get("torch"),
+            "cuda_runtime": runtime.get("cuda_runtime"),
+        },
+        "scope": result["run_scope"],
+        "target_data_access": task["target_data_access"],
+    }
+
+
+def _validate_study_contract(
+    result: dict[str, Any], path: Path, config: BenchmarkConfig, task: Any
+) -> None:
+    study = result["study"]
+    overrides = result["protocol_overrides"]
+    model_selection = overrides["model_selection"]
+    if study is None:
+        if model_selection is not None:
+            raise LeaderboardError(f"{path} declares model selection without a study")
+        return
+    if not isinstance(study, dict):
+        raise LeaderboardError(f"{path} study must be null or an object")
+    expected_study_fields = {
+        "study_name",
+        "study_spec",
+        "study_digest",
+        "selection_protocol",
+        "tuning_seed",
+        "coordination",
+        "completed_trials",
+        "best_value",
+        "best_params",
+        "optuna_best_suggestions",
+        "trial_record_files",
+        "trial_records",
+    }
+    if set(study) != expected_study_fields:
+        raise LeaderboardError(f"{path} has invalid study summary fields")
+    try:
+        validate_persistent_hpo_provenance(result["runtime"])
+    except ValueError as exc:
+        raise LeaderboardError(
+            f"{path} has unsafe persistent HPO provenance: {exc}"
+        ) from exc
+
+    study_spec = study["study_spec"]
+    study_digest = study["study_digest"]
+    if not isinstance(study_spec, dict) or study_digest != canonical_digest(study_spec):
+        raise LeaderboardError(f"{path} study identity does not match its spec")
+    if (
+        study["selection_protocol"] != HPO_SELECTION_PROTOCOL
+        or study["tuning_seed"] != HPO_TUNING_SEED
+    ):
+        raise LeaderboardError(f"{path} uses an unsupported multi-seed HPO protocol")
+    expected_study_name = (
+        f"{task.id}--{result['model']}--tune-seed{HPO_TUNING_SEED}--{study_digest}"
+    )
+    if study["study_name"] != expected_study_name:
+        raise LeaderboardError(f"{path} study name is not bound to its identity")
+
+    runtime = result["runtime"]
+    model_spec = result["model_spec"]
+    expected_top_spec_keys = {
+        "identity_schema",
+        "runner",
+        "contrib",
+        "container",
+        "device",
+        "protocol",
+        "source_dataset_identities",
+    }
+    if (
+        set(study_spec) != expected_top_spec_keys
+        or study_spec.get("identity_schema") != "nilmbench.optuna-study.v2"
+    ):
+        raise LeaderboardError(f"{path} has an invalid study specification schema")
+    if study_spec["runner"] != {
+        "git_sha": runtime.get("nilmbench_git_sha"),
+        "git_dirty": runtime.get("nilmbench_git_dirty"),
+    }:
+        raise LeaderboardError(f"{path} study runner is not bound to result provenance")
+    if study_spec["contrib"] != {
+        "git_sha": runtime.get("nilmtk_contrib_git_sha"),
+        "git_dirty": runtime.get("nilmtk_contrib_git_dirty"),
+        "version": runtime.get("nilmtk_contrib_version"),
+        "model_module": model_spec["module"],
+        "model_class": model_spec["class_name"],
+    }:
+        raise LeaderboardError(f"{path} study model is not bound to result provenance")
+    if study_spec["container"] != {
+        "image": runtime.get("container_image"),
+        "digest": runtime.get("container_digest"),
+    }:
+        raise LeaderboardError(f"{path} study container is not bound to provenance")
+    expected_device = {
+        "requested": result["model_params"].get("device", "auto"),
+        "cpu": runtime.get("cpu"),
+        "gpu": runtime.get("gpu"),
+        "torch": runtime.get("torch"),
+        "cuda_runtime": runtime.get("cuda_runtime"),
+        "cuda_available": runtime.get("cuda_available"),
+    }
+    if study_spec["device"] != expected_device:
+        raise LeaderboardError(f"{path} study device is not bound to provenance")
+
+    protocol = study_spec["protocol"]
+    if not isinstance(protocol, dict) or set(protocol) != {
+        "task_id",
+        "task_family",
+        "task_profile",
+        "task_config_sha256",
+        "target_data_access",
+        "model",
+        "selection_protocol",
+        "tuning_seed",
+        "appliances",
+        "sample_period",
+        "max_samples_per_window",
+        "epochs_override",
+        "sequence_length_override",
+        "alignment_policy",
+        "metric_policy",
+        "validation",
+        "optimization",
+    }:
+        raise LeaderboardError(f"{path} study protocol has invalid fields")
+    expected_protocol = {
+        "task_id": task.id,
+        "task_family": task.family,
+        "task_profile": task.profile,
+        "task_config_sha256": result["task_config_sha256"],
+        "target_data_access": task.target_data_access,
+        "model": result["model"],
+        "selection_protocol": HPO_SELECTION_PROTOCOL,
+        "tuning_seed": HPO_TUNING_SEED,
+        "appliances": result["appliances"],
+        "sample_period": result["sample_period"],
+        "max_samples_per_window": overrides["max_samples_per_window"],
+        "epochs_override": overrides["epochs"],
+        "sequence_length_override": overrides["sequence_length"],
+        "alignment_policy": task.alignment_policy,
+        "metric_policy": task.metric_policy,
+        "validation": VALIDATION_PROTOCOL,
+    }
+    for name, value in expected_protocol.items():
+        if protocol.get(name) != value:
+            raise LeaderboardError(f"{path} study protocol {name!r} is not bound")
+    optimization = protocol["optimization"]
+    if (
+        not isinstance(optimization, dict)
+        or set(optimization)
+        != {
+            "library",
+            "version",
+            "direction",
+            "sampler",
+            "sampler_seed",
+        }
+        or optimization.get("library") != "optuna"
+        or not isinstance(optimization.get("version"), str)
+        or not optimization["version"]
+        or optimization.get("direction") != "minimize"
+        or optimization.get("sampler") != "TPESampler"
+        or optimization.get("sampler_seed") != HPO_TUNING_SEED
+    ):
+        raise LeaderboardError(f"{path} study optimization contract is invalid")
+    source_names = {window.dataset for window in task.train}
+    expected_sources = {
+        name: result["dataset_identities"][name] for name in sorted(source_names)
+    }
+    if study_spec["source_dataset_identities"] != expected_sources:
+        raise LeaderboardError(f"{path} study sources are not bound to task.train")
+
+    coordination = study["coordination"]
+    expected_storage = f"optuna/{study['study_name']}.sqlite3"
+    if coordination != {
+        "backend": "sqlite",
+        "storage": expected_storage,
+        "scientific_source_of_truth": False,
+    }:
+        raise LeaderboardError(f"{path} study coordination disclosure is invalid")
+    completed = study["completed_trials"]
+    records = study["trial_records"]
+    files = study["trial_record_files"]
+    if (
+        isinstance(completed, bool)
+        or not isinstance(completed, int)
+        or completed <= 0
+        or not isinstance(records, list)
+        or len(records) != completed
+        or not isinstance(files, list)
+        or len(files) != completed
+        or study["best_params"] != result["model_params"]
+        or not isinstance(study["optuna_best_suggestions"], dict)
+        or any(
+            result["model_params"].get(name) != value
+            for name, value in study["optuna_best_suggestions"].items()
+        )
+    ):
+        raise LeaderboardError(f"{path} study summary is inconsistent")
+    best_value = study["best_value"]
+    if (
+        isinstance(best_value, bool)
+        or not isinstance(best_value, (int, float))
+        or not math.isfinite(best_value)
+        or best_value < 0
+    ):
+        raise LeaderboardError(f"{path} study has an invalid best value")
+
+    numbers: set[int] = set()
+    objectives: list[float] = []
+    policy = config.metric_policy(task.metric_policy)
+    for index, record in enumerate(records):
+        try:
+            validate_trial_record(
+                record,
+                study_name=study["study_name"],
+                study_digest=study_digest,
+                study_spec=study_spec,
+            )
+        except (KeyError, TypeError, ValueError) as exc:
+            raise LeaderboardError(
+                f"{path} has an invalid trial audit record: {exc}"
+            ) from exc
+        number = record["trial_number"]
+        if number in numbers:
+            raise LeaderboardError(f"{path} has duplicate trial audit records")
+        numbers.add(number)
+        expected_file = f"optuna/{study['study_name']}/trials/trial-{number:06d}.json"
+        if files[index] != expected_file:
+            raise LeaderboardError(f"{path} trial record file disclosure is invalid")
+        for appliance, metrics in record["validation"]["metrics"].items():
+            if metrics["activation_threshold_watts"] != policy.threshold(appliance):
+                raise LeaderboardError(f"{path} trial threshold is not trusted")
+        partitions = record["validation"]["partitions"]
+        for group_windows in partitions.values():
+            if not isinstance(group_windows, list) or len(group_windows) != len(
+                task.train
+            ):
+                raise LeaderboardError(f"{path} trial partitions are incomplete")
+            for partition, configured in zip(group_windows, task.train, strict=True):
+                if (
+                    not isinstance(partition, dict)
+                    or set(partition)
+                    != {
+                        "source_window",
+                        "training",
+                        "validation",
+                    }
+                    or not isinstance(partition["source_window"], dict)
+                    or partition["source_window"].get("requested")
+                    != _json_value(asdict(configured))
+                ):
+                    raise LeaderboardError(
+                        f"{path} trial partition is not bound to task.train"
+                    )
+                for split in ("training", "validation"):
+                    split_value = partition[split]
+                    if (
+                        not isinstance(split_value, dict)
+                        or set(split_value)
+                        != {
+                            "samples",
+                            "actual_start",
+                            "actual_end",
+                        }
+                        or isinstance(split_value["samples"], bool)
+                        or not isinstance(split_value["samples"], int)
+                        or split_value["samples"] <= 0
+                    ):
+                        raise LeaderboardError(
+                            f"{path} trial partition evidence is invalid"
+                        )
+        objectives.append(record["validation"]["objective_mae"])
+    if not math.isclose(best_value, min(objectives), rel_tol=1e-12):
+        raise LeaderboardError(f"{path} study best value is not supported by trials")
+    best_suggestions = study["optuna_best_suggestions"]
+    if not any(
+        math.isclose(record["validation"]["objective_mae"], best_value, rel_tol=1e-12)
+        and record["parameters"]["suggested"] == best_suggestions
+        and record["parameters"]["effective"] == study["best_params"]
+        for record in records
+    ):
+        raise LeaderboardError(
+            f"{path} selected parameters are not supported by the best trial"
+        )
+    expected_selection = {
+        "method": "optuna-tpe",
+        "selection_protocol": HPO_SELECTION_PROTOCOL,
+        "tuning_seed": HPO_TUNING_SEED,
+        "study_identity_sha256": study_digest,
+        "completed_trials": completed,
+        "validation_protocol": VALIDATION_PROTOCOL["id"],
+        "selected_parameters": study["best_params"],
+    }
+    if model_selection != expected_selection:
+        raise LeaderboardError(f"{path} model-selection disclosure is inconsistent")
 
 
 def _validate_trusted_contract(
@@ -100,9 +442,7 @@ def _validate_trusted_contract(
     model_params = result["model_params"]
     if not isinstance(model_params, dict):
         raise LeaderboardError(f"{path} model_params must be an object")
-    params_digest = hashlib.sha256(
-        json.dumps(model_params, sort_keys=True, separators=(",", ":")).encode()
-    ).hexdigest()
+    params_digest = canonical_digest(model_params)
     if result["model_params_sha256"] != params_digest:
         raise LeaderboardError(f"{path} model parameter digest does not match")
     for override_name, parameter_name in (
@@ -116,75 +456,35 @@ def _validate_trusted_contract(
             )
 
     overrides = result["protocol_overrides"]
+    if set(overrides) != {
+        "max_samples_per_window",
+        "epochs",
+        "appliances",
+        "sample_period",
+        "sequence_length",
+        "model_selection",
+    }:
+        raise LeaderboardError(f"{path} has invalid protocol override fields")
+    for name in (
+        "max_samples_per_window",
+        "epochs",
+        "sample_period",
+        "sequence_length",
+    ):
+        value = overrides[name]
+        if value is not None and (
+            isinstance(value, bool) or not isinstance(value, int) or value <= 0
+        ):
+            raise LeaderboardError(f"{path} has an invalid {name} override")
     period_override = overrides.get("sample_period")
     expected_period = period_override or task.sample_period
     if result["sample_period"] != expected_period:
         raise LeaderboardError(f"{path} sample period does not match its protocol")
+    max_samples = overrides["max_samples_per_window"]
+    if result.get("max_samples_per_window") != max_samples:
+        raise LeaderboardError(f"{path} sample limit does not match its protocol")
 
-    study = result["study"]
-    model_selection = overrides.get("model_selection")
-    if study is None:
-        if model_selection is not None:
-            raise LeaderboardError(f"{path} declares model selection without a study")
-    elif not isinstance(study, dict):
-        raise LeaderboardError(f"{path} study must be null or an object")
-    else:
-        try:
-            study_digest = study["study_digest"]
-            study_spec = study["study_spec"]
-            completed_trials = study["completed_trials"]
-            trial_records = study["trial_records"]
-            best_params = study["best_params"]
-        except KeyError as exc:
-            raise LeaderboardError(f"{path} has an incomplete study") from exc
-        expected_study_digest = hashlib.sha256(
-            json.dumps(
-                study_spec,
-                sort_keys=True,
-                separators=(",", ":"),
-                allow_nan=False,
-            ).encode()
-        ).hexdigest()
-        if study_digest != expected_study_digest:
-            raise LeaderboardError(f"{path} study identity does not match its spec")
-        if (
-            isinstance(completed_trials, bool)
-            or not isinstance(completed_trials, int)
-            or completed_trials <= 0
-            or not isinstance(trial_records, list)
-            or len(trial_records) != completed_trials
-            or best_params != model_params
-        ):
-            raise LeaderboardError(f"{path} study summary is inconsistent")
-        for record in trial_records:
-            if not isinstance(record, dict):
-                raise LeaderboardError(f"{path} has an invalid trial audit record")
-            payload = {
-                key: value for key, value in record.items() if key != "record_id"
-            }
-            record_id = hashlib.sha256(
-                json.dumps(
-                    payload,
-                    sort_keys=True,
-                    separators=(",", ":"),
-                    allow_nan=False,
-                ).encode()
-            ).hexdigest()
-            if (
-                record.get("record_id") != record_id
-                or record.get("study_identity_sha256") != study_digest
-                or record.get("study_spec") != study_spec
-            ):
-                raise LeaderboardError(f"{path} has a modified trial audit record")
-        expected_selection = {
-            "method": "optuna-tpe",
-            "study_identity_sha256": study_digest,
-            "completed_trials": completed_trials,
-            "validation_protocol": "source-train-blocked-holdout-v1",
-            "selected_parameters": best_params,
-        }
-        if model_selection != expected_selection:
-            raise LeaderboardError(f"{path} model-selection disclosure is inconsistent")
+    _validate_study_contract(result, path, config, task)
 
     appliances = result["appliances"]
     if (
@@ -205,15 +505,52 @@ def _validate_trusted_contract(
     metrics = result["run"].get("metrics")
     if not isinstance(metrics, dict) or set(metrics) != set(appliances):
         raise LeaderboardError(f"{path} metrics do not match benchmark appliances")
+    metric_maes: list[float] = []
     for appliance, values in metrics.items():
-        if values.get("activation_threshold_watts") != config.metric_policy(
-            task.metric_policy
-        ).threshold(appliance):
-            raise LeaderboardError(f"{path} metric threshold is not trusted")
+        mae = values.get("mae") if isinstance(values, dict) else None
+        if (
+            not isinstance(values, dict)
+            or isinstance(mae, bool)
+            or not isinstance(mae, (int, float))
+            or not math.isfinite(mae)
+            or values.get("activation_threshold_watts")
+            != config.metric_policy(task.metric_policy).threshold(appliance)
+        ):
+            raise LeaderboardError(f"{path} metrics are not trusted")
+        metric_maes.append(float(mae))
+    objective = result["run"].get("objective_mae")
+    if (
+        isinstance(objective, bool)
+        or not isinstance(objective, (int, float))
+        or not math.isfinite(objective)
+        or not math.isclose(objective, statistics.fmean(metric_maes), rel_tol=1e-12)
+    ):
+        raise LeaderboardError(f"{path} run objective is not supported by metrics")
 
-    expected_groups = (
-        set(appliances) if task.alignment_policy == "per_appliance" else {"joint"}
-    )
+    expected_groups = alignment_groups(appliances, task.alignment_policy)
+    for field in (
+        "elapsed_seconds_by_alignment_group",
+        "trainable_parameters",
+        "inference_flops_estimate",
+        "peak_accelerator_memory_bytes",
+    ):
+        values = result["run"].get(field)
+        if values is not None and (
+            not isinstance(values, dict) or set(values) != expected_groups
+        ):
+            raise LeaderboardError(f"{path} has invalid {field} groups")
+    try:
+        validate_resolved_parameters(
+            result["run"].get("params_by_alignment_group"),
+            model_params=model_params,
+            expected_groups=expected_groups,
+            expected_seed=result["seed"],
+        )
+    except ValueError as exc:
+        raise LeaderboardError(
+            f"{path} has invalid resolved model parameters: {exc}"
+        ) from exc
+    observed_limits: set[int | None] = set()
     for field, configured_windows in (
         ("train_windows", task.train),
         ("test_windows", task.test),
@@ -225,11 +562,18 @@ def _validate_trusted_contract(
             if not isinstance(windows, list) or len(windows) != len(configured_windows):
                 raise LeaderboardError(f"{path} has an incomplete {field} group")
             for window, configured in zip(windows, configured_windows, strict=True):
+                if not isinstance(window, dict):
+                    raise LeaderboardError(f"{path} has invalid {field} evidence")
                 if window.get("requested") != _json_value(asdict(configured)):
                     raise LeaderboardError(f"{path} {field} window is not configured")
                 samples = window.get("samples")
                 expected_samples = window.get("expected_samples")
+                sample_limit = window.get("sample_limit")
+                observed_limits.add(sample_limit)
                 fraction = window.get("aligned_sample_fraction")
+                trusted_expected = _expected_window_samples(
+                    configured, result["sample_period"], max_samples
+                )
                 if (
                     isinstance(samples, bool)
                     or not isinstance(samples, int)
@@ -237,6 +581,8 @@ def _validate_trusted_contract(
                     or isinstance(expected_samples, bool)
                     or not isinstance(expected_samples, int)
                     or expected_samples <= 0
+                    or expected_samples != trusted_expected
+                    or sample_limit != max_samples
                     or isinstance(fraction, bool)
                     or not isinstance(fraction, (int, float))
                     or not math.isfinite(fraction)
@@ -248,6 +594,18 @@ def _validate_trusted_contract(
                     raise LeaderboardError(
                         f"{path} {field} violates minimum aligned sample coverage"
                     )
+    expected_scope = (
+        "smoke"
+        if max_samples is not None
+        or overrides["epochs"] is not None
+        or overrides["appliances"] is not None
+        or any(limit is not None for limit in observed_limits)
+        else "full"
+    )
+    if result["run_scope"] != expected_scope:
+        raise LeaderboardError(
+            f"{path} run_scope does not match observed sample and epoch budgets"
+        )
 
 
 def _verified_provenance(
@@ -313,8 +671,6 @@ def _alignment_group_value(values: Any, appliance: str, path: Path, field: str) 
         return values[appliance]
     if "joint" in values:
         return values["joint"]
-    if len(values) == 1:
-        return next(iter(values.values()))
     raise LeaderboardError(
         f"{path} cannot resolve {field!r} for appliance {appliance!r}"
     )
@@ -322,8 +678,8 @@ def _alignment_group_value(values: Any, appliance: str, path: Path, field: str) 
 
 def _load_result(path: Path) -> dict[str, Any]:
     try:
-        result = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
+        result = strict_json_loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
         raise LeaderboardError(f"Could not read {path}: {exc}") from exc
     if not isinstance(result, dict):
         raise LeaderboardError(f"{path} must contain a JSON object")
@@ -341,6 +697,7 @@ def _load_result(path: Path) -> dict[str, Any]:
         "seed",
         "sample_period",
         "appliances",
+        "max_samples_per_window",
         "metric_policy",
         "run_scope",
         "protocol_overrides",
@@ -376,9 +733,7 @@ def _load_result(path: Path) -> dict[str, Any]:
     ):
         raise LeaderboardError(f"{path} has an invalid sample_period")
     stored_id = result.pop("result_id")
-    computed_id = hashlib.sha256(
-        json.dumps(result, sort_keys=True, separators=(",", ":")).encode()
-    ).hexdigest()
+    computed_id = canonical_digest(result)
     result["result_id"] = stored_id
     if stored_id != computed_id:
         raise LeaderboardError(f"{path} result_id does not match its contents")
@@ -398,6 +753,8 @@ def _rows(
     overrides_sha256 = hashlib.sha256(
         json.dumps(overrides, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
+    comparison_protocol = _comparison_protocol(result)
+    comparison_protocol_sha256 = canonical_digest(comparison_protocol)
     model_params = result["model_params"]
     sequence_length = model_params.get("sequence_length")
     if sequence_length is not None and (
@@ -507,6 +864,8 @@ def _rows(
             "sample_period": result["sample_period"],
             "protocol_overrides": overrides,
             "protocol_overrides_sha256": overrides_sha256,
+            "comparison_protocol": comparison_protocol,
+            "comparison_protocol_sha256": comparison_protocol_sha256,
             "sequence_length": sequence_length,
             "epochs": epochs,
             "max_samples_per_window": max_samples,
@@ -622,6 +981,8 @@ def build_leaderboard(
                 "sample_period": rows[0]["sample_period"],
                 "protocol_overrides": rows[0]["protocol_overrides"],
                 "protocol_overrides_sha256": rows[0]["protocol_overrides_sha256"],
+                "comparison_protocol": rows[0]["comparison_protocol"],
+                "comparison_protocol_sha256": rows[0]["comparison_protocol_sha256"],
                 "sequence_length": rows[0]["sequence_length"],
                 "epochs": rows[0]["epochs"],
                 "max_samples_per_window": rows[0]["max_samples_per_window"],
@@ -720,6 +1081,7 @@ def write_leaderboard(
         "epochs",
         "max_samples_per_window",
         "protocol_overrides_sha256",
+        "comparison_protocol_sha256",
         "appliance",
         "target_data_access",
         "scope",

@@ -110,7 +110,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "doctor":
             return _doctor(config, args.checksums)
         if args.command == "leaderboard":
-            leaderboard = build_leaderboard(args.results)
+            leaderboard = build_leaderboard(args.results, config=config)
             write_leaderboard(leaderboard, args.output, args.csv)
             print(args.output)
             return 0

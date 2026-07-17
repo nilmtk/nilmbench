@@ -1,9 +1,16 @@
 import hashlib
 import json
+from copy import deepcopy
 from dataclasses import asdict
 
 import pytest
 
+from nilmbench._contracts import (
+    HPO_SELECTION_PROTOCOL,
+    HPO_TUNING_SEED,
+    VALIDATION_PROTOCOL,
+    canonical_digest,
+)
 from nilmbench.leaderboard import (
     LeaderboardError,
     build_leaderboard,
@@ -99,6 +106,7 @@ def _write_result(
     sequence_length=99,
     max_samples=None,
 ):
+    expected_samples = min(1440, max_samples) if max_samples is not None else 1440
     model_params = {
         "sequence_length": sequence_length,
         "n_epochs": 1 if scope == "smoke" else 10,
@@ -134,6 +142,7 @@ def _write_result(
         "seed": seed,
         "sample_period": 60,
         "appliances": ["fridge"],
+        "max_samples_per_window": max_samples,
         "run_scope": scope,
         "protocol_overrides": {
             "appliances": ["fridge"] if scope == "smoke" else None,
@@ -141,6 +150,7 @@ def _write_result(
             "max_samples_per_window": max_samples,
             "sample_period": None,
             "sequence_length": sequence_length,
+            "model_selection": None,
         },
         "study": None,
         "runtime": {
@@ -148,14 +158,24 @@ def _write_result(
             "nilmbench_git_dirty": dirty,
             "nilmtk_contrib_git_sha": "d" * 40,
             "nilmtk_contrib_git_dirty": False,
+            "nilmtk_contrib_version": "1.0.0",
             "container_digest": "sha256:" + "e" * 64,
             "container_image": "ghcr.io/nilmtk/nilmbench:test-cuda",
+            "cpu": None,
             "gpu": "Test GPU",
+            "torch": "2.6.0",
+            "cuda_runtime": "12.4",
             "cuda_available": True,
         },
         "run": {
+            "objective_mae": float(seed if mae is None else mae),
             "params_by_alignment_group": {
-                "fridge": {"sequence_length": sequence_length}
+                "fridge": {
+                    **model_params,
+                    "seed": seed,
+                    "mains_mean": 100.0,
+                    "mains_std": 20.0,
+                }
             },
             "elapsed_seconds_by_alignment_group": {"fridge": float(seed)},
             "trainable_parameters": {"fridge": 1234},
@@ -164,8 +184,9 @@ def _write_result(
                 "fridge": [
                     {
                         "requested": asdict(TASK.train[0]),
-                        "samples": 100,
-                        "expected_samples": 100,
+                        "samples": expected_samples,
+                        "expected_samples": expected_samples,
+                        "sample_limit": max_samples,
                         "aligned_sample_fraction": 1.0,
                     }
                 ]
@@ -174,8 +195,9 @@ def _write_result(
                 "fridge": [
                     {
                         "requested": asdict(TASK.test[0]),
-                        "samples": 100,
-                        "expected_samples": 100,
+                        "samples": expected_samples,
+                        "expected_samples": expected_samples,
+                        "sample_limit": max_samples,
                         "aligned_sample_fraction": 1.0,
                     }
                 ]
@@ -196,6 +218,165 @@ def _write_result(
     path.parent.mkdir(parents=True)
     path.write_text(json.dumps(result), encoding="utf-8")
     return path
+
+
+def _rekey_study(result):
+    study = result["study"]
+    spec = study["study_spec"]
+    digest = canonical_digest(spec)
+    name = f"{TASK.id}--PatchTST--tune-seed{HPO_TUNING_SEED}--{digest}"
+    study["study_digest"] = digest
+    study["study_name"] = name
+    study["coordination"]["storage"] = f"optuna/{name}.sqlite3"
+    for record in study["trial_records"]:
+        record["study_name"] = name
+        record["study_identity_sha256"] = digest
+        record["study_spec"] = spec
+        payload = {key: value for key, value in record.items() if key != "record_id"}
+        record["record_id"] = canonical_digest(payload)
+    study["trial_record_files"] = [
+        f"optuna/{name}/trials/trial-{record['trial_number']:06d}.json"
+        for record in study["trial_records"]
+    ]
+    result["protocol_overrides"]["model_selection"]["study_identity_sha256"] = digest
+
+
+def _attach_valid_study(path):
+    result = json.loads(path.read_text(encoding="utf-8"))
+    params = result["model_params"]
+    spec = {
+        "identity_schema": "nilmbench.optuna-study.v2",
+        "runner": {
+            "git_sha": result["runtime"]["nilmbench_git_sha"],
+            "git_dirty": result["runtime"]["nilmbench_git_dirty"],
+        },
+        "contrib": {
+            "git_sha": result["runtime"]["nilmtk_contrib_git_sha"],
+            "git_dirty": result["runtime"]["nilmtk_contrib_git_dirty"],
+            "version": result["runtime"]["nilmtk_contrib_version"],
+            "model_module": result["model_spec"]["module"],
+            "model_class": result["model_spec"]["class_name"],
+        },
+        "container": {
+            "image": result["runtime"]["container_image"],
+            "digest": result["runtime"]["container_digest"],
+        },
+        "device": {
+            "requested": "auto",
+            "cpu": result["runtime"]["cpu"],
+            "gpu": result["runtime"]["gpu"],
+            "torch": result["runtime"]["torch"],
+            "cuda_runtime": result["runtime"]["cuda_runtime"],
+            "cuda_available": result["runtime"]["cuda_available"],
+        },
+        "protocol": {
+            "task_id": TASK.id,
+            "task_family": TASK.family,
+            "task_profile": TASK.profile,
+            "task_config_sha256": result["task_config_sha256"],
+            "target_data_access": TASK.target_data_access,
+            "model": "PatchTST",
+            "selection_protocol": HPO_SELECTION_PROTOCOL,
+            "tuning_seed": HPO_TUNING_SEED,
+            "appliances": result["appliances"],
+            "sample_period": result["sample_period"],
+            "max_samples_per_window": result["max_samples_per_window"],
+            "epochs_override": result["protocol_overrides"]["epochs"],
+            "sequence_length_override": result["protocol_overrides"]["sequence_length"],
+            "alignment_policy": TASK.alignment_policy,
+            "metric_policy": TASK.metric_policy,
+            "validation": VALIDATION_PROTOCOL,
+            "optimization": {
+                "library": "optuna",
+                "version": "4.5.0",
+                "direction": "minimize",
+                "sampler": "TPESampler",
+                "sampler_seed": HPO_TUNING_SEED,
+            },
+        },
+        "source_dataset_identities": result["dataset_identities"],
+    }
+    record = {
+        "schema_version": "1.0",
+        "created_at": "2026-07-17T00:00:00+00:00",
+        "state": "COMPLETE",
+        "study_name": "pending",
+        "study_identity_sha256": "pending",
+        "study_spec": spec,
+        "trial_number": 0,
+        "parameters": {
+            "suggested": dict(params),
+            "effective": dict(params),
+            "resolved_by_alignment_group": {
+                "fridge": {
+                    **params,
+                    "seed": HPO_TUNING_SEED,
+                    "mains_mean": 100.0,
+                    "mains_std": 20.0,
+                }
+            },
+        },
+        "validation": {
+            "protocol": VALIDATION_PROTOCOL,
+            "partitions": {
+                "fridge": [
+                    {
+                        "source_window": result["run"]["train_windows"]["fridge"][0],
+                        "training": {
+                            "samples": 800,
+                            "actual_start": "2020-01-01T00:00:00",
+                            "actual_end": "2020-01-01T13:19:00",
+                        },
+                        "validation": {
+                            "samples": 200,
+                            "actual_start": "2020-01-01T13:20:00",
+                            "actual_end": "2020-01-01T16:39:00",
+                        },
+                    }
+                ]
+            },
+            "metrics": {
+                "fridge": {
+                    "mae": 1.0,
+                    "f1": 0.5,
+                    "activation_threshold_watts": 50.0,
+                }
+            },
+            "objective_mae": 1.0,
+            "elapsed_seconds": 1.0,
+            "elapsed_seconds_by_alignment_group": {"fridge": 1.0},
+        },
+    }
+    result["study"] = {
+        "study_name": "pending",
+        "study_spec": spec,
+        "study_digest": "pending",
+        "selection_protocol": HPO_SELECTION_PROTOCOL,
+        "tuning_seed": HPO_TUNING_SEED,
+        "coordination": {
+            "backend": "sqlite",
+            "storage": "pending",
+            "scientific_source_of_truth": False,
+        },
+        "completed_trials": 1,
+        "best_value": 1.0,
+        "best_params": dict(params),
+        "optuna_best_suggestions": dict(params),
+        "trial_record_files": [],
+        "trial_records": [record],
+    }
+    result["protocol_overrides"]["model_selection"] = {
+        "method": "optuna-tpe",
+        "selection_protocol": HPO_SELECTION_PROTOCOL,
+        "tuning_seed": HPO_TUNING_SEED,
+        "study_identity_sha256": "pending",
+        "completed_trials": 1,
+        "validation_protocol": VALIDATION_PROTOCOL["id"],
+        "selected_parameters": dict(params),
+    }
+    _rekey_study(result)
+    _reseal(path, result)
+    return result
 
 
 def test_three_clean_full_seeds_are_verified(tmp_path):
@@ -264,6 +445,7 @@ def test_different_container_digests_are_never_aggregated(tmp_path):
     first = _write_result(tmp_path, 10)
     result = json.loads(first.read_text(encoding="utf-8"))
     result["seed"] = 20
+    result["run"]["params_by_alignment_group"]["fridge"]["seed"] = 20
     result["runtime"]["container_digest"] = "sha256:" + "f" * 64
     result.pop("result_id")
     result["result_id"] = hashlib.sha256(
@@ -280,6 +462,10 @@ def test_different_container_digests_are_never_aggregated(tmp_path):
         "sha256:" + "e" * 64,
         "sha256:" + "f" * 64,
     }
+    assert (
+        len({entry["comparison_protocol_sha256"] for entry in leaderboard["entries"]})
+        == 2
+    )
 
 
 def test_smoke_protocol_overrides_are_never_aggregated(tmp_path):
@@ -303,6 +489,7 @@ def test_smoke_protocol_overrides_are_never_aggregated(tmp_path):
     assert len(entries) == 2
     assert {entry["sequence_length"] for entry in entries} == {99, 299}
     assert len({entry["protocol_overrides_sha256"] for entry in entries}) == 2
+    assert len({entry["comparison_protocol_sha256"] for entry in entries}) == 2
 
 
 def test_json_and_csv_artifacts_are_deterministic(tmp_path):
@@ -360,6 +547,7 @@ def test_effective_model_parameters_are_never_aggregated(tmp_path):
     second = _write_result(tmp_path, 20, scope="smoke", max_samples=1024)
     result = json.loads(second.read_text(encoding="utf-8"))
     result["model_params"]["learning_rate"] = 5e-4
+    result["run"]["params_by_alignment_group"]["fridge"]["learning_rate"] = 5e-4
     result["model_params_sha256"] = hashlib.sha256(
         json.dumps(
             result["model_params"], sort_keys=True, separators=(",", ":")
@@ -412,18 +600,29 @@ def test_resealed_model_selection_without_trial_audit_is_rejected(tmp_path):
         _build(tmp_path)
 
 
-@pytest.mark.parametrize("bad_value", [float("nan"), float("inf"), -1.0])
-def test_invalid_metrics_are_rejected(tmp_path, bad_value):
+@pytest.mark.parametrize(
+    ("bad_value", "message"),
+    [
+        (float("nan"), "non-finite JSON"),
+        (float("inf"), "non-finite JSON"),
+        (-1.0, "out-of-range"),
+    ],
+)
+def test_invalid_metrics_are_rejected(tmp_path, bad_value, message):
     _write_result(tmp_path, 42, mae=bad_value)
 
-    with pytest.raises(LeaderboardError, match="out-of-range"):
+    with pytest.raises(LeaderboardError, match=message):
         _build(tmp_path)
 
 
 @pytest.mark.parametrize(
     ("field", "bad_value", "message"),
     [
-        ("elapsed_seconds_by_alignment_group", float("nan"), "elapsed"),
+        (
+            "elapsed_seconds_by_alignment_group",
+            float("nan"),
+            "non-finite JSON",
+        ),
         ("trainable_parameters", False, "parameter count"),
         ("peak_accelerator_memory_bytes", -1, "accelerator memory"),
     ],
@@ -441,4 +640,186 @@ def test_invalid_efficiency_measurements_are_rejected(
     path.write_text(json.dumps(result), encoding="utf-8")
 
     with pytest.raises(LeaderboardError, match=message):
+        _build(tmp_path)
+
+
+@pytest.mark.parametrize("budget", ["samples", "epochs"])
+def test_full_scope_cannot_hide_observed_smoke_budget(tmp_path, budget):
+    if budget == "samples":
+        _write_result(tmp_path, 42, scope="full", max_samples=512)
+    else:
+        path = _write_result(tmp_path, 42, scope="full")
+        result = json.loads(path.read_text(encoding="utf-8"))
+        result["protocol_overrides"]["epochs"] = 10
+        _reseal(path, result)
+
+    with pytest.raises(LeaderboardError, match="run_scope"):
+        _build(tmp_path)
+
+
+def test_task_window_expected_count_cannot_be_shrunk_and_resealed(tmp_path):
+    path = _write_result(tmp_path, 42)
+    result = json.loads(path.read_text(encoding="utf-8"))
+    window = result["run"]["test_windows"]["fridge"][0]
+    window["samples"] = 100
+    window["expected_samples"] = 100
+    window["aligned_sample_fraction"] = 1.0
+    _reseal(path, result)
+
+    with pytest.raises(LeaderboardError, match="minimum aligned"):
+        _build(tmp_path)
+
+
+@pytest.mark.parametrize("tamper", ["model_param", "extra_field", "seed", "group"])
+def test_resolved_model_parameters_are_exactly_bound(tmp_path, tamper):
+    path = _write_result(tmp_path, 42)
+    result = json.loads(path.read_text(encoding="utf-8"))
+    resolved = result["run"]["params_by_alignment_group"]["fridge"]
+    if tamper == "model_param":
+        resolved["learning_rate"] = 0.5
+    elif tamper == "extra_field":
+        resolved["undisclosed"] = True
+    elif tamper == "seed":
+        resolved["seed"] = 10
+    else:
+        result["run"]["params_by_alignment_group"] = {"hostile": resolved}
+    _reseal(path, result)
+
+    with pytest.raises(LeaderboardError, match="resolved model parameters"):
+        _build(tmp_path)
+
+
+def test_efficiency_alignment_groups_cannot_use_fallback_or_extra_keys(tmp_path):
+    path = _write_result(tmp_path, 42)
+    result = json.loads(path.read_text(encoding="utf-8"))
+    result["run"]["elapsed_seconds_by_alignment_group"]["hostile"] = 0.001
+    _reseal(path, result)
+
+    with pytest.raises(LeaderboardError, match="elapsed_seconds.*groups"):
+        _build(tmp_path)
+
+
+def test_fixed_hpo_study_aggregates_distinct_evaluation_seeds(tmp_path):
+    for seed in (10, 20, 42):
+        path = _write_result(tmp_path, seed)
+        _attach_valid_study(path)
+
+    entries = _build(tmp_path)["entries"]
+
+    assert len(entries) == 1
+    assert entries[0]["seeds"] == [10, 20, 42]
+    assert entries[0]["status"] == "full-verified"
+    assert entries[0]["tuning_study_digest"]
+    comparison = entries[0]["comparison_protocol"]
+    assert comparison["effective_sequence_length"] == 99
+    assert comparison["effective_epochs"] == 10
+    assert comparison["model_selection"] == {
+        "method": "optuna-tpe",
+        "selection_protocol": HPO_SELECTION_PROTOCOL,
+        "tuning_seed": HPO_TUNING_SEED,
+        "completed_trials": 1,
+        "validation_protocol": VALIDATION_PROTOCOL["id"],
+    }
+    assert "study_identity_sha256" not in json.dumps(comparison)
+    assert "selected_parameters" not in json.dumps(comparison)
+
+
+def test_comparison_protocol_separates_tuning_budget_and_runtime(tmp_path):
+    _write_result(tmp_path, 10)
+    tuned_one = _write_result(tmp_path, 20)
+    _attach_valid_study(tuned_one)
+
+    tuned_two = _write_result(tmp_path, 42)
+    result = _attach_valid_study(tuned_two)
+    second_record = deepcopy(result["study"]["trial_records"][0])
+    second_record["trial_number"] = 1
+    result["study"]["trial_records"].append(second_record)
+    result["study"]["completed_trials"] = 2
+    result["protocol_overrides"]["model_selection"]["completed_trials"] = 2
+    _rekey_study(result)
+    _reseal(tuned_two, result)
+
+    other_runtime = _write_result(tmp_path, 30)
+    result = json.loads(other_runtime.read_text(encoding="utf-8"))
+    result["runtime"]["container_digest"] = "sha256:" + "f" * 64
+    _reseal(other_runtime, result)
+
+    entries = _build(tmp_path)["entries"]
+
+    assert len(entries) == 4
+    assert len({entry["comparison_protocol_sha256"] for entry in entries}) == 4
+    protocols = [entry["comparison_protocol"] for entry in entries]
+    assert {
+        protocol["model_selection"]["completed_trials"]
+        for protocol in protocols
+        if protocol["model_selection"]
+    } == {1, 2}
+    assert {protocol["runtime"]["container_digest"] for protocol in protocols} == {
+        "sha256:" + "e" * 64,
+        "sha256:" + "f" * 64,
+    }
+
+
+def test_rekeyed_hpo_study_cannot_lie_about_bound_task(tmp_path):
+    path = _write_result(tmp_path, 42)
+    result = _attach_valid_study(path)
+    result["study"]["study_spec"]["protocol"]["task_id"] = "hostile-task"
+    _rekey_study(result)
+    _reseal(path, result)
+
+    with pytest.raises(LeaderboardError, match="task_id.*not bound"):
+        _build(tmp_path)
+
+
+def test_dirty_persistent_hpo_is_rejected_not_merely_marked_unverified(tmp_path):
+    path = _write_result(tmp_path, 42)
+    result = _attach_valid_study(path)
+    result["runtime"]["nilmbench_git_dirty"] = True
+    result["study"]["study_spec"]["runner"]["git_dirty"] = True
+    _rekey_study(result)
+    _reseal(path, result)
+
+    with pytest.raises(LeaderboardError, match="unsafe persistent HPO provenance"):
+        _build(tmp_path)
+
+
+def test_trial_record_rejects_resealed_unknown_fields(tmp_path):
+    path = _write_result(tmp_path, 42)
+    result = _attach_valid_study(path)
+    record = result["study"]["trial_records"][0]
+    record["validation"]["undisclosed_target_score"] = 0.0
+    payload = {key: value for key, value in record.items() if key != "record_id"}
+    record["record_id"] = canonical_digest(payload)
+    _reseal(path, result)
+
+    with pytest.raises(LeaderboardError, match="invalid trial audit record"):
+        _build(tmp_path)
+
+
+def test_study_selection_must_match_the_best_immutable_trial(tmp_path):
+    path = _write_result(tmp_path, 42)
+    result = _attach_valid_study(path)
+    result["study"]["optuna_best_suggestions"] = {"batch_size": 128}
+    _reseal(path, result)
+
+    with pytest.raises(LeaderboardError, match="not supported by the best trial"):
+        _build(tmp_path)
+
+
+def test_run_objective_must_equal_the_appliance_metric_mean(tmp_path):
+    path = _write_result(tmp_path, 42)
+    result = json.loads(path.read_text(encoding="utf-8"))
+    result["run"]["objective_mae"] = 0.0
+    _reseal(path, result)
+
+    with pytest.raises(LeaderboardError, match="objective is not supported"):
+        _build(tmp_path)
+
+
+def test_overflowing_json_number_is_rejected_before_result_id(tmp_path):
+    path = _write_result(tmp_path, 42)
+    text = path.read_text(encoding="utf-8")
+    path.write_text(text.replace('"mae": 42.0', '"mae": 1e309'), encoding="utf-8")
+
+    with pytest.raises(LeaderboardError, match="non-finite JSON number"):
         _build(tmp_path)

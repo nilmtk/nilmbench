@@ -280,13 +280,13 @@ def test_fixed_sequence_length_and_epochs_are_honored_inside_every_trial():
 
 def _provenance():
     return {
-        "nilmbench_git_sha": "runner-a",
+        "nilmbench_git_sha": "a" * 40,
         "nilmbench_git_dirty": False,
-        "nilmtk_contrib_git_sha": "contrib-a",
+        "nilmtk_contrib_git_sha": "b" * 40,
         "nilmtk_contrib_git_dirty": False,
         "nilmtk_contrib_version": "1.0",
         "container_image": "nilmbench:cuda",
-        "container_digest": "sha256:container-a",
+        "container_digest": "sha256:" + "c" * 64,
         "cpu": "cpu-a",
         "gpu": "gpu-a",
         "torch": "2.6.0",
@@ -418,10 +418,18 @@ def test_end_to_end_hpo_defers_target_dataset_until_final_evaluation(
     )
 
     def fake_validation(*args, **kwargs):
-        del args, kwargs
+        del kwargs
         events.append(("score", "source-validation"))
+        effective = args[4]
         return {
-            "params_by_alignment_group": {"fridge": {"sequence_length": 123}},
+            "params_by_alignment_group": {
+                "fridge": {
+                    **effective,
+                    "seed": args[3],
+                    "mains_mean": 1.0,
+                    "mains_std": 1.0,
+                }
+            },
             "metrics": {
                 "fridge": {
                     "mae": 1.0,
@@ -483,6 +491,8 @@ def test_end_to_end_hpo_defers_target_dataset_until_final_evaluation(
     assert len(result["study"]["trial_records"]) == 1
     assert result["protocol_overrides"]["model_selection"] == {
         "method": "optuna-tpe",
+        "selection_protocol": "tune-once-freeze-v1",
+        "tuning_seed": 42,
         "study_identity_sha256": result["study"]["study_digest"],
         "completed_trials": 1,
         "validation_protocol": "source-train-blocked-holdout-v1",
@@ -491,3 +501,100 @@ def test_end_to_end_hpo_defers_target_dataset_until_final_evaluation(
     record = result["study"]["trial_records"][0]
     assert record["parameters"]["effective"]["sequence_length"] == 123
     assert set(record["study_spec"]["source_dataset_identities"]) == {"REDD"}
+    assert record["parameters"]["resolved_by_alignment_group"]["fridge"]["seed"] == 42
+
+    second_output = run_benchmark(
+        config,
+        "corrected-t3-redd-to-refit",
+        "PatchTST",
+        20,
+        tmp_path,
+        trials=1,
+        appliances=("fridge",),
+        epochs=3,
+        sequence_length=123,
+        device="cpu",
+    )
+    second_result = json.loads(
+        (second_output / "result.json").read_text(encoding="utf-8")
+    )
+    assert events.count(("score", "source-validation")) == 1
+    assert second_result["study"]["study_digest"] == result["study"]["study_digest"]
+    assert second_result["model_params"] == result["model_params"]
+    assert second_result["seed"] == 20
+
+    audit_path = tmp_path / result["study"]["trial_record_files"][0]
+    audit_text = audit_path.read_text(encoding="utf-8")
+    audit_path.chmod(0o600)
+    audit_path.write_text(
+        audit_text.replace('"objective_mae": 1.0', '"objective_mae": 1e309'),
+        encoding="utf-8",
+    )
+    with pytest.raises(RuntimeError, match="no valid immutable JSON audit"):
+        run_benchmark(
+            config,
+            "corrected-t3-redd-to-refit",
+            "PatchTST",
+            10,
+            tmp_path,
+            trials=1,
+            appliances=("fridge",),
+            epochs=3,
+            sequence_length=123,
+            device="cpu",
+        )
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("nilmbench_git_dirty", True),
+        ("nilmtk_contrib_git_sha", None),
+        ("container_digest", "unknown"),
+    ],
+)
+def test_persistent_hpo_rejects_dirty_or_unknown_provenance_before_data_access(
+    monkeypatch, tmp_path, field, value
+):
+    provenance = _provenance()
+    provenance[field] = value
+    monkeypatch.setattr(runner, "runtime_provenance", lambda root: provenance)
+    monkeypatch.setattr(
+        runner,
+        "verify_dataset",
+        lambda dataset: pytest.fail(f"accessed dataset {dataset.id}"),
+    )
+
+    with pytest.raises(ValueError, match="clean, immutable, known provenance"):
+        run_benchmark(
+            load_config(),
+            "corrected-t3-redd-to-refit",
+            "PatchTST",
+            10,
+            tmp_path,
+            trials=1,
+            appliances=("fridge",),
+        )
+
+    assert not (tmp_path / "optuna").exists()
+
+
+@pytest.mark.parametrize(
+    ("name", "value"),
+    [
+        ("sample_period", True),
+        ("max_samples", True),
+        ("epochs", True),
+        ("trials", True),
+    ],
+)
+def test_boolean_run_budgets_are_rejected_before_data_access(name, value, tmp_path):
+    with pytest.raises(ValueError, match="integer"):
+        run_benchmark(
+            load_config(),
+            "corrected-t1-redd",
+            "PatchTST",
+            42,
+            tmp_path,
+            **{name: value},
+        )

@@ -286,7 +286,9 @@ def _load_one(
                     f"{window.dataset} building {window.building} has non-finite "
                     f"or empty aligned {name} data"
                 )
-        requested_seconds = (effective_end - effective_start).total_seconds()
+        # The denominator is the trusted task request, not the available data
+        # envelope. Otherwise missing boundary data can inflate coverage to 100%.
+        requested_seconds = (requested_end - requested_start).total_seconds()
         expected_samples = max(1, int(requested_seconds // sample_period))
         if max_samples is not None:
             expected_samples = min(expected_samples, max_samples)
