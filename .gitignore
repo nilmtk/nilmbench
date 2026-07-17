@@ -5,5 +5,7 @@ __pycache__/
 .ruff_cache/
 .venv/
 dist/
-results/
+results/*
+!results/published/
+!results/published/**
 data/

@@ -9,6 +9,7 @@
     <meta property="og:title" content="NILMBench2026: A Benchmark for Energy Disaggregation">
     <meta property="og:description" content="16 NILM models, 3 datasets, 2 resolutions — one reproducible, deployment-aware benchmark. Generalization is the wall. BuildSys 2026.">
     <meta property="og:type" content="website">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M4 38h13l7-25 10 39 8-26 6 12h12' fill='none' stroke='%232de3b0' stroke-width='6' stroke-linejoin='round'/%3E%3C/svg%3E">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -923,19 +924,13 @@ experiment['test']['metrics'] = ['mae', 'f1score', 'sae', 'nep']
         <div class="step"><div class="sn">03 · SUBMIT</div><h4>Open a pull request</h4><p>Your results are checked and your model takes its place on the public, generalization-first leaderboard.</p></div>
     </div>
 
-    <div class="lb-title"><span class="live"></span>Live leaderboard &middot; cross-building (T2) &middot; UK-DALE</div>
-    <div class="lb-sub">Ranked by mean MAE on unseen building B4 (lower is better). The metric that actually predicts deployment.</div>
+    <div class="lb-title"><span class="live"></span>Live leaderboard &middot; provenance-checked real runs</div>
+    <div class="lb-sub" id="live-leaderboard-summary">Loading immutable result bundles&hellip;</div>
     <div class="table-container">
         <table class="lb">
-            <thead><tr><th>#</th><th>Model</th><th>MAE&darr; (W)</th><th>F1&uarr;</th><th>Family</th></tr></thead>
-            <tbody>
-                <tr class="gold"><td class="rank">&#129351; 1</td><td>NILMFormer <span class="fam">· SOTA</span></td><td>15.42</td><td>0.53</td><td class="fam">Transformer</td></tr>
-                <tr><td class="rank">&#129352; 2</td><td>Seq2Point</td><td>18.43</td><td>0.45</td><td class="fam">Convolutional</td></tr>
-                <tr><td class="rank">&#129353; 3</td><td>MSDC</td><td>19.23</td><td>0.41</td><td class="fam">Specialized</td></tr>
-                <tr><td class="rank">4</td><td>ResNet</td><td>20.16</td><td>0.39</td><td class="fam">Convolutional</td></tr>
-                <tr><td class="rank">5</td><td>TCN <span class="fam">· 69K params</span></td><td>20.84</td><td>0.34</td><td class="fam">Convolutional</td></tr>
-                <tr><td class="rank">&hellip;</td><td style="color:var(--text-muted)">11 more baselines</td><td>&hellip;</td><td>&hellip;</td><td class="fam">&hellip;</td></tr>
-                <tr class="you"><td class="rank">&#8853;</td><td>Your model</td><td>?</td><td>?</td><td class="submit">submit &rarr;</td></tr>
+            <thead><tr><th>#</th><th>Model</th><th>Task / appliance</th><th>MAE&darr; (W)</th><th>F1&uarr;</th><th>Status</th></tr></thead>
+            <tbody id="live-leaderboard-body">
+                <tr><td colspan="6" style="color:var(--text-muted)">Loading&hellip;</td></tr>
             </tbody>
         </table>
     </div>
@@ -1546,6 +1541,44 @@ function highlight(){
   });
 }
 highlight();
+
+// ===== Generated living leaderboard =====
+function metricWithSpread(mean, spread, count) {
+  const value = Number(mean).toFixed(2);
+  return count > 1 ? `${value} &plusmn; ${Number(spread).toFixed(2)}` : value;
+}
+async function loadLiveLeaderboard() {
+  const body = document.getElementById('live-leaderboard-body');
+  const summary = document.getElementById('live-leaderboard-summary');
+  try {
+    const response = await fetch('leaderboard.json', {cache: 'no-store'});
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const payload = await response.json();
+    const entries = Array.isArray(payload.entries) ? payload.entries : [];
+    if (!entries.length) {
+      body.innerHTML = '<tr><td colspan="6" style="color:var(--text-muted)">No provenance-checked result bundles have been published yet.</td></tr>';
+      summary.textContent = 'The table remains empty until real result.json bundles pass checksum, source, container, and seed validation.';
+      return;
+    }
+    const statusOrder = {'full-verified': 0, 'candidate': 1, 'smoke-verified': 2, 'smoke-unverified': 3};
+    entries.sort((a,b)=>(statusOrder[a.status]??9)-(statusOrder[b.status]??9) || a.mae_mean-b.mae_mean);
+    body.innerHTML = entries.slice(0, 25).map((entry, index) => {
+      const task = `${entry.task} / ${entry.appliance} / ${entry.sample_period}s`;
+      const cls = entry.status === 'full-verified' && index === 0 ? ' class="gold"' : '';
+      return `<tr${cls}><td class="rank">${index + 1}</td><td>${escHTML(entry.model)}</td>` +
+        `<td class="fam">${escHTML(task)}</td>` +
+        `<td>${metricWithSpread(entry.mae_mean, entry.mae_std, entry.run_count)}</td>` +
+        `<td>${metricWithSpread(entry.f1_mean, entry.f1_std, entry.run_count)}</td>` +
+        `<td class="fam">${escHTML(entry.status)}</td></tr>`;
+    }).join('');
+    const verified = entries.filter(entry=>entry.status==='full-verified').length;
+    summary.textContent = `${payload.source_result_count} immutable runs · ${verified} fully verified aggregates · generated, never hand-entered.`;
+  } catch (error) {
+    body.innerHTML = '<tr><td colspan="6" style="color:var(--text-muted)">Leaderboard artifact unavailable.</td></tr>';
+    summary.textContent = 'Run `nilmbench leaderboard` to regenerate leaderboard.json from result bundles.';
+  }
+}
+loadLiveLeaderboard();
 
 // ===== Scroll fade =====
 const obs = new IntersectionObserver((entries)=>{
