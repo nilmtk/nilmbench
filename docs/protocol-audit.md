@@ -80,8 +80,10 @@ and protocol preflight; it is not a replacement for the CUDA model benchmark.
 
 ## Release sequence
 
-PatchTST and its model-level tests should merge in `nilmtk-contrib` first. The
-NILMbench PR should then replace its moving `nilmtk-contrib` dependency and
-container build context with that reviewed commit, refresh `uv.lock`, and run
-the CPU and CUDA smoke checks against the same revision. This keeps the two PRs
-reviewable while ensuring the eventual benchmark environment is immutable.
+Model implementations and their model-level tests merge in `nilmtk-contrib`
+first. NILMbench then advances its single `nilmtk-contrib` dependency and
+container build context to the reviewed batch commit, refreshes `uv.lock`, and
+runs CPU and CUDA checks against that same revision. ModernTCN and DLinear were
+adopted together at `8d745493ed9f84dd00fb502ffe85943eaeedc4c8`, avoiding a
+separate benchmark image for every algorithm while preserving an immutable
+campaign environment.
