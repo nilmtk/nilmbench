@@ -11,6 +11,7 @@ from pathlib import Path
 
 from nilmbench.config import ConfigError, load_config
 from nilmbench.data import DataError, load_split
+from nilmbench.leaderboard import LeaderboardError, build_leaderboard, write_leaderboard
 from nilmbench.provenance import runtime_provenance
 from nilmbench.registry import MODELS
 from nilmbench.runner import run_benchmark
@@ -46,6 +47,13 @@ def _parser() -> argparse.ArgumentParser:
     sub.add_parser("list", help="list configured tasks and models")
     doctor = sub.add_parser("doctor", help="show runtime and dataset availability")
     doctor.add_argument("--checksums", action="store_true")
+
+    leaderboard = sub.add_parser(
+        "leaderboard", help="generate JSON/CSV tables from immutable result bundles"
+    )
+    leaderboard.add_argument("--results", type=Path, default=Path("results"))
+    leaderboard.add_argument("--output", type=Path, default=Path("leaderboard.json"))
+    leaderboard.add_argument("--csv", type=Path)
 
     validate = sub.add_parser("validate", help="validate one task without training")
     validate.add_argument("--task", required=True)
@@ -100,6 +108,11 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         if args.command == "doctor":
             return _doctor(config, args.checksums)
+        if args.command == "leaderboard":
+            leaderboard = build_leaderboard(args.results)
+            write_leaderboard(leaderboard, args.output, args.csv)
+            print(args.output)
+            return 0
         if args.command == "validate":
             task = config.task(args.task)
             payload = {
@@ -192,7 +205,7 @@ def main(argv: list[str] | None = None) -> int:
             )
             print(output)
             return 0
-    except (ConfigError, DataError, RuntimeError, ValueError) as exc:
+    except (ConfigError, DataError, LeaderboardError, RuntimeError, ValueError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
     return 2
