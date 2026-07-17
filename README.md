@@ -132,7 +132,7 @@ docker compose --profile cuda run --rm cuda-benchmark \
   --seed 42 --epochs 1 --max-samples 1024 --device cuda --results /results/candidates
 ```
 
-For the full paper matrix, repeat each task at 60 and 900 seconds for seeds 10, 20, and 42. Optuna studies live under `results/optuna/` and resume to the requested total trial count. Their identity hashes the task config, model, seed, appliance subset, resolution, and smoke overrides, preventing incompatible runs from sharing a study.
+For the full paper matrix, repeat each task at 60 and 900 seconds for seeds 10, 20, and 42. Optuna studies live under `results/optuna/` and resume to the requested total trial count. Trials are scored only on a blocked 20% holdout from each `task.train` window; `task.test` is loaded only after model selection, during final benchmark evaluation. Fixed epoch and sequence-length overrides apply during every trial. Study identity covers the runner and nilmtk-contrib revisions, container digest, device/runtime, source dataset identity, full task protocol, appliance subset, resolution, and smoke overrides, so an incompatible environment creates a new study instead of resuming an old one.
 
 ## Historical versus corrected protocols
 
@@ -170,7 +170,9 @@ git diff -- leaderboard.json leaderboard.csv
 ```
 
 Those immutable, hashable JSON bundles are the scientific source of truth.
-SQLite is reserved for mutable coordination such as resumable Optuna studies;
+Each completed HPO trial also has a write-once JSON audit record under its
+`results/optuna/<study>/trials/` directory, and those records are embedded in
+the final result bundle. SQLite is reserved for mutable coordination such as resumable Optuna studies;
 an optional SQLite query index may be generated later, but it must always be
 rebuildable from the result bundles and never replace them.
 The CSV is written before the JSON commit marker; the JSON records the CSV's

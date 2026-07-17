@@ -13,11 +13,31 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from nilmbench._io import atomic_write_text
+from nilmbench._io import atomic_write_text, immutable_write_text
 from nilmbench.config import BenchmarkConfig, TaskConfig
 from nilmbench.data import LoadedSplit, load_split, verify_dataset
 from nilmbench.provenance import runtime_provenance
 from nilmbench.registry import get_model
+
+
+_VALIDATION_PROTOCOL = {
+    "id": "source-train-blocked-holdout-v1",
+    "source": "task.train",
+    "strategy": "last 20 percent of each source training window",
+    "validation_fraction": 0.2,
+    "task_test_access": "forbidden",
+}
+
+
+def _canonical_digest(payload: Any) -> str:
+    return hashlib.sha256(
+        json.dumps(
+            payload,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        ).encode()
+    ).hexdigest()
 
 
 def metrics(truth: Any, prediction: Any, threshold: float = 10.0) -> dict[str, float]:
@@ -152,6 +172,186 @@ def _truth(split: LoadedSplit, appliance: str) -> Any:
     )
 
 
+def _index_value(value: Any) -> str:
+    formatter = getattr(value, "isoformat", None)
+    return formatter() if formatter is not None else str(value)
+
+
+def _blocked_validation_split(
+    loaded: LoadedSplit,
+    validation_fraction: float = _VALIDATION_PROTOCOL["validation_fraction"],
+) -> tuple[LoadedSplit, LoadedSplit, list[dict[str, Any]]]:
+    """Hold out the chronological tail of every source training window."""
+    if not 0 < validation_fraction < 1:
+        raise ValueError("validation_fraction must be strictly between zero and one")
+    if not loaded.mains:
+        raise ValueError("Source training split has no windows")
+    if any(len(frames) != len(loaded.mains) for frames in loaded.appliances.values()):
+        raise ValueError("Source training appliance chunks are not window-aligned")
+
+    train_mains: list[Any] = []
+    validation_mains: list[Any] = []
+    train_appliances = {name: [] for name in loaded.appliances}
+    validation_appliances = {name: [] for name in loaded.appliances}
+    partitions: list[dict[str, Any]] = []
+    source_metadata = loaded.metadata()
+
+    for index, mains in enumerate(loaded.mains):
+        samples = len(mains)
+        validation_samples = max(1, math.ceil(samples * validation_fraction))
+        train_samples = samples - validation_samples
+        if train_samples < 1:
+            raise ValueError(
+                "Each task.train window needs at least two aligned samples for "
+                "blocked validation"
+            )
+        train_main = mains.iloc[:train_samples].copy()
+        validation_main = mains.iloc[train_samples:].copy()
+        train_mains.append(train_main)
+        validation_mains.append(validation_main)
+        for name, frames in loaded.appliances.items():
+            frame = frames[index]
+            if len(frame) != samples or not frame.index.equals(mains.index):
+                raise ValueError(
+                    f"Source training {name} chunk {index} is not aligned with mains"
+                )
+            train_appliances[name].append(frame.iloc[:train_samples].copy())
+            validation_appliances[name].append(frame.iloc[train_samples:].copy())
+        partitions.append(
+            {
+                "source_window": (
+                    source_metadata[index] if index < len(source_metadata) else None
+                ),
+                "training": {
+                    "samples": train_samples,
+                    "actual_start": _index_value(train_main.index[0]),
+                    "actual_end": _index_value(train_main.index[-1]),
+                },
+                "validation": {
+                    "samples": validation_samples,
+                    "actual_start": _index_value(validation_main.index[0]),
+                    "actual_end": _index_value(validation_main.index[-1]),
+                },
+            }
+        )
+
+    return (
+        LoadedSplit(train_mains, train_appliances, []),
+        LoadedSplit(validation_mains, validation_appliances, []),
+        partitions,
+    )
+
+
+def _run_validation_once(
+    config: BenchmarkConfig,
+    task: TaskConfig,
+    model_name: str,
+    seed: int,
+    params: dict[str, Any],
+    appliances: tuple[str, ...],
+    sample_period: int,
+    max_samples: int | None,
+) -> dict[str, Any]:
+    """Score one HPO trial without loading or inspecting ``task.test``."""
+    started = time.perf_counter()
+    _configure_determinism(seed)
+    groups = (
+        [(name,) for name in appliances]
+        if task.alignment_policy == "per_appliance"
+        else [appliances]
+    )
+    scores: dict[str, dict[str, float]] = {}
+    params_by_group: dict[str, dict[str, Any]] = {}
+    partitions_by_group: dict[str, list[dict[str, Any]]] = {}
+    elapsed_by_group: dict[str, float] = {}
+    metric_policy = config.metric_policy(task.metric_policy)
+    for group in groups:
+        group_started = time.perf_counter()
+        label = group[0] if len(group) == 1 else "joint"
+        source_train = load_split(
+            config, task, task.train, group, sample_period, max_samples
+        )
+        train, validation, partitions = _blocked_validation_split(source_train)
+        mains_mean, mains_std = _normalization(train)
+        resolved_params = {
+            **params,
+            "seed": seed,
+            "mains_mean": mains_mean,
+            "mains_std": mains_std,
+        }
+        model = get_model(model_name).model_class()(resolved_params)
+        model.partial_fit(
+            train.mains,
+            [(name, train.appliances[name]) for name in group],
+        )
+        predictions = _predict(model, validation, group)
+        for name in group:
+            scores[name] = metrics(
+                _truth(validation, name),
+                predictions[name],
+                threshold=metric_policy.threshold(name),
+            )
+        params_by_group[label] = resolved_params
+        partitions_by_group[label] = partitions
+        elapsed_by_group[label] = time.perf_counter() - group_started
+
+    return {
+        "params_by_alignment_group": params_by_group,
+        "metrics": scores,
+        "objective_mae": statistics.fmean(item["mae"] for item in scores.values()),
+        "validation_protocol": dict(_VALIDATION_PROTOCOL),
+        "validation_partitions": partitions_by_group,
+        "elapsed_seconds_by_alignment_group": elapsed_by_group,
+        "elapsed_seconds": time.perf_counter() - started,
+    }
+
+
+class _FixedSuggestionTrial:
+    """Remove command-line overrides from the search space for every trial."""
+
+    def __init__(self, trial: Any, fixed: dict[str, Any]) -> None:
+        self._trial = trial
+        self._fixed = fixed
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._trial, name)
+
+    def suggest_categorical(self, name: str, choices: Any) -> Any:
+        if name in self._fixed:
+            return self._fixed[name]
+        return self._trial.suggest_categorical(name, choices)
+
+    def suggest_int(self, name: str, low: int, high: int, **kwargs: Any) -> int:
+        if name in self._fixed:
+            return self._fixed[name]
+        return self._trial.suggest_int(name, low, high, **kwargs)
+
+    def suggest_float(self, name: str, low: float, high: float, **kwargs: Any) -> float:
+        if name in self._fixed:
+            return self._fixed[name]
+        return self._trial.suggest_float(name, low, high, **kwargs)
+
+
+def _trial_parameters(
+    model_entry: Any,
+    trial: Any,
+    *,
+    epochs: int | None,
+    sequence_length: int | None,
+    device: str | None,
+) -> dict[str, Any]:
+    fixed: dict[str, Any] = {}
+    if epochs is not None:
+        fixed["n_epochs"] = epochs
+    if sequence_length is not None:
+        fixed["sequence_length"] = sequence_length
+    params = model_entry.search_space(_FixedSuggestionTrial(trial, fixed))
+    params.update(fixed)
+    if device:
+        params["device"] = device
+    return params
+
+
 def _run_once(
     config: BenchmarkConfig,
     task: TaskConfig,
@@ -237,6 +437,188 @@ def _run_once(
     }
 
 
+def _study_spec(
+    config: BenchmarkConfig,
+    task: TaskConfig,
+    model_name: str,
+    model_entry: Any,
+    seed: int,
+    appliances: tuple[str, ...],
+    sample_period: int,
+    max_samples: int | None,
+    epochs: int | None,
+    sequence_length: int | None,
+    device: str | None,
+    provenance: dict[str, Any],
+    source_dataset_identities: dict[str, dict[str, Any]],
+    optuna_version: str,
+) -> dict[str, Any]:
+    """Describe every scientific input that makes an Optuna study resumable."""
+    return {
+        "identity_schema": "nilmbench.optuna-study.v2",
+        "runner": {
+            "git_sha": provenance["nilmbench_git_sha"],
+            "git_dirty": provenance["nilmbench_git_dirty"],
+        },
+        "contrib": {
+            "git_sha": provenance["nilmtk_contrib_git_sha"],
+            "git_dirty": provenance["nilmtk_contrib_git_dirty"],
+            "version": provenance["nilmtk_contrib_version"],
+            "model_module": model_entry.module,
+            "model_class": model_entry.class_name,
+        },
+        "container": {
+            "image": provenance["container_image"],
+            "digest": provenance["container_digest"],
+        },
+        "device": {
+            "requested": device or "auto",
+            "cpu": provenance["cpu"],
+            "gpu": provenance["gpu"],
+            "torch": provenance["torch"],
+            "cuda_runtime": provenance["cuda_runtime"],
+            "cuda_available": provenance["cuda_available"],
+        },
+        "protocol": {
+            "task_id": task.id,
+            "task_family": task.family,
+            "task_profile": task.profile,
+            "task_config_sha256": config.digest(task.id),
+            "target_data_access": task.target_data_access,
+            "model": model_name,
+            "seed": seed,
+            "appliances": list(appliances),
+            "sample_period": sample_period,
+            "max_samples_per_window": max_samples,
+            "epochs_override": epochs,
+            "sequence_length_override": sequence_length,
+            "alignment_policy": task.alignment_policy,
+            "metric_policy": task.metric_policy,
+            "validation": dict(_VALIDATION_PROTOCOL),
+            "optimization": {
+                "library": "optuna",
+                "version": optuna_version,
+                "direction": "minimize",
+                "sampler": "TPESampler",
+                "sampler_seed": seed,
+            },
+        },
+        "source_dataset_identities": source_dataset_identities,
+    }
+
+
+def _study_identity(
+    task_id: str, model_name: str, seed: int, spec: dict[str, Any]
+) -> tuple[str, str]:
+    digest = _canonical_digest(spec)
+    return digest, f"{task_id}--{model_name}--seed{seed}--{digest}"
+
+
+def _assert_resume_compatible(study: Any, spec: dict[str, Any], digest: str) -> None:
+    identity = {"sha256": digest, "spec": spec}
+    stored = study.user_attrs.get("nilmbench_study_identity")
+    if stored is None:
+        if study.trials:
+            raise RuntimeError(
+                "Refusing to resume an Optuna study without a NILMbench v2 identity"
+            )
+        study.set_user_attr("nilmbench_study_identity", identity)
+        return
+    if stored != identity:
+        raise RuntimeError(
+            "Refusing to resume an Optuna study with an incompatible scientific "
+            "identity"
+        )
+
+
+def _trial_record_path(audit_dir: Path, trial_number: int) -> Path:
+    return audit_dir / f"trial-{trial_number:06d}.json"
+
+
+def _trial_record(
+    study_name: str,
+    study_digest: str,
+    study_spec: dict[str, Any],
+    trial: Any,
+    effective_params: dict[str, Any],
+    validation_result: dict[str, Any],
+) -> dict[str, Any]:
+    payload = {
+        "schema_version": "1.0",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "state": "COMPLETE",
+        "study_name": study_name,
+        "study_identity_sha256": study_digest,
+        "study_spec": study_spec,
+        "trial_number": trial.number,
+        "parameters": {
+            "suggested": dict(trial.params),
+            "effective": effective_params,
+            "resolved_by_alignment_group": validation_result[
+                "params_by_alignment_group"
+            ],
+        },
+        "validation": {
+            "protocol": validation_result["validation_protocol"],
+            "partitions": validation_result["validation_partitions"],
+            "metrics": validation_result["metrics"],
+            "objective_mae": validation_result["objective_mae"],
+            "elapsed_seconds": validation_result["elapsed_seconds"],
+            "elapsed_seconds_by_alignment_group": validation_result[
+                "elapsed_seconds_by_alignment_group"
+            ],
+        },
+    }
+    return {**payload, "record_id": _canonical_digest(payload)}
+
+
+def _write_trial_record(path: Path, record: dict[str, Any]) -> None:
+    immutable_write_text(
+        path,
+        json.dumps(record, indent=2, sort_keys=True, allow_nan=False) + "\n",
+    )
+
+
+def _load_completed_trial_records(
+    study: Any,
+    complete_state: Any,
+    audit_dir: Path,
+    study_digest: str,
+    study_spec: dict[str, Any],
+) -> list[dict[str, Any]]:
+    records: list[dict[str, Any]] = []
+    for trial in sorted(study.trials, key=lambda item: item.number):
+        if trial.state != complete_state:
+            continue
+        path = _trial_record_path(audit_dir, trial.number)
+        try:
+            record = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise RuntimeError(
+                f"Completed trial {trial.number} has no valid immutable JSON audit "
+                f"record at {path}"
+            ) from exc
+        record_without_id = {
+            key: value for key, value in record.items() if key != "record_id"
+        }
+        if (
+            record.get("record_id") != _canonical_digest(record_without_id)
+            or record.get("study_identity_sha256") != study_digest
+            or record.get("study_spec") != study_spec
+            or record.get("study_name") != study.study_name
+            or record.get("trial_number") != trial.number
+            or record.get("state") != "COMPLETE"
+            or record.get("parameters", {}).get("suggested") != trial.params
+            or record.get("validation", {}).get("objective_mae") != trial.value
+        ):
+            raise RuntimeError(
+                f"Completed trial {trial.number} has an incompatible or modified "
+                "JSON audit record"
+            )
+        records.append(record)
+    return records
+
+
 def _write_result(result: dict[str, Any], output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=False)
     csv_rows = ["appliance,mae,f1,activation_threshold_watts"]
@@ -317,10 +699,20 @@ def run_benchmark(
 
     root = Path(__file__).resolve().parents[2]
     provenance = runtime_provenance(root)
-    dataset_identities = {
-        name: asdict(verify_dataset(config.datasets[name]))
-        for name in sorted({w.dataset for w in (*task.train, *task.test)})
-    }
+    all_dataset_names = sorted({w.dataset for w in (*task.train, *task.test)})
+    source_dataset_names = sorted({window.dataset for window in task.train})
+    dataset_identities: dict[str, dict[str, Any]] | None = None
+    source_dataset_identities: dict[str, dict[str, Any]] = {}
+    if trials > 0:
+        source_dataset_identities = {
+            name: asdict(verify_dataset(config.datasets[name]))
+            for name in source_dataset_names
+        }
+    else:
+        dataset_identities = {
+            name: asdict(verify_dataset(config.datasets[name]))
+            for name in all_dataset_names
+        }
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ")
     output_dir = output_root / f"{task_id}--{model_name}--seed{seed}--{timestamp}"
     trial_metadata: dict[str, Any] | None = None
@@ -331,25 +723,28 @@ def run_benchmark(
             raise RuntimeError("Optuna trials require nilmbench[benchmark]") from exc
         storage_dir = output_root / "optuna"
         storage_dir.mkdir(parents=True, exist_ok=True)
-        study_spec = {
-            "task_config_sha256": config.digest(task_id),
-            "model": model_name,
-            "seed": seed,
-            "appliances": chosen_appliances,
-            "sample_period": resolved_period,
-            "max_samples": max_samples,
-            "epochs_override": epochs,
-            "sequence_length_override": sequence_length,
-            "model_module": model_entry.module,
-            "model_class": model_entry.class_name,
-            "nilmtk_contrib_git_sha": provenance["nilmtk_contrib_git_sha"],
-            "nilmtk_contrib_version": provenance["nilmtk_contrib_version"],
-        }
-        study_digest = hashlib.sha256(
-            json.dumps(study_spec, sort_keys=True).encode()
-        ).hexdigest()[:12]
-        study_name = f"{task_id}--{model_name}--seed{seed}--{study_digest}"
-        storage = f"sqlite:///{(storage_dir / f'{study_name}.sqlite3').resolve()}"
+        study_spec = _study_spec(
+            config,
+            task,
+            model_name,
+            model_entry,
+            seed,
+            chosen_appliances,
+            resolved_period,
+            max_samples,
+            epochs,
+            sequence_length,
+            device,
+            provenance,
+            source_dataset_identities,
+            optuna.__version__,
+        )
+        study_digest, study_name = _study_identity(
+            task_id, model_name, seed, study_spec
+        )
+        storage_path = storage_dir / f"{study_name}.sqlite3"
+        storage = f"sqlite:///{storage_path.resolve()}"
+        audit_dir = storage_dir / study_name / "trials"
         study = optuna.create_study(
             study_name=study_name,
             direction="minimize",
@@ -357,14 +752,24 @@ def run_benchmark(
             storage=storage,
             load_if_exists=True,
         )
+        _assert_resume_compatible(study, study_spec, study_digest)
+        completed_records = _load_completed_trial_records(
+            study,
+            optuna.trial.TrialState.COMPLETE,
+            audit_dir,
+            study_digest,
+            study_spec,
+        )
 
         def objective(trial: Any) -> float:
-            params = model_entry.search_space(trial)
-            if epochs is not None:
-                params["n_epochs"] = epochs
-            if device:
-                params["device"] = device
-            trial_result = _run_once(
+            params = _trial_parameters(
+                model_entry,
+                trial,
+                epochs=epochs,
+                sequence_length=sequence_length,
+                device=device,
+            )
+            trial_result = _run_validation_once(
                 config,
                 task,
                 model_name,
@@ -374,13 +779,26 @@ def run_benchmark(
                 resolved_period,
                 max_samples,
             )
-            trial.set_user_attr("metrics", trial_result["metrics"])
+            record = _trial_record(
+                study_name,
+                study_digest,
+                study_spec,
+                trial,
+                params,
+                trial_result,
+            )
+            _write_trial_record(_trial_record_path(audit_dir, trial.number), record)
+            trial.set_user_attr("audit_record_id", record["record_id"])
             return trial_result["objective_mae"]
 
-        completed_before = sum(
-            trial.state == optuna.trial.TrialState.COMPLETE for trial in study.trials
+        study.optimize(objective, n_trials=max(0, trials - len(completed_records)))
+        completed_records = _load_completed_trial_records(
+            study,
+            optuna.trial.TrialState.COMPLETE,
+            audit_dir,
+            study_digest,
+            study_spec,
         )
-        study.optimize(objective, n_trials=max(0, trials - completed_before))
         base_params.update(study.best_params)
         if epochs is not None:
             base_params["n_epochs"] = epochs
@@ -392,15 +810,29 @@ def run_benchmark(
             "study_name": study.study_name,
             "study_spec": study_spec,
             "study_digest": study_digest,
-            "storage": storage,
-            "completed_trials": sum(
-                trial.state == optuna.trial.TrialState.COMPLETE
-                for trial in study.trials
-            ),
+            "coordination": {
+                "backend": "sqlite",
+                "storage": storage_path.relative_to(output_root).as_posix(),
+                "scientific_source_of_truth": False,
+            },
+            "completed_trials": len(completed_records),
             "best_value": study.best_value,
-            "best_params": study.best_params,
+            "best_params": dict(base_params),
+            "optuna_best_suggestions": study.best_params,
+            "trial_record_files": [
+                _trial_record_path(audit_dir, record["trial_number"])
+                .relative_to(output_root)
+                .as_posix()
+                for record in completed_records
+            ],
+            "trial_records": completed_records,
         }
 
+    if dataset_identities is None:
+        dataset_identities = {
+            name: asdict(verify_dataset(config.datasets[name]))
+            for name in all_dataset_names
+        }
     run = _run_once(
         config,
         task,
@@ -450,6 +882,15 @@ def run_benchmark(
             if resolved_period == task.sample_period
             else resolved_period,
             "sequence_length": sequence_length,
+            "model_selection": None
+            if trial_metadata is None
+            else {
+                "method": "optuna-tpe",
+                "study_identity_sha256": trial_metadata["study_digest"],
+                "completed_trials": trial_metadata["completed_trials"],
+                "validation_protocol": _VALIDATION_PROTOCOL["id"],
+                "selected_parameters": trial_metadata["best_params"],
+            },
         },
         "study": trial_metadata,
         "runtime": provenance,
