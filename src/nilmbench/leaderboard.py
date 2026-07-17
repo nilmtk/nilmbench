@@ -95,6 +95,7 @@ def _load_result(path: Path) -> dict[str, Any]:
         "seed",
         "sample_period",
         "run_scope",
+        "protocol_overrides",
         "runtime",
         "run",
     ):
@@ -131,12 +132,25 @@ def _load_result(path: Path) -> dict[str, Any]:
         raise LeaderboardError(f"{path} result_id does not match its contents")
     if result["run_scope"] not in {"smoke", "full"}:
         raise LeaderboardError(f"{path} has an invalid run_scope")
+    if not isinstance(result["protocol_overrides"], dict):
+        raise LeaderboardError(f"{path} field 'protocol_overrides' must be an object")
     return result
 
 
 def _rows(result: dict[str, Any], path: Path) -> Iterable[dict[str, Any]]:
     verified, failures = _verified_provenance(result)
     task = result["task"]
+    overrides = result["protocol_overrides"]
+    overrides_sha256 = hashlib.sha256(
+        json.dumps(overrides, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    sequence_length = overrides.get("sequence_length")
+    if sequence_length is not None and (
+        isinstance(sequence_length, bool)
+        or not isinstance(sequence_length, int)
+        or sequence_length <= 0
+    ):
+        raise LeaderboardError(f"{path} has an invalid sequence-length override")
     metrics = result["run"].get("metrics")
     if not isinstance(metrics, dict) or not metrics:
         raise LeaderboardError(f"{path} has no appliance metrics")
@@ -171,6 +185,9 @@ def _rows(result: dict[str, Any], path: Path) -> Iterable[dict[str, Any]]:
             "container_digest": result["runtime"].get("container_digest"),
             "hardware": hardware,
             "sample_period": result["sample_period"],
+            "protocol_overrides": overrides,
+            "protocol_overrides_sha256": overrides_sha256,
+            "sequence_length": sequence_length,
             "appliance": appliance,
             "scope": result["run_scope"],
             "seed": result["seed"],
@@ -203,6 +220,7 @@ def build_leaderboard(
                 row["container_digest"],
                 row["hardware"],
                 row["sample_period"],
+                row["protocol_overrides_sha256"],
                 row["appliance"],
                 row["scope"],
                 row["target_data_access"],
@@ -246,6 +264,11 @@ def build_leaderboard(
                 "container_digest": rows[0]["container_digest"],
                 "hardware": rows[0]["hardware"],
                 "sample_period": rows[0]["sample_period"],
+                "protocol_overrides": rows[0]["protocol_overrides"],
+                "protocol_overrides_sha256": rows[0][
+                    "protocol_overrides_sha256"
+                ],
+                "sequence_length": rows[0]["sequence_length"],
                 "appliance": rows[0]["appliance"],
                 "scope": scope,
                 "status": status,
@@ -302,6 +325,8 @@ def write_leaderboard(
         "container_digest",
         "hardware",
         "sample_period",
+        "sequence_length",
+        "protocol_overrides_sha256",
         "appliance",
         "target_data_access",
         "scope",

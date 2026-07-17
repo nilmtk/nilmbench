@@ -10,7 +10,16 @@ from nilmbench.leaderboard import (
 )
 
 
-def _write_result(root, seed, *, scope="full", dirty=False, mae=None):
+def _write_result(
+    root,
+    seed,
+    *,
+    scope="full",
+    dirty=False,
+    mae=None,
+    sequence_length=99,
+    max_samples=None,
+):
     result = {
         "schema_version": "1.1",
         "created_at": f"2026-07-17T00:00:{seed:02d}+00:00",
@@ -30,6 +39,13 @@ def _write_result(root, seed, *, scope="full", dirty=False, mae=None):
         "seed": seed,
         "sample_period": 60,
         "run_scope": scope,
+        "protocol_overrides": {
+            "appliances": ["fridge"] if scope == "smoke" else None,
+            "epochs": 1 if scope == "smoke" else None,
+            "max_samples_per_window": max_samples,
+            "sample_period": None,
+            "sequence_length": sequence_length,
+        },
         "runtime": {
             "nilmbench_git_sha": "c" * 40,
             "nilmbench_git_dirty": dirty,
@@ -39,6 +55,9 @@ def _write_result(root, seed, *, scope="full", dirty=False, mae=None):
             "gpu": "Test GPU",
         },
         "run": {
+            "params_by_alignment_group": {
+                "fridge": {"sequence_length": sequence_length}
+            },
             "metrics": {
                 "fridge": {
                     "mae": float(seed if mae is None else mae),
@@ -51,7 +70,7 @@ def _write_result(root, seed, *, scope="full", dirty=False, mae=None):
     result["result_id"] = hashlib.sha256(
         json.dumps(result, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
-    path = root / f"seed-{seed}-{scope}" / "result.json"
+    path = root / f"seed-{seed}-{scope}-seq{sequence_length}" / "result.json"
     path.parent.mkdir(parents=True)
     path.write_text(json.dumps(result), encoding="utf-8")
     return path
@@ -122,6 +141,29 @@ def test_different_container_digests_are_never_aggregated(tmp_path):
         "sha256:" + "e" * 64,
         "sha256:" + "f" * 64,
     }
+
+
+def test_smoke_protocol_overrides_are_never_aggregated(tmp_path):
+    _write_result(
+        tmp_path,
+        42,
+        scope="smoke",
+        sequence_length=99,
+        max_samples=512,
+    )
+    _write_result(
+        tmp_path,
+        42,
+        scope="smoke",
+        sequence_length=299,
+        max_samples=1024,
+    )
+
+    entries = build_leaderboard(tmp_path)["entries"]
+
+    assert len(entries) == 2
+    assert {entry["sequence_length"] for entry in entries} == {99, 299}
+    assert len({entry["protocol_overrides_sha256"] for entry in entries}) == 2
 
 
 def test_json_and_csv_artifacts_are_deterministic(tmp_path):
