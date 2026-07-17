@@ -84,6 +84,16 @@ Container builds take nilmtk-contrib as a named BuildKit context. The default Co
 
 Published images pin their nilmtk-contrib build context to the exact PatchTST commit rather than a moving branch. Update that pin deliberately when a reviewed model release is adopted.
 
+Model contributions and benchmark-image releases have separate cadences. A
+model can merge after its contrib contract, CPU, and targeted CUDA checks pass;
+it does not trigger a public image by itself. NILMbench periodically batches
+eligible contrib changes, advances its single immutable contrib pin, builds the
+matching `-cpu` and `-cuda` variants once, and runs the real-data matrix against
+the candidate CUDA digest. The versioned images and leaderboard update are
+promoted together only after that matrix passes. Development builds may use a
+local contrib checkout, but their results cannot become verified leaderboard
+rows unless the source revisions and immutable container digest are recorded.
+
 For local Compose builds, pass the two source revisions into the OCI labels and
 runtime result metadata:
 

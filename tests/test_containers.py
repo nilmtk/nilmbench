@@ -13,3 +13,15 @@ def test_cpu_and_cuda_images_pin_the_same_core_revisions():
         assert f"ARG NILMTK_COMMIT={NILMTK_REVISION}" in source
         assert f"ARG NILM_METADATA_COMMIT={NILM_METADATA_REVISION}" in source
         assert "USER benchmark" in source
+
+
+def test_public_images_are_released_as_one_cpu_cuda_family():
+    workflow = (ROOT / ".github" / "workflows" / "publish-images.yml").read_text(
+        encoding="utf-8"
+    )
+
+    assert "workflow_dispatch:" in workflow
+    assert 'tags: ["v*"]' in workflow
+    assert "target: [cpu, cuda]" in workflow
+    assert "pull_request:" not in workflow
+    assert "type=semver,pattern={{version}},suffix=-${{ matrix.target }}" in workflow
