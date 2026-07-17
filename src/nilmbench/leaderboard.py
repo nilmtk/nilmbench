@@ -69,7 +69,7 @@ def _expected_window_samples(window: Any, sample_period: int, limit: int | None)
 
 
 def _comparison_protocol(result: dict[str, Any]) -> dict[str, Any]:
-    """Return only evaluation controls under which models may be ranked together."""
+    """Return the full training, runtime, and evaluation comparison record."""
     overrides = result["protocol_overrides"]
     task = result["task"]
     runtime = result["runtime"]
@@ -104,6 +104,27 @@ def _comparison_protocol(result: dict[str, Any]) -> dict[str, Any]:
         },
         "scope": result["run_scope"],
         "target_data_access": task["target_data_access"],
+    }
+
+
+def _ranking_protocol(entry: dict[str, Any]) -> dict[str, Any]:
+    """Return evaluation controls that define one public ranking cohort.
+
+    Model choices such as sequence length and epoch count, and provenance such as
+    the container revision, remain in the full comparison protocol.  They must not
+    create a fresh public rank: otherwise every architecture or later image build
+    can become an incomparable group of one.
+    """
+    return {
+        "schema": "nilmbench.ranking-protocol.v1",
+        "task_id": entry["task"],
+        "task_config_sha256": entry["task_config_sha256"],
+        "profile": entry["profile"],
+        "sample_period": entry["sample_period"],
+        "appliance": entry["appliance"],
+        "max_samples_per_window": entry["max_samples_per_window"],
+        "scope": entry["scope"],
+        "target_data_access": entry["target_data_access"],
     }
 
 
@@ -1073,6 +1094,11 @@ def build_leaderboard(
                 "result_file_sha256": sorted(row["result_file_sha256"] for row in rows),
             }
         )
+    for entry in entries:
+        ranking_protocol = _ranking_protocol(entry)
+        entry["ranking_protocol"] = ranking_protocol
+        entry["ranking_protocol_sha256"] = canonical_digest(ranking_protocol)
+
     entries.sort(
         key=lambda item: (
             item["task"],
@@ -1083,6 +1109,14 @@ def build_leaderboard(
             item["model"],
         )
     )
+    ranks: dict[str, int] = defaultdict(int)
+    for entry in entries:
+        if entry["status"] not in {"full-verified", "smoke-verified"}:
+            entry["rank"] = None
+            continue
+        cohort = entry["ranking_protocol_sha256"]
+        ranks[cohort] += 1
+        entry["rank"] = ranks[cohort]
     return {
         "schema_version": "1.0",
         "required_seeds": list(required_seeds),
@@ -1118,6 +1152,8 @@ def write_leaderboard(
         "max_samples_per_window",
         "protocol_overrides_sha256",
         "comparison_protocol_sha256",
+        "ranking_protocol_sha256",
+        "rank",
         "appliance",
         "target_data_access",
         "scope",

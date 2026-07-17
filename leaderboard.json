@@ -1,7 +1,7 @@
 {
   "artifacts": {
     "csv_name": "leaderboard.csv",
-    "csv_sha256": "130a6394bc1f041491bb33a840d1d37a2350aadaf2673f8e59b0f2c96e24af49"
+    "csv_sha256": "7693db2ccd0c03581fd5c1d9ae53b3f3bb083c56a4fb331fca939690eeb766dc"
   },
   "entries": [
     {
@@ -69,6 +69,19 @@
       },
       "protocol_overrides_sha256": "7f654b6d261e1d9a6e733400a6ee383eacf61da0a0f5e45ce5aa7bc88f385056",
       "provenance_verified": true,
+      "rank": 1,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 3960,
+        "profile": "corrected",
+        "sample_period": 60,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "bc8002ef4b917cda509fc789093422ad2abfb3d472bd00c7df3f846d750a14b4",
       "result_file_sha256": [
         "73030fec03b2384c74de17c001c09e40f97cc949e4ed0982bfd95af1a721635e",
         "863e4dd1c3ef33e0ed52697a63a5ad6db742bba14122f660a471a58d23ad143c",
@@ -163,6 +176,19 @@
       },
       "protocol_overrides_sha256": "7f654b6d261e1d9a6e733400a6ee383eacf61da0a0f5e45ce5aa7bc88f385056",
       "provenance_verified": true,
+      "rank": 2,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 3960,
+        "profile": "corrected",
+        "sample_period": 60,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "bc8002ef4b917cda509fc789093422ad2abfb3d472bd00c7df3f846d750a14b4",
       "result_file_sha256": [
         "2f2d7481260deae279aa0e1d7b376d50a2362bae2e0a11243a757a27f7e13064",
         "5f58b3b479d236284b5b5666e91dfb969fea98cadc34b2e2b394e2ff9b1fd2c5",
@@ -257,6 +283,19 @@
       },
       "protocol_overrides_sha256": "fe0a640391067d0d8eef3655b630a41151a1bdf4cbff179ce47626525764d28a",
       "provenance_verified": true,
+      "rank": 3,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 3960,
+        "profile": "corrected",
+        "sample_period": 60,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "bc8002ef4b917cda509fc789093422ad2abfb3d472bd00c7df3f846d750a14b4",
       "result_file_sha256": [
         "9079482cff7ca1fb426dc518c6959bd036f49ea90de9caf9f1bcd62896ebdbd1",
         "b41f75deb3ffa243475b97859ce536b0570296aa81061a4a74e66504d3a2753e",
@@ -351,6 +390,19 @@
       },
       "protocol_overrides_sha256": "7f654b6d261e1d9a6e733400a6ee383eacf61da0a0f5e45ce5aa7bc88f385056",
       "provenance_verified": true,
+      "rank": 4,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 3960,
+        "profile": "corrected",
+        "sample_period": 60,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "bc8002ef4b917cda509fc789093422ad2abfb3d472bd00c7df3f846d750a14b4",
       "result_file_sha256": [
         "4cb9bde15cab2fa76b1b330596bfd5118a0e309c5d0e29a6b4e1216486df244e",
         "a9e566210b505ab752a12ae9ba40e9cd0595226b70759d938b7d698619288a05",
@@ -445,6 +497,19 @@
       },
       "protocol_overrides_sha256": "7f654b6d261e1d9a6e733400a6ee383eacf61da0a0f5e45ce5aa7bc88f385056",
       "provenance_verified": true,
+      "rank": 5,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 3960,
+        "profile": "corrected",
+        "sample_period": 60,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "bc8002ef4b917cda509fc789093422ad2abfb3d472bd00c7df3f846d750a14b4",
       "result_file_sha256": [
         "0d3d123799624431e17d791735dd2029d5086ca9317afa63d9e6d992be1122c1",
         "c580e6570b7f0251d57fff01c097279acab6327aadc4d6ead0cd68ce3eeed2ba",
@@ -539,6 +604,19 @@
       },
       "protocol_overrides_sha256": "7f654b6d261e1d9a6e733400a6ee383eacf61da0a0f5e45ce5aa7bc88f385056",
       "provenance_verified": true,
+      "rank": 6,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 3960,
+        "profile": "corrected",
+        "sample_period": 60,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "bc8002ef4b917cda509fc789093422ad2abfb3d472bd00c7df3f846d750a14b4",
       "result_file_sha256": [
         "645467b57a9f3901c9d7dfeb4678f38e8271cca4ac949bea05f34af905ba0db7",
         "a7025964e7d8abe80996911c793d4f65f7381007863f456f8e6da48b62187aef",
@@ -633,6 +711,19 @@
       },
       "protocol_overrides_sha256": "7f654b6d261e1d9a6e733400a6ee383eacf61da0a0f5e45ce5aa7bc88f385056",
       "provenance_verified": true,
+      "rank": 7,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 3960,
+        "profile": "corrected",
+        "sample_period": 60,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "bc8002ef4b917cda509fc789093422ad2abfb3d472bd00c7df3f846d750a14b4",
       "result_file_sha256": [
         "155f158fb13e12d1f701307fd81b312e61884faadf4bdb5d2d6c0f8242f66012",
         "27f781248b31b2b7e5cc89723852de739303be951c9a36e606aea6fdae254e81",
@@ -727,6 +818,19 @@
       },
       "protocol_overrides_sha256": "7f654b6d261e1d9a6e733400a6ee383eacf61da0a0f5e45ce5aa7bc88f385056",
       "provenance_verified": true,
+      "rank": 8,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 3960,
+        "profile": "corrected",
+        "sample_period": 60,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "bc8002ef4b917cda509fc789093422ad2abfb3d472bd00c7df3f846d750a14b4",
       "result_file_sha256": [
         "0ac7552de10c0b19e54d36673a6982da479a1831fc29d0deba756e0dfdcbf27f",
         "38cec1110bcb4e53ca0f49388b37b13e8c3809868ba7bd1086d5576f29a67895",
@@ -821,6 +925,19 @@
       },
       "protocol_overrides_sha256": "7f654b6d261e1d9a6e733400a6ee383eacf61da0a0f5e45ce5aa7bc88f385056",
       "provenance_verified": true,
+      "rank": 9,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 3960,
+        "profile": "corrected",
+        "sample_period": 60,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "bc8002ef4b917cda509fc789093422ad2abfb3d472bd00c7df3f846d750a14b4",
       "result_file_sha256": [
         "6290dd5922d63077b44f76ebe87702b88cd20457ea24c5303b847732dd84920a",
         "e52cb6ef8f2b31b47ffbf30ea66f94896e7e5bd510906f2f199e17eb03f911a7",
@@ -915,6 +1032,19 @@
       },
       "protocol_overrides_sha256": "7f654b6d261e1d9a6e733400a6ee383eacf61da0a0f5e45ce5aa7bc88f385056",
       "provenance_verified": true,
+      "rank": 10,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 3960,
+        "profile": "corrected",
+        "sample_period": 60,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "bc8002ef4b917cda509fc789093422ad2abfb3d472bd00c7df3f846d750a14b4",
       "result_file_sha256": [
         "8065e7bd11a837aac7140b77a4e011441519304aeb1c8f189fac40103c593326",
         "d37b82aa6f7aa6ea1be49b37de896a62b685a15645a6f59728e629a420cbddf5",
@@ -1009,6 +1139,19 @@
       },
       "protocol_overrides_sha256": "7f654b6d261e1d9a6e733400a6ee383eacf61da0a0f5e45ce5aa7bc88f385056",
       "provenance_verified": true,
+      "rank": 11,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 3960,
+        "profile": "corrected",
+        "sample_period": 60,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "bc8002ef4b917cda509fc789093422ad2abfb3d472bd00c7df3f846d750a14b4",
       "result_file_sha256": [
         "2aa65755cf4eb64e175ef7ef77de0cd1d017efd025bb0a87f86e5cbf1bfedd75",
         "688b313658b15abdbb016b8d4e369985076e1b2b56a437a1ccf7e729bc64c045",
@@ -1103,6 +1246,19 @@
       },
       "protocol_overrides_sha256": "fe0a640391067d0d8eef3655b630a41151a1bdf4cbff179ce47626525764d28a",
       "provenance_verified": true,
+      "rank": 12,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 3960,
+        "profile": "corrected",
+        "sample_period": 60,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "bc8002ef4b917cda509fc789093422ad2abfb3d472bd00c7df3f846d750a14b4",
       "result_file_sha256": [
         "a7aca7a81942e4133c386bfe36cd795388857071c6dbe390e3591a92b893593f",
         "c70cdd2d44c65d4c177d55701f3307baac6e466e47d5bf5de7734e452a696bd1",
@@ -1197,6 +1353,19 @@
       },
       "protocol_overrides_sha256": "7f654b6d261e1d9a6e733400a6ee383eacf61da0a0f5e45ce5aa7bc88f385056",
       "provenance_verified": true,
+      "rank": 13,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 3960,
+        "profile": "corrected",
+        "sample_period": 60,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "bc8002ef4b917cda509fc789093422ad2abfb3d472bd00c7df3f846d750a14b4",
       "result_file_sha256": [
         "421844be6c76e2d9dbbd08d6ba1ccec73f1703680aa4ef234aedd5dc8141adfc",
         "65a84deccc30f630796307b1983319f0a3ad679db392b37c3dad52ec3d6701cc",
@@ -1285,6 +1454,19 @@
       },
       "protocol_overrides_sha256": "294356c6c7b66030569075b0afb4f8937761162c74d3e189a0091ed038522ccd",
       "provenance_verified": true,
+      "rank": 14,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 3960,
+        "profile": "corrected",
+        "sample_period": 60,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "bc8002ef4b917cda509fc789093422ad2abfb3d472bd00c7df3f846d750a14b4",
       "result_file_sha256": [
         "c46e149a787bc9c65de81676f8fddab18a6ef248d9d92cfdc4288d66bad06c63",
         "ca9081995565070588fa8ae895271f52bf62e1b6a8fc998b390e466decb957b9",
@@ -1379,6 +1561,19 @@
       },
       "protocol_overrides_sha256": "7f654b6d261e1d9a6e733400a6ee383eacf61da0a0f5e45ce5aa7bc88f385056",
       "provenance_verified": true,
+      "rank": 15,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 3960,
+        "profile": "corrected",
+        "sample_period": 60,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "bc8002ef4b917cda509fc789093422ad2abfb3d472bd00c7df3f846d750a14b4",
       "result_file_sha256": [
         "3b16687835429c14148d073fc3c6f61478af88d973b9a5812dc13cd0ed71fc22",
         "403f278660ea83b33e9bb0eb7cbac8d05ae9c07fcf330acb43a3aa9562b459a7",
@@ -1473,6 +1668,19 @@
       },
       "protocol_overrides_sha256": "7f654b6d261e1d9a6e733400a6ee383eacf61da0a0f5e45ce5aa7bc88f385056",
       "provenance_verified": true,
+      "rank": 16,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 3960,
+        "profile": "corrected",
+        "sample_period": 60,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "bc8002ef4b917cda509fc789093422ad2abfb3d472bd00c7df3f846d750a14b4",
       "result_file_sha256": [
         "2c3e4e96326c683130cac8092c53b9abd5be2b9784113a37927b84be350dd9e1",
         "45379dda3b95bf308daf7a2fadfb1facd908c8aaec0883e61cadf4b963de2a5a",
@@ -1567,6 +1775,19 @@
       },
       "protocol_overrides_sha256": "7f654b6d261e1d9a6e733400a6ee383eacf61da0a0f5e45ce5aa7bc88f385056",
       "provenance_verified": true,
+      "rank": 17,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 3960,
+        "profile": "corrected",
+        "sample_period": 60,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "bc8002ef4b917cda509fc789093422ad2abfb3d472bd00c7df3f846d750a14b4",
       "result_file_sha256": [
         "442d2b34f4bdcbd69f62e7442783ffe41192e93b3d57bdd2965cf218985aef36",
         "9714888b16cbdf016a4d39b1783b2e0e58fe7a480579564e9135a2eeae839d13",
