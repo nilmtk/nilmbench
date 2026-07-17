@@ -58,6 +58,9 @@ def _write_result(
             "params_by_alignment_group": {
                 "fridge": {"sequence_length": sequence_length}
             },
+            "elapsed_seconds_by_alignment_group": {"fridge": float(seed)},
+            "trainable_parameters": {"fridge": 1234},
+            "peak_accelerator_memory_bytes": {"fridge": 4096},
             "metrics": {
                 "fridge": {
                     "mae": float(seed if mae is None else mae),
@@ -89,6 +92,9 @@ def test_three_clean_full_seeds_are_verified(tmp_path):
     assert entry["seeds"] == [10, 20, 42]
     assert entry["mae_mean"] == pytest.approx(24.0)
     assert entry["mae_std"] > 0
+    assert entry["elapsed_seconds_mean"] == pytest.approx(24.0)
+    assert entry["trainable_parameters_mean"] == 1234
+    assert entry["peak_accelerator_memory_bytes_mean"] == 4096
 
 
 def test_smoke_and_dirty_runs_cannot_become_verified(tmp_path):
@@ -203,4 +209,28 @@ def test_invalid_metrics_are_rejected(tmp_path, bad_value):
     _write_result(tmp_path, 42, mae=bad_value)
 
     with pytest.raises(LeaderboardError, match="out-of-range"):
+        build_leaderboard(tmp_path)
+
+
+@pytest.mark.parametrize(
+    ("field", "bad_value", "message"),
+    [
+        ("elapsed_seconds_by_alignment_group", float("nan"), "elapsed"),
+        ("trainable_parameters", False, "parameter count"),
+        ("peak_accelerator_memory_bytes", -1, "accelerator memory"),
+    ],
+)
+def test_invalid_efficiency_measurements_are_rejected(
+    tmp_path, field, bad_value, message
+):
+    path = _write_result(tmp_path, 42)
+    result = json.loads(path.read_text(encoding="utf-8"))
+    result["run"][field]["fridge"] = bad_value
+    result.pop("result_id")
+    result["result_id"] = hashlib.sha256(
+        json.dumps(result, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    path.write_text(json.dumps(result), encoding="utf-8")
+
+    with pytest.raises(LeaderboardError, match=message):
         build_leaderboard(tmp_path)

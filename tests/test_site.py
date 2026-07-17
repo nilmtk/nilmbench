@@ -10,3 +10,6 @@ def test_site_loads_generated_leaderboard_and_discloses_smoke_protocol():
     assert "entry.sequence_length" in source
     assert "entry.epochs" in source
     assert "entry.max_samples_per_window" in source
+    assert "entry.trainable_parameters_mean" in source
+    assert "entry.elapsed_seconds_mean" in source
+    assert "entry.peak_accelerator_memory_bytes_mean" in source

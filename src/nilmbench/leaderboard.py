@@ -67,6 +67,24 @@ def _verified_provenance(result: dict[str, Any]) -> tuple[bool, list[str]]:
     return not failures, failures
 
 
+def _alignment_group_value(
+    values: Any, appliance: str, path: Path, field: str
+) -> Any:
+    if values is None:
+        return None
+    if not isinstance(values, dict):
+        raise LeaderboardError(f"{path} run field {field!r} must be an object")
+    if appliance in values:
+        return values[appliance]
+    if "joint" in values:
+        return values["joint"]
+    if len(values) == 1:
+        return next(iter(values.values()))
+    raise LeaderboardError(
+        f"{path} cannot resolve {field!r} for appliance {appliance!r}"
+    )
+
+
 def _load_result(path: Path) -> dict[str, Any]:
     try:
         result = json.loads(path.read_text(encoding="utf-8"))
@@ -170,6 +188,45 @@ def _rows(result: dict[str, Any], path: Path) -> Iterable[dict[str, Any]]:
         ):
             raise LeaderboardError(f"{path} has out-of-range metrics for {appliance}")
         hardware = result["runtime"].get("gpu") or result["runtime"].get("cpu")
+        elapsed = _alignment_group_value(
+            result["run"].get("elapsed_seconds_by_alignment_group"),
+            appliance,
+            path,
+            "elapsed_seconds_by_alignment_group",
+        )
+        if elapsed is None and len(metrics) == 1:
+            elapsed = result["run"].get("elapsed_seconds")
+        parameters = _alignment_group_value(
+            result["run"].get("trainable_parameters"),
+            appliance,
+            path,
+            "trainable_parameters",
+        )
+        peak_memory = _alignment_group_value(
+            result["run"].get("peak_accelerator_memory_bytes"),
+            appliance,
+            path,
+            "peak_accelerator_memory_bytes",
+        )
+        if elapsed is not None and (
+            isinstance(elapsed, bool)
+            or not isinstance(elapsed, (int, float))
+            or not math.isfinite(elapsed)
+            or elapsed <= 0
+        ):
+            raise LeaderboardError(f"{path} has invalid elapsed seconds")
+        if parameters is not None and (
+            isinstance(parameters, bool)
+            or not isinstance(parameters, int)
+            or parameters <= 0
+        ):
+            raise LeaderboardError(f"{path} has an invalid parameter count")
+        if peak_memory is not None and (
+            isinstance(peak_memory, bool)
+            or not isinstance(peak_memory, int)
+            or peak_memory < 0
+        ):
+            raise LeaderboardError(f"{path} has invalid peak accelerator memory")
         yield {
             "task": task["id"],
             "family": task["family"],
@@ -192,6 +249,9 @@ def _rows(result: dict[str, Any], path: Path) -> Iterable[dict[str, Any]]:
             "seed": result["seed"],
             "mae": mae,
             "f1": f1,
+            "elapsed_seconds": None if elapsed is None else float(elapsed),
+            "trainable_parameters": parameters,
+            "peak_accelerator_memory_bytes": peak_memory,
             "result_id": result["result_id"],
             "result_file_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
             "provenance_verified": verified,
@@ -252,6 +312,21 @@ def build_leaderboard(
             status = "candidate"
         maes = [row["mae"] for row in rows]
         f1s = [row["f1"] for row in rows]
+        elapsed_values = [
+            row["elapsed_seconds"]
+            for row in rows
+            if row["elapsed_seconds"] is not None
+        ]
+        parameter_values = [
+            row["trainable_parameters"]
+            for row in rows
+            if row["trainable_parameters"] is not None
+        ]
+        peak_memory_values = [
+            row["peak_accelerator_memory_bytes"]
+            for row in rows
+            if row["peak_accelerator_memory_bytes"] is not None
+        ]
         entries.append(
             {
                 "task": rows[0]["task"],
@@ -285,6 +360,32 @@ def build_leaderboard(
                 "mae_std": statistics.stdev(maes) if len(maes) > 1 else 0.0,
                 "f1_mean": statistics.fmean(f1s),
                 "f1_std": statistics.stdev(f1s) if len(f1s) > 1 else 0.0,
+                "elapsed_seconds_mean": (
+                    statistics.fmean(elapsed_values) if elapsed_values else None
+                ),
+                "elapsed_seconds_std": (
+                    statistics.stdev(elapsed_values)
+                    if len(elapsed_values) > 1
+                    else 0.0 if elapsed_values else None
+                ),
+                "trainable_parameters_mean": (
+                    statistics.fmean(parameter_values) if parameter_values else None
+                ),
+                "trainable_parameters_std": (
+                    statistics.stdev(parameter_values)
+                    if len(parameter_values) > 1
+                    else 0.0 if parameter_values else None
+                ),
+                "peak_accelerator_memory_bytes_mean": (
+                    statistics.fmean(peak_memory_values)
+                    if peak_memory_values
+                    else None
+                ),
+                "peak_accelerator_memory_bytes_std": (
+                    statistics.stdev(peak_memory_values)
+                    if len(peak_memory_values) > 1
+                    else 0.0 if peak_memory_values else None
+                ),
                 "result_ids": sorted(row["result_id"] for row in rows),
                 "result_file_sha256": sorted(
                     row["result_file_sha256"] for row in rows
@@ -342,6 +443,12 @@ def write_leaderboard(
         "mae_std",
         "f1_mean",
         "f1_std",
+        "elapsed_seconds_mean",
+        "elapsed_seconds_std",
+        "trainable_parameters_mean",
+        "trainable_parameters_std",
+        "peak_accelerator_memory_bytes_mean",
+        "peak_accelerator_memory_bytes_std",
     ]
     output = io.StringIO()
     writer = csv.DictWriter(output, fieldnames=fields, lineterminator="\n")

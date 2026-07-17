@@ -928,9 +928,9 @@ experiment['test']['metrics'] = ['mae', 'f1score', 'sae', 'nep']
     <div class="lb-sub" id="live-leaderboard-summary">Loading immutable result bundles&hellip;</div>
     <div class="table-container">
         <table class="lb">
-            <thead><tr><th>#</th><th>Model</th><th>Task / appliance</th><th>MAE&darr; (W)</th><th>F1&uarr;</th><th>Status</th></tr></thead>
+            <thead><tr><th>#</th><th>Model</th><th>Task / appliance</th><th>MAE&darr; (W)</th><th>F1&uarr;</th><th>Params</th><th>Time&darr;</th><th>Peak VRAM&darr;</th><th>Status</th></tr></thead>
             <tbody id="live-leaderboard-body">
-                <tr><td colspan="6" style="color:var(--text-muted)">Loading&hellip;</td></tr>
+                <tr><td colspan="9" style="color:var(--text-muted)">Loading&hellip;</td></tr>
             </tbody>
         </table>
     </div>
@@ -1547,6 +1547,20 @@ function metricWithSpread(mean, spread, count) {
   const value = Number(mean).toFixed(2);
   return count > 1 ? `${value} &plusmn; ${Number(spread).toFixed(2)}` : value;
 }
+function compactCount(value) {
+  if (value == null) return '&mdash;';
+  if (value >= 1e6) return `${(value / 1e6).toFixed(2)}M`;
+  if (value >= 1e3) return `${(value / 1e3).toFixed(1)}K`;
+  return Math.round(value).toString();
+}
+function elapsedWithSpread(mean, spread, count) {
+  if (mean == null) return '&mdash;';
+  const value = `${Number(mean).toFixed(1)}s`;
+  return count > 1 ? `${value} &plusmn; ${Number(spread).toFixed(1)}s` : value;
+}
+function memoryInMiB(value) {
+  return value == null ? '&mdash;' : `${(Number(value) / 1048576).toFixed(1)} MiB`;
+}
 async function loadLiveLeaderboard() {
   const body = document.getElementById('live-leaderboard-body');
   const summary = document.getElementById('live-leaderboard-summary');
@@ -1556,7 +1570,7 @@ async function loadLiveLeaderboard() {
     const payload = await response.json();
     const entries = Array.isArray(payload.entries) ? payload.entries : [];
     if (!entries.length) {
-      body.innerHTML = '<tr><td colspan="6" style="color:var(--text-muted)">No provenance-checked result bundles have been published yet.</td></tr>';
+      body.innerHTML = '<tr><td colspan="9" style="color:var(--text-muted)">No provenance-checked result bundles have been published yet.</td></tr>';
       summary.textContent = 'The table remains empty until real result.json bundles pass checksum, source, container, and seed validation.';
       return;
     }
@@ -1575,13 +1589,16 @@ async function loadLiveLeaderboard() {
         `<td class="fam">${escHTML(task)}</td>` +
         `<td>${metricWithSpread(entry.mae_mean, entry.mae_std, entry.run_count)}</td>` +
         `<td>${metricWithSpread(entry.f1_mean, entry.f1_std, entry.run_count)}</td>` +
+        `<td>${compactCount(entry.trainable_parameters_mean)}</td>` +
+        `<td>${elapsedWithSpread(entry.elapsed_seconds_mean, entry.elapsed_seconds_std, entry.run_count)}</td>` +
+        `<td>${memoryInMiB(entry.peak_accelerator_memory_bytes_mean)}</td>` +
         `<td class="fam">${escHTML(entry.status)}</td></tr>`;
     }).join('');
     const fullVerified = entries.filter(entry=>entry.status==='full-verified').length;
     const smokeVerified = entries.filter(entry=>entry.status==='smoke-verified').length;
     summary.textContent = `${payload.source_result_count} immutable runs · ${fullVerified} full and ${smokeVerified} smoke-verified aggregates · generated, never hand-entered.`;
   } catch (error) {
-    body.innerHTML = '<tr><td colspan="6" style="color:var(--text-muted)">Leaderboard artifact unavailable.</td></tr>';
+    body.innerHTML = '<tr><td colspan="9" style="color:var(--text-muted)">Leaderboard artifact unavailable.</td></tr>';
     summary.textContent = 'Run `nilmbench leaderboard` to regenerate leaderboard.json from result bundles.';
   }
 }

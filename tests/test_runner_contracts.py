@@ -3,7 +3,7 @@ import pytest
 
 from nilmbench.data import LoadedSplit
 from nilmbench.config import load_config
-from nilmbench.runner import _predict, run_benchmark
+from nilmbench.runner import _model_size, _predict, run_benchmark
 
 
 class _Model:
@@ -13,6 +13,22 @@ class _Model:
     def disaggregate_chunk(self, mains):
         del mains
         return self.chunks
+
+
+class _Parameter:
+    def __init__(self, count):
+        self.count = count
+
+    def numel(self):
+        return self.count
+
+
+class _Network:
+    def __init__(self, *parameters):
+        self._parameters = parameters
+
+    def parameters(self):
+        return iter(self._parameters)
 
 
 def _split():
@@ -31,6 +47,22 @@ def test_predict_preserves_final_partial_chunk():
     prediction = _predict(model, _split(), ("fridge",))
 
     assert prediction["fridge"].tolist() == [1.0, 2.0, 3.0]
+
+
+def test_model_size_includes_auxiliary_networks_without_double_counting():
+    shared = _Parameter(10)
+    main_only = _Parameter(20)
+    attention_only = _Parameter(30)
+    model = type(
+        "Model",
+        (),
+        {
+            "models": {"fridge": _Network(shared, main_only)},
+            "att_models": {"fridge": _Network(shared, attention_only)},
+        },
+    )()
+
+    assert _model_size(model) == 60
 
 
 @pytest.mark.parametrize(

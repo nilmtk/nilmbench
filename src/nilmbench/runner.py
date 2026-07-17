@@ -73,11 +73,15 @@ def _normalization(split: LoadedSplit) -> tuple[float, float]:
 
 
 def _model_size(model: Any) -> int:
-    return sum(
-        parameter.numel()
-        for network in model.models.values()
-        for parameter in network.parameters()
-    )
+    parameters: dict[int, Any] = {}
+    for attribute in ("models", "att_models"):
+        networks = getattr(model, attribute, None)
+        if not isinstance(networks, dict):
+            continue
+        for network in networks.values():
+            for parameter in network.parameters():
+                parameters[id(parameter)] = parameter
+    return sum(parameter.numel() for parameter in parameters.values())
 
 
 def _patchtst_flops(model: Any) -> int | None:
@@ -166,8 +170,11 @@ def _run_once(
     test_windows: dict[str, Any] = {}
     parameter_counts: dict[str, int] = {}
     flops: dict[str, int | None] = {}
+    elapsed_by_group: dict[str, float] = {}
+    peak_accelerator_memory: dict[str, int | None] = {}
     metric_policy = config.metric_policy(task.metric_policy)
     for group in groups:
+        group_started = time.perf_counter()
         label = group[0] if len(group) == 1 else "joint"
         train = load_split(
             config, task, task.train, group, sample_period, max_samples
@@ -183,6 +190,11 @@ def _run_once(
             "mains_std": mains_std,
         }
         model = get_model(model_name).model_class()(resolved_params)
+        tracks_cuda_memory = getattr(model.device, "type", None) == "cuda"
+        if tracks_cuda_memory:
+            import torch
+
+            torch.cuda.reset_peak_memory_stats(model.device)
         model.partial_fit(
             train.mains,
             [(name, train.appliances[name]) for name in group],
@@ -199,6 +211,13 @@ def _run_once(
         test_windows[label] = test.metadata()
         parameter_counts[label] = _model_size(model)
         flops[label] = _patchtst_flops(model)
+        if tracks_cuda_memory:
+            peak_accelerator_memory[label] = torch.cuda.max_memory_allocated(
+                model.device
+            )
+        else:
+            peak_accelerator_memory[label] = None
+        elapsed_by_group[label] = time.perf_counter() - group_started
 
     return {
         "params_by_alignment_group": params_by_group,
@@ -207,6 +226,8 @@ def _run_once(
         "trainable_parameters": parameter_counts,
         "inference_flops_estimate": flops,
         "flops_method": "dense multiply-add estimate; normalization and activations excluded",
+        "elapsed_seconds_by_alignment_group": elapsed_by_group,
+        "peak_accelerator_memory_bytes": peak_accelerator_memory,
         "train_windows": train_windows,
         "test_windows": test_windows,
         "elapsed_seconds": time.perf_counter() - started,
