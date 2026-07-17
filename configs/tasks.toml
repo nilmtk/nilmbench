@@ -5,6 +5,8 @@
 id = "historical-t1-redd"
 family = "T1"
 profile = "historical"
+shared_meter_policy = "allow"
+metric_policy = "legacy-nilmtk-10w"
 description = "Within REDD building 1 (recovered notebook protocol)"
 sample_period = 60
 appliances = ["fridge", "washing machine", "microwave", "dish washer"]
@@ -17,6 +19,8 @@ test = [{ dataset = "REDD", building = 1, start = "2011-05-01", end = "2011-05-0
 id = "historical-t1-ukdale"
 family = "T1"
 profile = "historical"
+shared_meter_policy = "allow"
+metric_policy = "legacy-nilmtk-10w"
 description = "Within UK-DALE building 1 (recovered notebook protocol)"
 sample_period = 60
 appliances = ["fridge", "washing machine", "microwave", "kettle"]
@@ -29,6 +33,8 @@ test = [{ dataset = "UKDALE", building = 1, start = "2013-05-20", end = "2013-05
 id = "historical-t1-refit"
 family = "T1"
 profile = "historical"
+shared_meter_policy = "allow"
+metric_policy = "legacy-nilmtk-10w"
 description = "Within REFIT building 1 (recovered notebook protocol)"
 sample_period = 60
 appliances = ["fridge", "washing machine", "microwave", "dish washer"]
@@ -41,6 +47,8 @@ test = [{ dataset = "REFIT", building = 1, start = "2014-05-01", end = "2014-05-
 id = "historical-t2-redd"
 family = "T2"
 profile = "historical"
+shared_meter_policy = "allow"
+metric_policy = "legacy-nilmtk-10w"
 description = "REDD buildings 1-3 to building 4"
 sample_period = 60
 appliances = ["fridge", "washing machine", "dish washer"]
@@ -57,6 +65,8 @@ test = [{ dataset = "REDD", building = 4, start = "2011-05-23", end = "2011-05-3
 id = "historical-t2-ukdale"
 family = "T2"
 profile = "historical"
+shared_meter_policy = "allow"
+metric_policy = "legacy-nilmtk-10w"
 description = "UK-DALE buildings 1-2 to building 4"
 sample_period = 60
 appliances = ["fridge", "washing machine", "microwave", "kettle"]
@@ -72,6 +82,8 @@ test = [{ dataset = "UKDALE", building = 4, start = "2013-06-01", end = "2013-06
 id = "historical-t2-refit"
 family = "T2"
 profile = "historical"
+shared_meter_policy = "allow"
+metric_policy = "legacy-nilmtk-10w"
 description = "REFIT buildings 2-3 to building 4"
 sample_period = 60
 appliances = ["television", "washing machine", "microwave", "kettle"]
@@ -87,6 +99,8 @@ test = [{ dataset = "REFIT", building = 4, start = "2014-05-01", end = "2014-05-
 id = "historical-t3-redd-to-refit"
 family = "T3"
 profile = "historical"
+shared_meter_policy = "allow"
+metric_policy = "legacy-nilmtk-10w"
 description = "REDD buildings 1-3 to REFIT building 2"
 sample_period = 60
 appliances = ["fridge", "washing machine", "dish washer"]
@@ -103,6 +117,8 @@ test = [{ dataset = "REFIT", building = 2, start = "2014-05-01", end = "2014-05-
 id = "historical-t3-refit-to-redd"
 family = "T3"
 profile = "historical"
+shared_meter_policy = "allow"
+metric_policy = "legacy-nilmtk-10w"
 description = "REFIT buildings 2, 5, 6 to REDD building 1"
 sample_period = 60
 appliances = ["fridge", "washing machine", "dish washer"]
@@ -121,6 +137,8 @@ test = [{ dataset = "REDD", building = 1, start = "2011-05-01", end = "2011-05-0
 id = "corrected-t1-redd"
 family = "T1"
 profile = "corrected"
+shared_meter_policy = "warn"
+metric_policy = "paper-appliance-thresholds"
 description = "REDD building 1 with an explicit 29-day train / 7-day test split"
 sample_period = 60
 appliances = ["fridge", "washing machine", "microwave", "dish washer"]
@@ -133,6 +151,8 @@ test = [{ dataset = "REDD", building = 1, start = "2011-05-17 10:00:00", end = "
 id = "corrected-t1-ukdale"
 family = "T1"
 profile = "corrected"
+shared_meter_policy = "warn"
+metric_policy = "paper-appliance-thresholds"
 description = "UK-DALE building 1 with 30 train days and a 7-day holdout"
 sample_period = 60
 appliances = ["fridge", "washing machine", "microwave", "kettle"]
@@ -145,6 +165,8 @@ test = [{ dataset = "UKDALE", building = 1, start = "2013-05-20", end = "2013-05
 id = "corrected-t1-refit"
 family = "T1"
 profile = "corrected"
+shared_meter_policy = "warn"
+metric_policy = "paper-appliance-thresholds"
 description = "REFIT building 1 with television replacing its absent microwave"
 sample_period = 60
 appliances = ["fridge", "washing machine", "television", "dish washer"]
@@ -157,22 +179,26 @@ test = [{ dataset = "REFIT", building = 1, start = "2014-05-01", end = "2014-05-
 id = "corrected-t2-redd"
 family = "T2"
 profile = "corrected"
-description = "REDD buildings 1-3 to building 4 using common appliances"
+shared_meter_policy = "warn"
+metric_policy = "paper-appliance-thresholds"
+description = "Paper protocol: REDD buildings 1-3 to building 6"
 sample_period = 60
-appliances = ["washing machine", "dish washer"]
+appliances = ["fridge", "washing machine", "dish washer"]
 coverage_policy = "strict"
 alignment_policy = "per_appliance"
 train = [
-  { dataset = "REDD", building = 1, start = "2011-04-18", end = "2011-04-28" },
-  { dataset = "REDD", building = 2, start = "2011-04-18", end = "2011-04-28" },
-  { dataset = "REDD", building = 3, start = "2011-04-18", end = "2011-04-28" },
+  { dataset = "REDD", building = 1, start = "2011-04-18 10:00:00", end = "2011-04-28 10:00:00" },
+  { dataset = "REDD", building = 2, start = "2011-04-18 10:00:00", end = "2011-04-28 10:00:00" },
+  { dataset = "REDD", building = 3, start = "2011-04-18 10:00:00", end = "2011-04-28 10:00:00" },
 ]
-test = [{ dataset = "REDD", building = 4, start = "2011-05-23", end = "2011-05-30" }]
+test = [{ dataset = "REDD", building = 6, start = "2011-05-23", end = "2011-05-30" }]
 
 [[task]]
 id = "corrected-t2-ukdale"
 family = "T2"
 profile = "corrected"
+shared_meter_policy = "warn"
+metric_policy = "paper-appliance-thresholds"
 description = "UK-DALE buildings 1-2 to building 4"
 sample_period = 60
 appliances = ["fridge", "washing machine", "microwave", "kettle"]
@@ -188,6 +214,8 @@ test = [{ dataset = "UKDALE", building = 4, start = "2013-06-01", end = "2013-06
 id = "corrected-t2-refit"
 family = "T2"
 profile = "corrected"
+shared_meter_policy = "warn"
+metric_policy = "paper-appliance-thresholds"
 description = "REFIT buildings 2-3 to building 4"
 sample_period = 60
 appliances = ["television", "washing machine", "microwave", "kettle"]
@@ -203,15 +231,17 @@ test = [{ dataset = "REFIT", building = 4, start = "2014-05-01", end = "2014-05-
 id = "corrected-t3-redd-to-refit"
 family = "T3"
 profile = "corrected"
+shared_meter_policy = "warn"
+metric_policy = "paper-appliance-thresholds"
 description = "REDD buildings 1-3 to REFIT building 2"
 sample_period = 60
 appliances = ["fridge", "washing machine", "dish washer"]
 coverage_policy = "strict"
 alignment_policy = "per_appliance"
 train = [
-  { dataset = "REDD", building = 1, start = "2011-04-18", end = "2011-04-28" },
-  { dataset = "REDD", building = 2, start = "2011-04-18", end = "2011-04-28" },
-  { dataset = "REDD", building = 3, start = "2011-04-18", end = "2011-04-28" },
+  { dataset = "REDD", building = 1, start = "2011-04-18 10:00:00", end = "2011-04-28 10:00:00" },
+  { dataset = "REDD", building = 2, start = "2011-04-18 10:00:00", end = "2011-04-28 10:00:00" },
+  { dataset = "REDD", building = 3, start = "2011-04-18 10:00:00", end = "2011-04-28 10:00:00" },
 ]
 test = [{ dataset = "REFIT", building = 2, start = "2014-05-01", end = "2014-05-07" }]
 
@@ -219,6 +249,8 @@ test = [{ dataset = "REFIT", building = 2, start = "2014-05-01", end = "2014-05-
 id = "corrected-t3-refit-to-redd"
 family = "T3"
 profile = "corrected"
+shared_meter_policy = "warn"
+metric_policy = "paper-appliance-thresholds"
 description = "REFIT buildings 2, 5, 6 to REDD building 1"
 sample_period = 60
 appliances = ["fridge", "washing machine", "dish washer"]

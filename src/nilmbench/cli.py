@@ -24,6 +24,20 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _positive_int(value: str) -> int:
+    parsed = int(value)
+    if parsed <= 0:
+        raise argparse.ArgumentTypeError("must be a positive integer")
+    return parsed
+
+
+def _nonnegative_int(value: str) -> int:
+    parsed = int(value)
+    if parsed < 0:
+        raise argparse.ArgumentTypeError("must be a non-negative integer")
+    return parsed
+
+
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="nilmbench")
     parser.add_argument("--config-dir", type=Path)
@@ -36,17 +50,18 @@ def _parser() -> argparse.ArgumentParser:
     validate = sub.add_parser("validate", help="validate one task without training")
     validate.add_argument("--task", required=True)
     validate.add_argument("--check-data", action="store_true")
+    validate.add_argument("--max-samples", type=_positive_int)
 
     run = sub.add_parser("run", help="run one model on one benchmark task")
     run.add_argument("--task", required=True)
     run.add_argument("--model", default="PatchTST", choices=sorted(MODELS))
     run.add_argument("--seed", type=int, default=42)
-    run.add_argument("--trials", type=int, default=0)
+    run.add_argument("--trials", type=_nonnegative_int, default=0)
     run.add_argument("--results", type=Path, default=Path("results"))
     run.add_argument("--appliance", action="append", dest="appliances")
     run.add_argument("--sample-period", type=int, choices=(60, 900))
-    run.add_argument("--max-samples", type=int)
-    run.add_argument("--epochs", type=int)
+    run.add_argument("--max-samples", type=_positive_int)
+    run.add_argument("--epochs", type=_positive_int)
     run.add_argument("--device")
     run.add_argument("--dry-run", action="store_true")
     return parser
@@ -90,6 +105,7 @@ def main(argv: list[str] | None = None) -> int:
             payload = {
                 "task": asdict(task),
                 "config_sha256": config.digest(task.id),
+                "metric_policy": asdict(config.metric_policy(task.metric_policy)),
                 "datasets": {
                     name: {
                         "path": str(config.datasets[name].path),
@@ -119,6 +135,7 @@ def main(argv: list[str] | None = None) -> int:
                         task.train,
                         group,
                         task.sample_period,
+                        args.max_samples,
                     )
                     test = load_split(
                         config,
@@ -126,6 +143,7 @@ def main(argv: list[str] | None = None) -> int:
                         task.test,
                         group,
                         task.sample_period,
+                        args.max_samples,
                     )
                     observed[label] = {
                         "train": train.metadata(),
@@ -142,6 +160,9 @@ def main(argv: list[str] | None = None) -> int:
                         {
                             "task": asdict(task),
                             "config_sha256": config.digest(task.id),
+                            "metric_policy": asdict(
+                                config.metric_policy(task.metric_policy)
+                            ),
                             "model": args.model,
                             "seed": args.seed,
                             "trials": args.trials,

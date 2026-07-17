@@ -21,7 +21,7 @@ from nilmbench.registry import get_model
 
 
 def metrics(truth: Any, prediction: Any, threshold: float = 10.0) -> dict[str, float]:
-    """Compute paper-compatible MAE and 10 W threshold F1 without sklearn."""
+    """Compute MAE and thresholded F1 without an sklearn dependency."""
     import numpy as np
 
     actual = np.asarray(truth, dtype=np.float64).reshape(-1)
@@ -36,7 +36,7 @@ def metrics(truth: Any, prediction: Any, threshold: float = 10.0) -> dict[str, f
     fn = int(np.sum(actual_on & ~predicted_on))
     denominator = 2 * tp + fp + fn
     f1 = float(2 * tp / denominator) if denominator else 0.0
-    return {"mae": mae, "f1": f1}
+    return {"mae": mae, "f1": f1, "activation_threshold_watts": threshold}
 
 
 def _configure_determinism(seed: int) -> None:
@@ -62,7 +62,11 @@ def _normalization(split: LoadedSplit) -> tuple[float, float]:
 
 
 def _model_size(model: Any) -> int:
-    return sum(parameter.numel() for network in model.models.values() for parameter in network.parameters())
+    return sum(
+        parameter.numel()
+        for network in model.models.values()
+        for parameter in network.parameters()
+    )
 
 
 def _patchtst_flops(model: Any) -> int | None:
@@ -129,6 +133,7 @@ def _run_once(
     test_windows: dict[str, Any] = {}
     parameter_counts: dict[str, int] = {}
     flops: dict[str, int | None] = {}
+    metric_policy = config.metric_policy(task.metric_policy)
     for group in groups:
         label = group[0] if len(group) == 1 else "joint"
         train = load_split(
@@ -151,7 +156,11 @@ def _run_once(
         )
         predictions = _predict(model, test)
         for name in group:
-            scores[name] = metrics(_truth(test, name), predictions[name])
+            scores[name] = metrics(
+                _truth(test, name),
+                predictions[name],
+                threshold=metric_policy.threshold(name),
+            )
         params_by_group[label] = resolved_params
         train_windows[label] = train.metadata()
         test_windows[label] = test.metadata()
@@ -177,7 +186,10 @@ def _write_result(result: dict[str, Any], output_dir: Path) -> None:
         json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     with (output_dir / "metrics.csv").open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=["appliance", "mae", "f1"])
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=["appliance", "mae", "f1", "activation_threshold_watts"],
+        )
         writer.writeheader()
         for appliance, values in result["run"]["metrics"].items():
             writer.writerow({"appliance": appliance, **values})
@@ -203,9 +215,17 @@ def run_benchmark(
     if unknown:
         raise ValueError(f"Task {task.id} does not include: {', '.join(sorted(unknown))}")
     resolved_period = sample_period or task.sample_period
+    if resolved_period <= 0:
+        raise ValueError("sample_period must be positive")
+    if max_samples is not None and max_samples <= 0:
+        raise ValueError("max_samples must be positive")
+    if epochs is not None and epochs <= 0:
+        raise ValueError("epochs must be positive")
+    if trials < 0:
+        raise ValueError("trials must be non-negative")
     base_params: dict[str, Any] = {
         "sequence_length": 99,
-        "n_epochs": epochs or 10,
+        "n_epochs": epochs if epochs is not None else 10,
         "batch_size": 128,
         "learning_rate": 1e-3,
     }
@@ -301,6 +321,7 @@ def run_benchmark(
         "created_at": datetime.now(timezone.utc).isoformat(),
         "task": asdict(task),
         "task_config_sha256": config.digest(task_id),
+        "metric_policy": asdict(config.metric_policy(task.metric_policy)),
         "dataset_manifests": {
             name: asdict(config.datasets[name])
             for name in sorted({w.dataset for w in (*task.train, *task.test)})

@@ -22,12 +22,16 @@ The benchmark is now an installable command-line application rather than a set o
 - typed TOML definitions for the paper's T1/T2/T3 protocols;
 - explicit `historical-*` profiles reconstructed from the executed notebooks;
 - strict corrected profiles that reject silently truncated data windows;
+- canonical appliance resolution through NILM Metadata, with exact resolved
+  appliance/meter identities and shared-circuit contamination in every result;
+- ordered active/apparent power preferences resolved per dataset window;
+- explicit legacy and paper appliance-threshold policies for F1;
 - deterministic seeds and persistent, resumable Optuna SQLite studies;
 - deterministic Torch algorithms with an explicit cuBLAS workspace policy;
 - structured JSON and CSV results with source, dataset, runtime, parameter/FLOP, and container provenance;
 - separate CPU-smoke and CUDA-benchmark containers.
 
-The REDD, UK-DALE, and REFIT data are not redistributed. The runner expects user-provided NILMTK HDF5 conversions and verifies them against the recorded file sizes and SHA-256 digests.
+The REDD, UK-DALE, and REFIT data are not redistributed. The runner expects user-provided NILMTK HDF5 conversions and verifies them against the recorded file sizes and SHA-256 digests. The exact protocol discrepancies recovered from the old notebooks are documented in [`docs/protocol-audit.md`](docs/protocol-audit.md).
 
 ## Install for development
 
@@ -68,7 +72,7 @@ Alternatively, set `NILMBENCH_REDD`, `NILMBENCH_REFIT`, and `NILMBENCH_UKDALE` t
 
 ```bash
 nilmbench doctor --checksums
-nilmbench validate --task corrected-t1-redd --check-data
+nilmbench validate --task corrected-t1-redd --check-data --max-samples 64
 ```
 
 The dataset mounts in `compose.yaml` are read-only. Results are written to a separate `/results` mount.
@@ -78,6 +82,14 @@ The dataset mounts in `compose.yaml` are read-only. Results are written to a sep
 Container builds take nilmtk-contrib as a named BuildKit context. The default Compose configuration expects the two repositories to be sibling directories; set `NILMTK_CONTRIB_CONTEXT` to override that location.
 
 Published images pin their nilmtk-contrib build context to the exact PatchTST commit rather than a moving branch. Update that pin deliberately when a reviewed model release is adopted.
+
+For local Compose builds, pass the two source revisions into the OCI labels and
+runtime result metadata:
+
+```bash
+export NILMBENCH_GIT_SHA="$(git rev-parse HEAD)"
+export NILMTK_CONTRIB_GIT_SHA="$(git -C ../nilmtk-contrib rev-parse HEAD)"
+```
 
 The CPU path is deliberately small and is suitable for CI or a laptop:
 
@@ -105,9 +117,9 @@ For the full paper matrix, repeat each task at 60 and 900 seconds for seeds 10, 
 
 ## Historical versus corrected protocols
 
-The recovered notebooks requested REDD building 1 from 1–30 April 2011, although this converted file starts on 18 April. `historical-t1-redd` retains that request and emits a coverage warning. Two other historical definitions request unavailable appliance/building pairs; validation reports those explicitly. Historical tasks also retain the legacy joint appliance alignment, where a missing sample for any appliance removes that timestamp from every appliance.
+The recovered notebooks requested REDD building 1 from 1–30 April 2011, although this converted file starts on 18 April. `historical-t1-redd` retains that request and emits a coverage warning. Two other historical definitions request unavailable appliance/building pairs; validation reports those explicitly. Historical tasks also retain the legacy joint appliance alignment and fixed 10 W F1 threshold.
 
-The eight `corrected-*` tasks form a runnable T1/T2/T3 matrix. They enforce dataset/meter coverage, select appliances present in every participating building, use full 30/7-day splits where the data permit, and align each appliance independently. Corrected profiles are the basis for new leaderboard claims; historical profiles are retained only for forensic reproduction.
+The eight `corrected-*` tasks form a real-data-validated T1/T2/T3 matrix. They enforce dataset/meter coverage, use the paper's appliance-specific F1 thresholds, select active or apparent power from an explicit preference list, and align each appliance independently. NILM Metadata remains the source of truth for taxonomy and synonyms. Shared physical circuits are warned and recorded; a future clean-meter profile can reject them. Corrected profiles are the basis for new leaderboard claims, while historical profiles are retained for forensic reproduction.
 
 ## Repository layout
 

@@ -6,6 +6,7 @@ import os
 import platform
 import subprocess
 import sys
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Any
 
@@ -23,6 +24,13 @@ def _git_sha(path: Path) -> str | None:
         return None
 
 
+def _package_version(name: str) -> str | None:
+    try:
+        return version(name)
+    except PackageNotFoundError:
+        return None
+
+
 def runtime_provenance(repo_root: Path) -> dict[str, Any]:
     result: dict[str, Any] = {
         "python": sys.version.split()[0],
@@ -32,6 +40,9 @@ def runtime_provenance(repo_root: Path) -> dict[str, Any]:
         "nilmtk_contrib_git_sha": os.environ.get("NILMTK_CONTRIB_GIT_SHA"),
         "container_image": os.environ.get("NILMBENCH_IMAGE"),
         "container_digest": os.environ.get("NILMBENCH_IMAGE_DIGEST"),
+        "nilmtk_contrib_version": _package_version("nilmtk-contrib"),
+        "nilmtk_version": _package_version("nilmtk"),
+        "nilm_metadata_version": _package_version("nilm-metadata"),
     }
     try:
         import torch

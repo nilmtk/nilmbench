@@ -5,8 +5,8 @@ default_path = "/data/redd.h5"
 sha256 = "757e694a420157aa035c8fd345915080c2396cb7a37bfeb5f925bcb84f9532b8"
 size_bytes = 401317829
 timezone = "US/Eastern"
-mains_ac_type = "apparent"
-appliance_ac_type = "active"
+mains_ac_types = ["apparent", "active"]
+appliance_ac_types = ["active", "apparent"]
 
 [[dataset]]
 id = "UKDALE"
@@ -15,8 +15,8 @@ default_path = "/data/ukdale.h5"
 sha256 = "5cb9c07ec0da0ac4cc9e1a6ee6a7ba76561f4fe4367e6de78addaa2a63432092"
 size_bytes = 6330639238
 timezone = "Europe/London"
-mains_ac_type = "active"
-appliance_ac_type = "active"
+mains_ac_types = ["active", "apparent"]
+appliance_ac_types = ["active", "apparent"]
 
 [[dataset]]
 id = "REFIT"
@@ -25,5 +25,5 @@ default_path = "/data/refit.h5"
 sha256 = "6237b3855d7de2211047d295a71ebd8aff32dccae2331726475f0e7aa0455a40"
 size_bytes = 7864168633
 timezone = "Europe/London"
-mains_ac_type = "active"
-appliance_ac_type = "active"
+mains_ac_types = ["active", "apparent"]
+appliance_ac_types = ["active", "apparent"]

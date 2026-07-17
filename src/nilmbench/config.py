@@ -24,8 +24,8 @@ class DatasetConfig:
     sha256: str
     size_bytes: int
     timezone: str
-    mains_ac_type: str
-    appliance_ac_type: str
+    mains_ac_types: tuple[str, ...]
+    appliance_ac_types: tuple[str, ...]
 
     @property
     def path(self) -> Path:
@@ -41,6 +41,22 @@ class WindowConfig:
 
 
 @dataclass(frozen=True)
+class MetricPolicyConfig:
+    id: str
+    description: str
+    source_url: str
+    thresholds: dict[str, float]
+
+    def threshold(self, appliance: str) -> float:
+        try:
+            return self.thresholds[appliance]
+        except KeyError as exc:
+            raise ConfigError(
+                f"Metric policy {self.id!r} has no threshold for {appliance!r}"
+            ) from exc
+
+
+@dataclass(frozen=True)
 class TaskConfig:
     id: str
     family: str
@@ -48,8 +64,10 @@ class TaskConfig:
     description: str
     sample_period: int
     appliances: tuple[str, ...]
+    metric_policy: str
     coverage_policy: str
     alignment_policy: str
+    shared_meter_policy: str
     train: tuple[WindowConfig, ...]
     test: tuple[WindowConfig, ...]
 
@@ -57,6 +75,7 @@ class TaskConfig:
 @dataclass(frozen=True)
 class BenchmarkConfig:
     datasets: dict[str, DatasetConfig]
+    metric_policies: dict[str, MetricPolicyConfig]
     tasks: dict[str, TaskConfig]
 
     def task(self, task_id: str) -> TaskConfig:
@@ -66,6 +85,15 @@ class BenchmarkConfig:
             available = ", ".join(sorted(self.tasks))
             raise ConfigError(f"Unknown task {task_id!r}. Available: {available}") from exc
 
+    def metric_policy(self, policy_id: str) -> MetricPolicyConfig:
+        try:
+            return self.metric_policies[policy_id]
+        except KeyError as exc:
+            available = ", ".join(sorted(self.metric_policies))
+            raise ConfigError(
+                f"Unknown metric policy {policy_id!r}. Available: {available}"
+            ) from exc
+
     def digest(self, task_id: str) -> str:
         task = self.task(task_id)
         payload = {
@@ -74,6 +102,7 @@ class BenchmarkConfig:
                 name: asdict(self.datasets[name])
                 for name in sorted({w.dataset for w in (*task.train, *task.test)})
             },
+            "metric_policy": asdict(self.metric_policy(task.metric_policy)),
         }
         encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
         return hashlib.sha256(encoded).hexdigest()
@@ -100,19 +129,41 @@ def load_config(config_dir: str | Path | None = None) -> BenchmarkConfig:
     """Load the built-in or user-supplied TOML benchmark configuration."""
     root = _config_root(config_dir)
     dataset_doc = _read_toml(root / "datasets.toml")
+    metric_doc = _read_toml(root / "metrics.toml")
     task_doc = _read_toml(root / "tasks.toml")
 
     datasets: dict[str, DatasetConfig] = {}
-    for raw in dataset_doc.get("dataset", []):
-        dataset = DatasetConfig(**raw)
+    for source in dataset_doc.get("dataset", []):
+        raw = dict(source)
+        mains_ac_types = tuple(raw.pop("mains_ac_types"))
+        appliance_ac_types = tuple(raw.pop("appliance_ac_types"))
+        dataset = DatasetConfig(
+            **raw,
+            mains_ac_types=mains_ac_types,
+            appliance_ac_types=appliance_ac_types,
+        )
         if len(dataset.sha256) != 64:
             raise ConfigError(f"Dataset {dataset.id} has an invalid SHA-256 digest")
         if dataset.id in datasets:
             raise ConfigError(f"Duplicate dataset id {dataset.id}")
+        if not dataset.mains_ac_types or not dataset.appliance_ac_types:
+            raise ConfigError(f"Dataset {dataset.id} has no AC type preferences")
         datasets[dataset.id] = dataset
 
+    metric_policies: dict[str, MetricPolicyConfig] = {}
+    for raw in metric_doc.get("metric_policy", []):
+        policy = MetricPolicyConfig(**raw)
+        if not policy.id or not policy.thresholds:
+            raise ConfigError("Metric policies need an id and thresholds")
+        if any(value <= 0 for value in policy.thresholds.values()):
+            raise ConfigError(f"Metric policy {policy.id} has a non-positive threshold")
+        if policy.id in metric_policies:
+            raise ConfigError(f"Duplicate metric policy id {policy.id}")
+        metric_policies[policy.id] = policy
+
     tasks: dict[str, TaskConfig] = {}
-    for raw in task_doc.get("task", []):
+    for source in task_doc.get("task", []):
+        raw = dict(source)
         train = tuple(WindowConfig(**item) for item in raw.pop("train"))
         test = tuple(WindowConfig(**item) for item in raw.pop("test"))
         appliances = tuple(raw.pop("appliances"))
@@ -130,6 +181,12 @@ def load_config(config_dir: str | Path | None = None) -> BenchmarkConfig:
             raise ConfigError(f"Task {task.id} has invalid coverage_policy")
         if task.alignment_policy not in {"joint", "per_appliance"}:
             raise ConfigError(f"Task {task.id} has invalid alignment_policy")
+        if task.shared_meter_policy not in {"allow", "warn", "strict"}:
+            raise ConfigError(f"Task {task.id} has invalid shared_meter_policy")
+        if task.metric_policy not in metric_policies:
+            raise ConfigError(
+                f"Task {task.id} references unknown metric policy {task.metric_policy}"
+            )
         if task.sample_period <= 0 or not task.appliances:
             raise ConfigError(f"Task {task.id} has invalid sampling or appliances")
         for window in (*task.train, *task.test):
@@ -139,8 +196,15 @@ def load_config(config_dir: str | Path | None = None) -> BenchmarkConfig:
                 )
             if window.start >= window.end:
                 raise ConfigError(f"Task {task.id} has a non-positive window")
+        policy = metric_policies[task.metric_policy]
+        for appliance in task.appliances:
+            policy.threshold(appliance)
         tasks[task.id] = task
 
-    if not datasets or not tasks:
-        raise ConfigError("At least one dataset and task must be configured")
-    return BenchmarkConfig(datasets=datasets, tasks=tasks)
+    if not datasets or not metric_policies or not tasks:
+        raise ConfigError("Datasets, metric policies, and tasks are required")
+    return BenchmarkConfig(
+        datasets=datasets,
+        metric_policies=metric_policies,
+        tasks=tasks,
+    )

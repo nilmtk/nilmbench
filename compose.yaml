@@ -5,6 +5,9 @@ services:
       dockerfile: docker/Dockerfile.cpu
       additional_contexts:
         contrib: ${NILMTK_CONTRIB_CONTEXT:-../nilmtk-contrib}
+      args:
+        SOURCE_REVISION: ${NILMBENCH_GIT_SHA:-unknown}
+        NILMTK_CONTRIB_REVISION: ${NILMTK_CONTRIB_GIT_SHA:-unknown}
     image: nilmbench:cpu
     command:
       - run
@@ -33,6 +36,9 @@ services:
       dockerfile: docker/Dockerfile.cuda
       additional_contexts:
         contrib: ${NILMTK_CONTRIB_CONTEXT:-../nilmtk-contrib}
+      args:
+        SOURCE_REVISION: ${NILMBENCH_GIT_SHA:-unknown}
+        NILMTK_CONTRIB_REVISION: ${NILMTK_CONTRIB_GIT_SHA:-unknown}
     image: nilmbench:cuda
     command:
       - run
