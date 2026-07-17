@@ -72,7 +72,7 @@ def _normalization(split: LoadedSplit) -> tuple[float, float]:
     return mean, max(std, 1.0)
 
 
-def _model_size(model: Any) -> int:
+def _model_size(model: Any) -> int | None:
     parameters: dict[int, Any] = {}
     for attribute in ("models", "att_models"):
         networks = getattr(model, attribute, None)
@@ -81,14 +81,17 @@ def _model_size(model: Any) -> int:
         for network in networks.values():
             for parameter in network.parameters():
                 parameters[id(parameter)] = parameter
+    if not parameters:
+        return None
     return sum(parameter.numel() for parameter in parameters.values())
 
 
 def _patchtst_flops(model: Any) -> int | None:
     """Estimate one forward pass using dense multiply-adds (two FLOPs each)."""
-    if not model.models:
+    models = getattr(model, "models", None)
+    if not models:
         return None
-    network = next(iter(model.models.values()))
+    network = next(iter(models.values()))
     required = ("num_patches", "patch_length", "position_embedding", "encoder")
     if not all(hasattr(network, name) for name in required):
         return None
@@ -168,7 +171,7 @@ def _run_once(
     params_by_group: dict[str, dict[str, Any]] = {}
     train_windows: dict[str, Any] = {}
     test_windows: dict[str, Any] = {}
-    parameter_counts: dict[str, int] = {}
+    parameter_counts: dict[str, int | None] = {}
     flops: dict[str, int | None] = {}
     elapsed_by_group: dict[str, float] = {}
     peak_accelerator_memory: dict[str, int | None] = {}
@@ -190,7 +193,9 @@ def _run_once(
             "mains_std": mains_std,
         }
         model = get_model(model_name).model_class()(resolved_params)
-        tracks_cuda_memory = getattr(model.device, "type", None) == "cuda"
+        tracks_cuda_memory = (
+            getattr(getattr(model, "device", None), "type", None) == "cuda"
+        )
         if tracks_cuda_memory:
             import torch
 
@@ -265,6 +270,7 @@ def run_benchmark(
     sequence_length: int | None = None,
 ) -> Path:
     task = config.task(task_id)
+    model_entry = get_model(model_name)
     chosen_appliances = appliances or task.appliances
     if len(set(chosen_appliances)) != len(chosen_appliances):
         raise ValueError("Appliances must not contain duplicates")
@@ -288,14 +294,23 @@ def run_benchmark(
         raise ValueError("sequence_length must be a positive integer")
     if trials < 0:
         raise ValueError("trials must be non-negative")
-    base_params: dict[str, Any] = {
-        "sequence_length": sequence_length if sequence_length is not None else 99,
-        "n_epochs": epochs if epochs is not None else 10,
-        "batch_size": 128,
-        "learning_rate": 1e-3,
-    }
-    if device:
-        base_params["device"] = device
+    if not model_entry.supports_training_overrides and (
+        trials or epochs is not None or sequence_length is not None or device is not None
+    ):
+        raise ValueError(
+            f"{model_name} does not accept trials, epochs, sequence length, or device"
+        )
+    if model_entry.supports_training_overrides:
+        base_params: dict[str, Any] = {
+            "sequence_length": sequence_length if sequence_length is not None else 99,
+            "n_epochs": epochs if epochs is not None else 10,
+            "batch_size": 128,
+            "learning_rate": 1e-3,
+        }
+        if device:
+            base_params["device"] = device
+    else:
+        base_params = {}
 
     root = Path(__file__).resolve().parents[2]
     provenance = runtime_provenance(root)
@@ -322,8 +337,8 @@ def run_benchmark(
             "max_samples": max_samples,
             "epochs_override": epochs,
             "sequence_length_override": sequence_length,
-            "model_module": get_model(model_name).module,
-            "model_class": get_model(model_name).class_name,
+            "model_module": model_entry.module,
+            "model_class": model_entry.class_name,
             "nilmtk_contrib_git_sha": provenance["nilmtk_contrib_git_sha"],
             "nilmtk_contrib_version": provenance["nilmtk_contrib_version"],
         }
@@ -341,7 +356,7 @@ def run_benchmark(
         )
 
         def objective(trial: Any) -> float:
-            params = get_model(model_name).search_space(trial)
+            params = model_entry.search_space(trial)
             if epochs is not None:
                 params["n_epochs"] = epochs
             if device:

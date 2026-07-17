@@ -65,6 +65,10 @@ def test_model_size_includes_auxiliary_networks_without_double_counting():
     assert _model_size(model) == 60
 
 
+def test_non_neural_baseline_has_no_trainable_parameter_count():
+    assert _model_size(type("Baseline", (), {"model": {"fridge": 42.0}})()) is None
+
+
 @pytest.mark.parametrize(
     ("chunks", "message"),
     [
@@ -109,4 +113,27 @@ def test_run_rejects_invalid_sequence_length_before_data_access(
             42,
             tmp_path,
             sequence_length=sequence_length,
+        )
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"trials": 1},
+        {"epochs": 1},
+        {"sequence_length": 99},
+        {"device": "cpu"},
+    ],
+)
+def test_mean_rejects_irrelevant_neural_overrides_before_data_access(
+    overrides, tmp_path
+):
+    with pytest.raises(ValueError, match="does not accept"):
+        run_benchmark(
+            load_config(),
+            "corrected-t1-redd",
+            "Mean",
+            42,
+            tmp_path,
+            **overrides,
         )

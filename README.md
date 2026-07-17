@@ -30,6 +30,7 @@ The benchmark is now an installable command-line application rather than a set o
 - deterministic Torch algorithms with an explicit cuBLAS workspace policy;
 - structured JSON and CSV results with source, dataset, runtime, parameter/FLOP, and container provenance;
 - separate CPU-smoke and CUDA-benchmark containers.
+- a NILMTK Mean sanity-check baseline alongside the contrib architectures.
 
 The REDD, UK-DALE, and REFIT data are not redistributed. The runner expects user-provided NILMTK HDF5 conversions and verifies them against the recorded file sizes and SHA-256 digests. The exact protocol discrepancies recovered from the old notebooks are documented in [`docs/protocol-audit.md`](docs/protocol-audit.md).
 
