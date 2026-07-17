@@ -15,11 +15,13 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from nilmbench._contracts import (
+    DEFAULT_TRAINING_EPOCHS,
     HPO_SELECTION_PROTOCOL,
     HPO_TUNING_SEED,
     VALIDATION_PROTOCOL,
     alignment_groups,
     canonical_digest,
+    exact_json_equal,
     is_git_sha,
     is_sha256,
     strict_json_loads,
@@ -171,23 +173,32 @@ def _validate_study_contract(
         or study_spec.get("identity_schema") != "nilmbench.optuna-study.v2"
     ):
         raise LeaderboardError(f"{path} has an invalid study specification schema")
-    if study_spec["runner"] != {
-        "git_sha": runtime.get("nilmbench_git_sha"),
-        "git_dirty": runtime.get("nilmbench_git_dirty"),
-    }:
+    if not exact_json_equal(
+        study_spec["runner"],
+        {
+            "git_sha": runtime.get("nilmbench_git_sha"),
+            "git_dirty": runtime.get("nilmbench_git_dirty"),
+        },
+    ):
         raise LeaderboardError(f"{path} study runner is not bound to result provenance")
-    if study_spec["contrib"] != {
-        "git_sha": runtime.get("nilmtk_contrib_git_sha"),
-        "git_dirty": runtime.get("nilmtk_contrib_git_dirty"),
-        "version": runtime.get("nilmtk_contrib_version"),
-        "model_module": model_spec["module"],
-        "model_class": model_spec["class_name"],
-    }:
+    if not exact_json_equal(
+        study_spec["contrib"],
+        {
+            "git_sha": runtime.get("nilmtk_contrib_git_sha"),
+            "git_dirty": runtime.get("nilmtk_contrib_git_dirty"),
+            "version": runtime.get("nilmtk_contrib_version"),
+            "model_module": model_spec["module"],
+            "model_class": model_spec["class_name"],
+        },
+    ):
         raise LeaderboardError(f"{path} study model is not bound to result provenance")
-    if study_spec["container"] != {
-        "image": runtime.get("container_image"),
-        "digest": runtime.get("container_digest"),
-    }:
+    if not exact_json_equal(
+        study_spec["container"],
+        {
+            "image": runtime.get("container_image"),
+            "digest": runtime.get("container_digest"),
+        },
+    ):
         raise LeaderboardError(f"{path} study container is not bound to provenance")
     expected_device = {
         "requested": result["model_params"].get("device", "auto"),
@@ -197,7 +208,7 @@ def _validate_study_contract(
         "cuda_runtime": runtime.get("cuda_runtime"),
         "cuda_available": runtime.get("cuda_available"),
     }
-    if study_spec["device"] != expected_device:
+    if not exact_json_equal(study_spec["device"], expected_device):
         raise LeaderboardError(f"{path} study device is not bound to provenance")
 
     protocol = study_spec["protocol"]
@@ -240,7 +251,7 @@ def _validate_study_contract(
         "validation": VALIDATION_PROTOCOL,
     }
     for name, value in expected_protocol.items():
-        if protocol.get(name) != value:
+        if name not in protocol or not exact_json_equal(protocol[name], value):
             raise LeaderboardError(f"{path} study protocol {name!r} is not bound")
     optimization = protocol["optimization"]
     if (
@@ -265,16 +276,19 @@ def _validate_study_contract(
     expected_sources = {
         name: result["dataset_identities"][name] for name in sorted(source_names)
     }
-    if study_spec["source_dataset_identities"] != expected_sources:
+    if not exact_json_equal(study_spec["source_dataset_identities"], expected_sources):
         raise LeaderboardError(f"{path} study sources are not bound to task.train")
 
     coordination = study["coordination"]
     expected_storage = f"optuna/{study['study_name']}.sqlite3"
-    if coordination != {
-        "backend": "sqlite",
-        "storage": expected_storage,
-        "scientific_source_of_truth": False,
-    }:
+    if not exact_json_equal(
+        coordination,
+        {
+            "backend": "sqlite",
+            "storage": expected_storage,
+            "scientific_source_of_truth": False,
+        },
+    ):
         raise LeaderboardError(f"{path} study coordination disclosure is invalid")
     completed = study["completed_trials"]
     records = study["trial_records"]
@@ -287,10 +301,11 @@ def _validate_study_contract(
         or len(records) != completed
         or not isinstance(files, list)
         or len(files) != completed
-        or study["best_params"] != result["model_params"]
+        or not exact_json_equal(study["best_params"], result["model_params"])
         or not isinstance(study["optuna_best_suggestions"], dict)
         or any(
-            result["model_params"].get(name) != value
+            name not in result["model_params"]
+            or not exact_json_equal(result["model_params"][name], value)
             for name, value in study["optuna_best_suggestions"].items()
         )
     ):
@@ -307,6 +322,15 @@ def _validate_study_contract(
     numbers: set[int] = set()
     objectives: list[float] = []
     policy = config.metric_policy(task.metric_policy)
+    expected_partition_groups = alignment_groups(
+        result["appliances"], task.alignment_policy
+    )
+    trusted_train_windows = result["run"].get("train_windows")
+    if (
+        not isinstance(trusted_train_windows, dict)
+        or set(trusted_train_windows) != expected_partition_groups
+    ):
+        raise LeaderboardError(f"{path} study has no trusted source-window evidence")
     for index, record in enumerate(records):
         try:
             validate_trial_record(
@@ -330,52 +354,38 @@ def _validate_study_contract(
             if metrics["activation_threshold_watts"] != policy.threshold(appliance):
                 raise LeaderboardError(f"{path} trial threshold is not trusted")
         partitions = record["validation"]["partitions"]
-        for group_windows in partitions.values():
+        for group, group_windows in partitions.items():
             if not isinstance(group_windows, list) or len(group_windows) != len(
                 task.train
             ):
                 raise LeaderboardError(f"{path} trial partitions are incomplete")
-            for partition, configured in zip(group_windows, task.train, strict=True):
-                if (
-                    not isinstance(partition, dict)
-                    or set(partition)
-                    != {
-                        "source_window",
-                        "training",
-                        "validation",
-                    }
-                    or not isinstance(partition["source_window"], dict)
-                    or partition["source_window"].get("requested")
-                    != _json_value(asdict(configured))
+            trusted_group_windows = trusted_train_windows.get(group)
+            if not isinstance(trusted_group_windows, list) or len(
+                trusted_group_windows
+            ) != len(task.train):
+                raise LeaderboardError(
+                    f"{path} study has incomplete trusted source-window evidence"
+                )
+            for partition, configured, trusted_window in zip(
+                group_windows, task.train, trusted_group_windows, strict=True
+            ):
+                if not exact_json_equal(
+                    partition["source_window"], trusted_window
+                ) or not exact_json_equal(
+                    partition["source_window"].get("requested"),
+                    _json_value(asdict(configured)),
                 ):
                     raise LeaderboardError(
                         f"{path} trial partition is not bound to task.train"
                     )
-                for split in ("training", "validation"):
-                    split_value = partition[split]
-                    if (
-                        not isinstance(split_value, dict)
-                        or set(split_value)
-                        != {
-                            "samples",
-                            "actual_start",
-                            "actual_end",
-                        }
-                        or isinstance(split_value["samples"], bool)
-                        or not isinstance(split_value["samples"], int)
-                        or split_value["samples"] <= 0
-                    ):
-                        raise LeaderboardError(
-                            f"{path} trial partition evidence is invalid"
-                        )
         objectives.append(record["validation"]["objective_mae"])
     if not math.isclose(best_value, min(objectives), rel_tol=1e-12):
         raise LeaderboardError(f"{path} study best value is not supported by trials")
     best_suggestions = study["optuna_best_suggestions"]
     if not any(
         math.isclose(record["validation"]["objective_mae"], best_value, rel_tol=1e-12)
-        and record["parameters"]["suggested"] == best_suggestions
-        and record["parameters"]["effective"] == study["best_params"]
+        and exact_json_equal(record["parameters"]["suggested"], best_suggestions)
+        and exact_json_equal(record["parameters"]["effective"], study["best_params"])
         for record in records
     ):
         raise LeaderboardError(
@@ -390,7 +400,7 @@ def _validate_study_contract(
         "validation_protocol": VALIDATION_PROTOCOL["id"],
         "selected_parameters": study["best_params"],
     }
-    if model_selection != expected_selection:
+    if not exact_json_equal(model_selection, expected_selection):
         raise LeaderboardError(f"{path} model-selection disclosure is inconsistent")
 
 
@@ -402,20 +412,20 @@ def _validate_trusted_contract(
     if not isinstance(task_id, str) or task_id not in config.tasks:
         raise LeaderboardError(f"{path} references an unknown benchmark task")
     task = config.task(task_id)
-    if task_payload != _json_value(asdict(task)):
+    if not exact_json_equal(task_payload, _json_value(asdict(task))):
         raise LeaderboardError(f"{path} task does not match trusted configuration")
     if result["task_config_sha256"] != config.digest(task_id):
         raise LeaderboardError(
             f"{path} task digest does not match trusted configuration"
         )
     expected_policy = _json_value(asdict(config.metric_policy(task.metric_policy)))
-    if result["metric_policy"] != expected_policy:
+    if not exact_json_equal(result["metric_policy"], expected_policy):
         raise LeaderboardError(f"{path} metric policy does not match configuration")
     dataset_names = sorted({window.dataset for window in (*task.train, *task.test)})
     expected_manifests = {
         name: _json_value(asdict(config.datasets[name])) for name in dataset_names
     }
-    if result["dataset_manifests"] != expected_manifests:
+    if not exact_json_equal(result["dataset_manifests"], expected_manifests):
         raise LeaderboardError(f"{path} dataset manifests do not match configuration")
     if set(result["dataset_identities"]) != set(expected_manifests):
         raise LeaderboardError(f"{path} dataset identities are incomplete")
@@ -437,7 +447,7 @@ def _validate_trusted_contract(
         "class_name": entry.class_name,
         "family": entry.family,
     }
-    if result["model_spec"] != expected_spec:
+    if not exact_json_equal(result["model_spec"], expected_spec):
         raise LeaderboardError(f"{path} model specification is not trusted")
     model_params = result["model_params"]
     if not isinstance(model_params, dict):
@@ -450,7 +460,10 @@ def _validate_trusted_contract(
         ("sequence_length", "sequence_length"),
     ):
         override = result["protocol_overrides"].get(override_name)
-        if override is not None and model_params.get(parameter_name) != override:
+        if override is not None and (
+            parameter_name not in model_params
+            or not exact_json_equal(model_params[parameter_name], override)
+        ):
             raise LeaderboardError(
                 f"{path} {override_name} override does not match effective parameters"
             )
@@ -476,6 +489,23 @@ def _validate_trusted_contract(
             isinstance(value, bool) or not isinstance(value, int) or value <= 0
         ):
             raise LeaderboardError(f"{path} has an invalid {name} override")
+    effective_epochs = model_params.get("n_epochs")
+    if entry.supports_training_overrides:
+        if (
+            isinstance(effective_epochs, bool)
+            or not isinstance(effective_epochs, int)
+            or effective_epochs <= 0
+        ):
+            raise LeaderboardError(f"{path} has invalid effective epochs")
+        if overrides["epochs"] is None:
+            if result["study"] is None and effective_epochs != DEFAULT_TRAINING_EPOCHS:
+                raise LeaderboardError(
+                    f"{path} untuned effective epochs do not match the runner default"
+                )
+            if effective_epochs < DEFAULT_TRAINING_EPOCHS:
+                raise LeaderboardError(
+                    f"{path} full effective epochs are below the publication minimum"
+                )
     period_override = overrides.get("sample_period")
     expected_period = period_override or task.sample_period
     if result["sample_period"] != expected_period:
@@ -564,7 +594,9 @@ def _validate_trusted_contract(
             for window, configured in zip(windows, configured_windows, strict=True):
                 if not isinstance(window, dict):
                     raise LeaderboardError(f"{path} has invalid {field} evidence")
-                if window.get("requested") != _json_value(asdict(configured)):
+                if not exact_json_equal(
+                    window.get("requested"), _json_value(asdict(configured))
+                ):
                     raise LeaderboardError(f"{path} {field} window is not configured")
                 samples = window.get("samples")
                 expected_samples = window.get("expected_samples")
@@ -582,7 +614,7 @@ def _validate_trusted_contract(
                     or not isinstance(expected_samples, int)
                     or expected_samples <= 0
                     or expected_samples != trusted_expected
-                    or sample_limit != max_samples
+                    or not exact_json_equal(sample_limit, max_samples)
                     or isinstance(fraction, bool)
                     or not isinstance(fraction, (int, float))
                     or not math.isfinite(fraction)
@@ -599,6 +631,10 @@ def _validate_trusted_contract(
         if max_samples is not None
         or overrides["epochs"] is not None
         or overrides["appliances"] is not None
+        or (
+            entry.supports_training_overrides
+            and effective_epochs < DEFAULT_TRAINING_EPOCHS
+        )
         or any(limit is not None for limit in observed_limits)
         else "full"
     )

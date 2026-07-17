@@ -439,7 +439,27 @@ def test_end_to_end_hpo_defers_target_dataset_until_final_evaluation(
             },
             "objective_mae": 1.0,
             "validation_protocol": dict(runner._VALIDATION_PROTOCOL),
-            "validation_partitions": {"fridge": []},
+            "validation_partitions": {
+                "fridge": [
+                    {
+                        "source_window": {
+                            "samples": 10,
+                            "actual_start": "2011-04-18T00:00:00",
+                            "actual_end": "2011-04-18T00:09:00",
+                        },
+                        "training": {
+                            "samples": 8,
+                            "actual_start": "2011-04-18T00:00:00",
+                            "actual_end": "2011-04-18T00:07:00",
+                        },
+                        "validation": {
+                            "samples": 2,
+                            "actual_start": "2011-04-18T00:08:00",
+                            "actual_end": "2011-04-18T00:09:00",
+                        },
+                    }
+                ]
+            },
             "elapsed_seconds_by_alignment_group": {"fridge": 0.1},
             "elapsed_seconds": 0.1,
         }
@@ -551,6 +571,10 @@ def test_end_to_end_hpo_defers_target_dataset_until_final_evaluation(
         ("nilmbench_git_dirty", True),
         ("nilmtk_contrib_git_sha", None),
         ("container_digest", "unknown"),
+        ("cpu", 7),
+        ("cpu", ["hostile"]),
+        ("cpu", {"hostile": True}),
+        ("gpu", {"hostile": True}),
     ],
 )
 def test_persistent_hpo_rejects_dirty_or_unknown_provenance_before_data_access(

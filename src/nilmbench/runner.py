@@ -13,6 +13,8 @@ from pathlib import Path
 from typing import Any
 
 from nilmbench._contracts import (
+    DEFAULT_SEQUENCE_LENGTH,
+    DEFAULT_TRAINING_EPOCHS,
     HPO_SELECTION_PROTOCOL,
     HPO_TUNING_SEED,
     VALIDATION_PROTOCOL,
@@ -693,8 +695,12 @@ def run_benchmark(
         )
     if model_entry.supports_training_overrides:
         base_params: dict[str, Any] = {
-            "sequence_length": sequence_length if sequence_length is not None else 99,
-            "n_epochs": epochs if epochs is not None else 10,
+            "sequence_length": (
+                sequence_length
+                if sequence_length is not None
+                else DEFAULT_SEQUENCE_LENGTH
+            ),
+            "n_epochs": (epochs if epochs is not None else DEFAULT_TRAINING_EPOCHS),
             "batch_size": 128,
             "learning_rate": 1e-3,
         }

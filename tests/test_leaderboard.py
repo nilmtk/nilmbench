@@ -1,7 +1,9 @@
 import hashlib
 import json
+import math
 from copy import deepcopy
 from dataclasses import asdict
+from datetime import datetime, timedelta
 
 import pytest
 
@@ -107,6 +109,22 @@ def _write_result(
     max_samples=None,
 ):
     expected_samples = min(1440, max_samples) if max_samples is not None else 1440
+
+    def window_evidence(window):
+        actual_start = datetime.fromisoformat(window.start)
+        actual_end = actual_start + timedelta(
+            seconds=TASK.sample_period * (expected_samples - 1)
+        )
+        return {
+            "requested": asdict(window),
+            "samples": expected_samples,
+            "expected_samples": expected_samples,
+            "sample_limit": max_samples,
+            "aligned_sample_fraction": 1.0,
+            "actual_start": actual_start.isoformat(),
+            "actual_end": actual_end.isoformat(),
+        }
+
     model_params = {
         "sequence_length": sequence_length,
         "n_epochs": 1 if scope == "smoke" else 10,
@@ -180,28 +198,8 @@ def _write_result(
             "elapsed_seconds_by_alignment_group": {"fridge": float(seed)},
             "trainable_parameters": {"fridge": 1234},
             "peak_accelerator_memory_bytes": {"fridge": 4096},
-            "train_windows": {
-                "fridge": [
-                    {
-                        "requested": asdict(TASK.train[0]),
-                        "samples": expected_samples,
-                        "expected_samples": expected_samples,
-                        "sample_limit": max_samples,
-                        "aligned_sample_fraction": 1.0,
-                    }
-                ]
-            },
-            "test_windows": {
-                "fridge": [
-                    {
-                        "requested": asdict(TASK.test[0]),
-                        "samples": expected_samples,
-                        "expected_samples": expected_samples,
-                        "sample_limit": max_samples,
-                        "aligned_sample_fraction": 1.0,
-                    }
-                ]
-            },
+            "train_windows": {"fridge": [window_evidence(TASK.train[0])]},
+            "test_windows": {"fridge": [window_evidence(TASK.test[0])]},
             "metrics": {
                 "fridge": {
                     "mae": float(seed if mae is None else mae),
@@ -239,6 +237,11 @@ def _rekey_study(result):
         for record in study["trial_records"]
     ]
     result["protocol_overrides"]["model_selection"]["study_identity_sha256"] = digest
+
+
+def _reseal_trial_record(record):
+    payload = {key: value for key, value in record.items() if key != "record_id"}
+    record["record_id"] = canonical_digest(payload)
 
 
 def _attach_valid_study(path):
@@ -296,6 +299,17 @@ def _attach_valid_study(path):
         },
         "source_dataset_identities": result["dataset_identities"],
     }
+    source_window = result["run"]["train_windows"]["fridge"][0]
+    source_samples = source_window["samples"]
+    validation_samples = math.ceil(
+        source_samples * VALIDATION_PROTOCOL["validation_fraction"]
+    )
+    training_samples = source_samples - validation_samples
+    start = datetime.fromisoformat(source_window["actual_start"])
+    training_end = start + timedelta(
+        seconds=result["sample_period"] * (training_samples - 1)
+    )
+    validation_start = training_end + timedelta(seconds=result["sample_period"])
     record = {
         "schema_version": "1.0",
         "created_at": "2026-07-17T00:00:00+00:00",
@@ -321,16 +335,16 @@ def _attach_valid_study(path):
             "partitions": {
                 "fridge": [
                     {
-                        "source_window": result["run"]["train_windows"]["fridge"][0],
+                        "source_window": source_window,
                         "training": {
-                            "samples": 800,
-                            "actual_start": "2020-01-01T00:00:00",
-                            "actual_end": "2020-01-01T13:19:00",
+                            "samples": training_samples,
+                            "actual_start": source_window["actual_start"],
+                            "actual_end": training_end.isoformat(),
                         },
                         "validation": {
-                            "samples": 200,
-                            "actual_start": "2020-01-01T13:20:00",
-                            "actual_end": "2020-01-01T16:39:00",
+                            "samples": validation_samples,
+                            "actual_start": validation_start.isoformat(),
+                            "actual_end": source_window["actual_end"],
                         },
                     }
                 ]
@@ -657,6 +671,18 @@ def test_full_scope_cannot_hide_observed_smoke_budget(tmp_path, budget):
         _build(tmp_path)
 
 
+def test_full_scope_cannot_hide_reduced_effective_epochs(tmp_path):
+    path = _write_result(tmp_path, 42)
+    result = json.loads(path.read_text(encoding="utf-8"))
+    result["model_params"]["n_epochs"] = 1
+    result["run"]["params_by_alignment_group"]["fridge"]["n_epochs"] = 1
+    result["model_params_sha256"] = canonical_digest(result["model_params"])
+    _reseal(path, result)
+
+    with pytest.raises(LeaderboardError, match="effective epochs"):
+        _build(tmp_path)
+
+
 def test_task_window_expected_count_cannot_be_shrunk_and_resealed(tmp_path):
     path = _write_result(tmp_path, 42)
     result = json.loads(path.read_text(encoding="utf-8"))
@@ -670,13 +696,17 @@ def test_task_window_expected_count_cannot_be_shrunk_and_resealed(tmp_path):
         _build(tmp_path)
 
 
-@pytest.mark.parametrize("tamper", ["model_param", "extra_field", "seed", "group"])
+@pytest.mark.parametrize(
+    "tamper", ["model_param", "parameter_type", "extra_field", "seed", "group"]
+)
 def test_resolved_model_parameters_are_exactly_bound(tmp_path, tamper):
     path = _write_result(tmp_path, 42)
     result = json.loads(path.read_text(encoding="utf-8"))
     resolved = result["run"]["params_by_alignment_group"]["fridge"]
     if tamper == "model_param":
         resolved["learning_rate"] = 0.5
+    elif tamper == "parameter_type":
+        resolved["sequence_length"] = 99.0
     elif tamper == "extra_field":
         resolved["undisclosed"] = True
     elif tamper == "seed":
@@ -760,14 +790,19 @@ def test_comparison_protocol_separates_tuning_budget_and_runtime(tmp_path):
     }
 
 
-def test_rekeyed_hpo_study_cannot_lie_about_bound_task(tmp_path):
+@pytest.mark.parametrize("tamper", ["task_id", "sample_period_type"])
+def test_rekeyed_hpo_study_cannot_lie_about_bound_task(tmp_path, tamper):
     path = _write_result(tmp_path, 42)
     result = _attach_valid_study(path)
-    result["study"]["study_spec"]["protocol"]["task_id"] = "hostile-task"
+    protocol = result["study"]["study_spec"]["protocol"]
+    if tamper == "task_id":
+        protocol["task_id"] = "hostile-task"
+    else:
+        protocol["sample_period"] = float(protocol["sample_period"])
     _rekey_study(result)
     _reseal(path, result)
 
-    with pytest.raises(LeaderboardError, match="task_id.*not bound"):
+    with pytest.raises(LeaderboardError, match="(task_id|sample_period).*not bound"):
         _build(tmp_path)
 
 
@@ -793,6 +828,44 @@ def test_trial_record_rejects_resealed_unknown_fields(tmp_path):
     _reseal(path, result)
 
     with pytest.raises(LeaderboardError, match="invalid trial audit record"):
+        _build(tmp_path)
+
+
+@pytest.mark.parametrize(
+    "tamper",
+    [
+        "count_conservation",
+        "blocked_ratio",
+        "chronology",
+        "invalid_timestamp",
+        "window_containment",
+        "trusted_source_binding",
+    ],
+)
+def test_trial_partition_is_scientifically_bound(tmp_path, tamper):
+    path = _write_result(tmp_path, 42)
+    result = _attach_valid_study(path)
+    record = result["study"]["trial_records"][0]
+    partition = record["validation"]["partitions"]["fridge"][0]
+    source_samples = partition["source_window"]["samples"]
+    if tamper == "count_conservation":
+        partition["training"]["samples"] -= 1
+    elif tamper == "blocked_ratio":
+        partition["training"]["samples"] = source_samples - 1
+        partition["validation"]["samples"] = 1
+    elif tamper == "chronology":
+        partition["validation"]["actual_start"] = partition["training"]["actual_end"]
+    elif tamper == "invalid_timestamp":
+        partition["training"]["actual_end"] = "not-a-timestamp"
+    elif tamper == "window_containment":
+        partition["training"]["actual_start"] = "2019-12-31T23:59:00"
+    else:
+        partition["source_window"] = deepcopy(partition["source_window"])
+        partition["source_window"]["untrusted_note"] = "different source evidence"
+    _reseal_trial_record(record)
+    _reseal(path, result)
+
+    with pytest.raises(LeaderboardError, match="invalid trial audit record|not bound"):
         _build(tmp_path)
 
 

@@ -11,6 +11,8 @@ from typing import Any
 
 HPO_SELECTION_PROTOCOL = "tune-once-freeze-v1"
 HPO_TUNING_SEED = 42
+DEFAULT_SEQUENCE_LENGTH = 99
+DEFAULT_TRAINING_EPOCHS = 10
 RESOLVED_RUNTIME_PARAMETERS = frozenset({"seed", "mains_mean", "mains_std"})
 VALIDATION_PROTOCOL = {
     "id": "source-train-blocked-holdout-v1",
@@ -113,9 +115,17 @@ def validate_persistent_hpo_provenance(provenance: Any) -> None:
         or not is_sha256(digest[7:])
     ):
         failures.append("immutable container_digest")
-    if not provenance.get("cpu") and not provenance.get("gpu"):
+    cpu = provenance.get("cpu")
+    gpu = provenance.get("gpu")
+    valid_cpu = isinstance(cpu, str) and bool(cpu.strip())
+    valid_gpu = isinstance(gpu, str) and bool(gpu.strip())
+    if (
+        (cpu is not None and not valid_cpu)
+        or (gpu is not None and not valid_gpu)
+        or not (valid_cpu or valid_gpu)
+    ):
         failures.append("known CPU or GPU identity")
-    if provenance.get("gpu") and provenance.get("cuda_available") is not True:
+    if valid_gpu and provenance.get("cuda_available") is not True:
         failures.append("available CUDA runtime for GPU identity")
     if failures:
         raise ValueError(
@@ -126,6 +136,101 @@ def validate_persistent_hpo_provenance(provenance: Any) -> None:
 
 def alignment_groups(appliances: list[str] | tuple[str, ...], policy: str) -> set[str]:
     return set(appliances) if policy == "per_appliance" else {"joint"}
+
+
+def exact_json_equal(left: Any, right: Any) -> bool:
+    """Compare JSON values without Python's bool/int and int/float coercions."""
+    if type(left) is not type(right):
+        return False
+    if isinstance(left, dict):
+        return set(left) == set(right) and all(
+            exact_json_equal(left[key], right[key]) for key in left
+        )
+    if isinstance(left, list):
+        return len(left) == len(right) and all(
+            exact_json_equal(left_item, right_item)
+            for left_item, right_item in zip(left, right, strict=True)
+        )
+    return left == right
+
+
+def _iso_timestamp(value: Any, field: str) -> datetime:
+    if not isinstance(value, str) or not value:
+        raise ValueError(f"trial partition {field} must be an ISO timestamp")
+    try:
+        return datetime.fromisoformat(value)
+    except ValueError as exc:
+        raise ValueError(f"trial partition {field} must be an ISO timestamp") from exc
+
+
+def _validate_blocked_partition(partition: Any) -> None:
+    if not isinstance(partition, dict) or set(partition) != {
+        "source_window",
+        "training",
+        "validation",
+    }:
+        raise ValueError("trial partition has invalid fields")
+    source = partition["source_window"]
+    if not isinstance(source, dict):
+        raise ValueError("trial partition source_window must be an object")
+    source_samples = source.get("samples")
+    if (
+        isinstance(source_samples, bool)
+        or not isinstance(source_samples, int)
+        or source_samples < 2
+    ):
+        raise ValueError("trial partition source_window has invalid samples")
+
+    splits = {}
+    for name in ("training", "validation"):
+        split = partition[name]
+        if not isinstance(split, dict) or set(split) != {
+            "samples",
+            "actual_start",
+            "actual_end",
+        }:
+            raise ValueError(f"trial partition {name} has invalid fields")
+        samples = split["samples"]
+        if isinstance(samples, bool) or not isinstance(samples, int) or samples <= 0:
+            raise ValueError(f"trial partition {name} has invalid samples")
+        splits[name] = {
+            "samples": samples,
+            "start": _iso_timestamp(split["actual_start"], f"{name}.actual_start"),
+            "end": _iso_timestamp(split["actual_end"], f"{name}.actual_end"),
+        }
+
+    expected_validation = max(
+        1, math.ceil(source_samples * VALIDATION_PROTOCOL["validation_fraction"])
+    )
+    if (
+        splits["training"]["samples"] + splits["validation"]["samples"]
+        != source_samples
+        or splits["validation"]["samples"] != expected_validation
+    ):
+        raise ValueError(
+            "trial partition counts do not match its source or blocked split"
+        )
+
+    source_start = _iso_timestamp(source.get("actual_start"), "source.actual_start")
+    source_end = _iso_timestamp(source.get("actual_end"), "source.actual_end")
+    train_start = splits["training"]["start"]
+    train_end = splits["training"]["end"]
+    validation_start = splits["validation"]["start"]
+    validation_end = splits["validation"]["end"]
+    try:
+        chronological = (
+            source_start == train_start
+            and source_start <= train_end < validation_start <= validation_end
+            and validation_end == source_end
+        )
+    except TypeError as exc:
+        raise ValueError(
+            "trial partition timestamps use incompatible timezone forms"
+        ) from exc
+    if not chronological:
+        raise ValueError(
+            "trial partition timestamps do not form a contained chronological holdout"
+        )
 
 
 def validate_resolved_parameters(
@@ -148,7 +253,7 @@ def validate_resolved_parameters(
         if not isinstance(resolved, dict) or set(resolved) != expected_keys:
             raise ValueError(f"resolved parameters for {group!r} have invalid fields")
         for name, expected in model_params.items():
-            if resolved[name] != expected:
+            if not exact_json_equal(resolved[name], expected):
                 raise ValueError(
                     f"resolved parameter {name!r} for {group!r} is not model_params"
                 )
@@ -202,7 +307,7 @@ def validate_trial_record(
         or record["state"] != "COMPLETE"
         or record["study_name"] != study_name
         or record["study_identity_sha256"] != study_digest
-        or record["study_spec"] != study_spec
+        or not exact_json_equal(record["study_spec"], study_spec)
     ):
         raise ValueError("trial audit record is not bound to its study")
     try:
@@ -228,10 +333,12 @@ def validate_trial_record(
     effective = parameters["effective"]
     if not isinstance(suggested, dict) or not isinstance(effective, dict):
         raise ValueError("trial audit parameters must be objects")
-    if expected_suggestions is not None and suggested != expected_suggestions:
+    if expected_suggestions is not None and not exact_json_equal(
+        suggested, expected_suggestions
+    ):
         raise ValueError("trial suggestions do not match persistent study state")
     if any(
-        name not in effective or effective[name] != value
+        name not in effective or not exact_json_equal(effective[name], value)
         for name, value in suggested.items()
     ):
         raise ValueError("trial suggestions are not present in effective parameters")
@@ -255,7 +362,7 @@ def validate_trial_record(
         "elapsed_seconds_by_alignment_group",
     }:
         raise ValueError("trial audit validation has invalid fields")
-    if validation["protocol"] != VALIDATION_PROTOCOL:
+    if not exact_json_equal(validation["protocol"], VALIDATION_PROTOCOL):
         raise ValueError("trial audit uses an unknown validation protocol")
     groups = alignment_groups(
         protocol.get("appliances", []), protocol.get("alignment_policy", "")
@@ -265,6 +372,11 @@ def validate_trial_record(
         or set(validation["partitions"]) != groups
     ):
         raise ValueError("trial audit partitions have invalid alignment groups")
+    for group_windows in validation["partitions"].values():
+        if not isinstance(group_windows, list) or not group_windows:
+            raise ValueError("trial audit partitions must contain source windows")
+        for partition in group_windows:
+            _validate_blocked_partition(partition)
     if (
         not isinstance(validation["elapsed_seconds_by_alignment_group"], dict)
         or set(validation["elapsed_seconds_by_alignment_group"]) != groups
