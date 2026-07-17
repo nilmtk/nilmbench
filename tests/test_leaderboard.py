@@ -101,6 +101,20 @@ def test_smoke_and_dirty_runs_cannot_become_verified(tmp_path):
     assert entry["verification_failures"]
 
 
+def test_clean_smoke_requires_all_declared_seeds(tmp_path):
+    _write_result(tmp_path, 42, scope="smoke", max_samples=1024)
+
+    partial = build_leaderboard(tmp_path)["entries"][0]
+
+    assert partial["status"] == "smoke-partial"
+    for seed in (10, 20):
+        _write_result(tmp_path, seed, scope="smoke", max_samples=1024)
+
+    verified = build_leaderboard(tmp_path)["entries"][0]
+    assert verified["status"] == "smoke-verified"
+    assert verified["seeds"] == [10, 20, 42]
+
+
 def test_tampered_result_is_rejected(tmp_path):
     path = _write_result(tmp_path, 42)
     result = json.loads(path.read_text(encoding="utf-8"))

@@ -1560,10 +1560,16 @@ async function loadLiveLeaderboard() {
       summary.textContent = 'The table remains empty until real result.json bundles pass checksum, source, container, and seed validation.';
       return;
     }
-    const statusOrder = {'full-verified': 0, 'candidate': 1, 'smoke-verified': 2, 'smoke-unverified': 3};
+    const statusOrder = {'full-verified': 0, 'smoke-verified': 1, 'smoke-partial': 2, 'candidate': 3, 'smoke-unverified': 4};
     entries.sort((a,b)=>(statusOrder[a.status]??9)-(statusOrder[b.status]??9) || a.mae_mean-b.mae_mean);
     body.innerHTML = entries.slice(0, 25).map((entry, index) => {
-      const task = `${entry.task} / ${entry.appliance} / ${entry.sample_period}s`;
+      const protocol = [
+        entry.sequence_length ? `seq ${entry.sequence_length}` : null,
+        entry.epochs ? `${entry.epochs} epochs` : null,
+        entry.max_samples_per_window ? `limit ${entry.max_samples_per_window}` : null,
+      ].filter(Boolean).join(' / ');
+      const task = `${entry.task} / ${entry.appliance} / ${entry.sample_period}s` +
+        (protocol ? ` / ${protocol}` : '');
       const cls = entry.status === 'full-verified' && index === 0 ? ' class="gold"' : '';
       return `<tr${cls}><td class="rank">${index + 1}</td><td>${escHTML(entry.model)}</td>` +
         `<td class="fam">${escHTML(task)}</td>` +
@@ -1571,8 +1577,9 @@ async function loadLiveLeaderboard() {
         `<td>${metricWithSpread(entry.f1_mean, entry.f1_std, entry.run_count)}</td>` +
         `<td class="fam">${escHTML(entry.status)}</td></tr>`;
     }).join('');
-    const verified = entries.filter(entry=>entry.status==='full-verified').length;
-    summary.textContent = `${payload.source_result_count} immutable runs · ${verified} fully verified aggregates · generated, never hand-entered.`;
+    const fullVerified = entries.filter(entry=>entry.status==='full-verified').length;
+    const smokeVerified = entries.filter(entry=>entry.status==='smoke-verified').length;
+    summary.textContent = `${payload.source_result_count} immutable runs · ${fullVerified} full and ${smokeVerified} smoke-verified aggregates · generated, never hand-entered.`;
   } catch (error) {
     body.innerHTML = '<tr><td colspan="6" style="color:var(--text-muted)">Leaderboard artifact unavailable.</td></tr>';
     summary.textContent = 'Run `nilmbench leaderboard` to regenerate leaderboard.json from result bundles.';

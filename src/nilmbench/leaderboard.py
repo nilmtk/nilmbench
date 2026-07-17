@@ -7,12 +7,12 @@ import hashlib
 import io
 import json
 import math
-import os
 import statistics
-import tempfile
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Iterable
+
+from nilmbench._io import atomic_write_text
 
 
 class LeaderboardError(ValueError):
@@ -20,16 +20,6 @@ class LeaderboardError(ValueError):
 
 
 DEFAULT_REQUIRED_SEEDS = (10, 20, 42)
-
-
-def _atomic_write_text(path: Path, content: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with tempfile.NamedTemporaryFile(
-        "w", encoding="utf-8", dir=path.parent, prefix=f".{path.name}.", delete=False
-    ) as handle:
-        handle.write(content)
-        temporary = Path(handle.name)
-    os.replace(temporary, path)
 
 
 def _expect(mapping: dict[str, Any], key: str, path: Path) -> Any:
@@ -151,6 +141,13 @@ def _rows(result: dict[str, Any], path: Path) -> Iterable[dict[str, Any]]:
         or sequence_length <= 0
     ):
         raise LeaderboardError(f"{path} has an invalid sequence-length override")
+    epochs = overrides.get("epochs")
+    max_samples = overrides.get("max_samples_per_window")
+    for name, value in (("epochs", epochs), ("max_samples_per_window", max_samples)):
+        if value is not None and (
+            isinstance(value, bool) or not isinstance(value, int) or value <= 0
+        ):
+            raise LeaderboardError(f"{path} has an invalid {name} override")
     metrics = result["run"].get("metrics")
     if not isinstance(metrics, dict) or not metrics:
         raise LeaderboardError(f"{path} has no appliance metrics")
@@ -188,6 +185,8 @@ def _rows(result: dict[str, Any], path: Path) -> Iterable[dict[str, Any]]:
             "protocol_overrides": overrides,
             "protocol_overrides_sha256": overrides_sha256,
             "sequence_length": sequence_length,
+            "epochs": epochs,
+            "max_samples_per_window": max_samples,
             "appliance": appliance,
             "scope": result["run_scope"],
             "seed": result["seed"],
@@ -243,8 +242,10 @@ def build_leaderboard(
         profile = rows[0]["profile"]
         if scope == "full" and profile == "corrected" and required.issubset(seeds) and verified:
             status = "full-verified"
-        elif scope == "smoke" and verified:
+        elif scope == "smoke" and required.issubset(seeds) and verified:
             status = "smoke-verified"
+        elif scope == "smoke" and verified:
+            status = "smoke-partial"
         elif scope == "smoke":
             status = "smoke-unverified"
         else:
@@ -269,6 +270,8 @@ def build_leaderboard(
                     "protocol_overrides_sha256"
                 ],
                 "sequence_length": rows[0]["sequence_length"],
+                "epochs": rows[0]["epochs"],
+                "max_samples_per_window": rows[0]["max_samples_per_window"],
                 "appliance": rows[0]["appliance"],
                 "scope": scope,
                 "status": status,
@@ -309,7 +312,7 @@ def build_leaderboard(
 def write_leaderboard(
     leaderboard: dict[str, Any], json_path: Path, csv_path: Path | None = None
 ) -> None:
-    _atomic_write_text(
+    atomic_write_text(
         json_path,
         json.dumps(leaderboard, indent=2, sort_keys=True, allow_nan=False) + "\n",
     )
@@ -326,6 +329,8 @@ def write_leaderboard(
         "hardware",
         "sample_period",
         "sequence_length",
+        "epochs",
+        "max_samples_per_window",
         "protocol_overrides_sha256",
         "appliance",
         "target_data_access",
@@ -348,4 +353,4 @@ def write_leaderboard(
                 for key in fields
             }
         )
-    _atomic_write_text(csv_path, output.getvalue())
+    atomic_write_text(csv_path, output.getvalue())

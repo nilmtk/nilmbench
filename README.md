@@ -153,9 +153,12 @@ git diff -- leaderboard.json leaderboard.csv
 
 Every aggregate is separated by task/config revision, model revision, runner
 revision, container digest, hardware, resolution, appliance, target-data access,
-and smoke/full scope. A corrected full run becomes `full-verified` only after the
-required seeds 10, 20, and 42 pass source, container, and dataset provenance
-checks. CI regenerates the artifacts and rejects hand-edited or stale tables.
+smoke/full scope, and a digest of every protocol override. Context length,
+epochs, and sample limits remain visible in the generated table. A corrected
+full run becomes `full-verified`, and a smoke run becomes `smoke-verified`, only
+after the required seeds 10, 20, and 42 pass source, container, and dataset
+provenance checks. Incomplete clean smoke matrices are labelled `smoke-partial`.
+CI regenerates the artifacts and rejects hand-edited or stale tables.
 
 ## Add a model
 

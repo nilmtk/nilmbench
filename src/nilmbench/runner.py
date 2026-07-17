@@ -7,13 +7,13 @@ import json
 import math
 import os
 import statistics
-import tempfile
 import time
 from dataclasses import asdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from nilmbench._io import atomic_write_text
 from nilmbench.config import BenchmarkConfig, TaskConfig
 from nilmbench.data import LoadedSplit, load_split, verify_dataset
 from nilmbench.provenance import runtime_provenance
@@ -213,16 +213,6 @@ def _run_once(
     }
 
 
-def _atomic_write_text(path: Path, content: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with tempfile.NamedTemporaryFile(
-        "w", encoding="utf-8", dir=path.parent, prefix=f".{path.name}.", delete=False
-    ) as handle:
-        handle.write(content)
-        temporary = Path(handle.name)
-    os.replace(temporary, path)
-
-
 def _write_result(result: dict[str, Any], output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=False)
     csv_rows = ["appliance,mae,f1,activation_threshold_watts"]
@@ -231,8 +221,8 @@ def _write_result(result: dict[str, Any], output_dir: Path) -> None:
             f"{appliance},{values['mae']},{values['f1']},"
             f"{values['activation_threshold_watts']}"
         )
-    _atomic_write_text(output_dir / "metrics.csv", "\n".join(csv_rows) + "\n")
-    _atomic_write_text(
+    atomic_write_text(output_dir / "metrics.csv", "\n".join(csv_rows) + "\n")
+    atomic_write_text(
         output_dir / "result.json",
         json.dumps(result, indent=2, sort_keys=True, allow_nan=False) + "\n",
     )
