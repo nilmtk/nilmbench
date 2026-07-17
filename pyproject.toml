@@ -14,12 +14,27 @@ dependencies = []
 
 [project.optional-dependencies]
 runtime = [
+  "nilm-metadata @ git+https://github.com/nilmtk/nilm_metadata.git@59c9990de4836d77c0dcd807bd4293e39e0cc314",
+  "nilmtk @ git+https://github.com/nilmtk/nilmtk.git@0768b1b8457eef9de76d123a94e2de8af22a45d0",
   "numpy>=1.26,<2",
   "optuna>=4,<5",
   "pandas>=2,<3",
 ]
+torch-runtime = [
+  "filelock>=3,<4",
+  "fsspec>=2024,<2027",
+  "jinja2>=3.1,<4",
+  "networkx>=3,<4",
+  "sympy==1.13.1",
+  "typing-extensions>=4.10,<5",
+]
+build-runtime = [
+  "hatchling>=1.27,<2",
+]
 benchmark = [
-  "nilmtk-contrib[torch] @ git+https://github.com/nilmtk/nilmtk-contrib.git@f152f9f1783161bced09da7239d7ad57f4196a9b",
+  "nilm-metadata @ git+https://github.com/nilmtk/nilm_metadata.git@59c9990de4836d77c0dcd807bd4293e39e0cc314",
+  "nilmtk @ git+https://github.com/nilmtk/nilmtk.git@0768b1b8457eef9de76d123a94e2de8af22a45d0",
+  "nilmtk-contrib[torch] @ git+https://github.com/nilmtk/nilmtk-contrib.git@825740b39bcd44b3f4bfaf146f4c0d944843b131",
   "numpy>=1.26,<2",
   "optuna>=4,<5",
   "pandas>=2,<3",
@@ -39,6 +54,12 @@ packages = ["src/nilmbench"]
 
 [tool.hatch.metadata]
 allow-direct-references = true
+
+[tool.uv]
+override-dependencies = [
+  "nilm-metadata @ git+https://github.com/nilmtk/nilm_metadata.git@59c9990de4836d77c0dcd807bd4293e39e0cc314",
+  "nilmtk @ git+https://github.com/nilmtk/nilmtk.git@0768b1b8457eef9de76d123a94e2de8af22a45d0",
+]
 
 [tool.hatch.build.targets.wheel.force-include]
 "configs" = "nilmbench/configs"

@@ -1,9 +1,25 @@
-from nilmbench.config import load_config
+from nilmbench.config import TrustedRuntimeConfig, load_config
 
 
 def test_builtin_config_has_complete_paper_task_matrix():
     config = load_config()
-    historical = [task for task in config.tasks.values() if task.profile == "historical"]
+    assert config.trusted_runtimes == (
+        TrustedRuntimeConfig(
+            id="t0-redd-a100-83fb39e",
+            nilmbench_git_sha="83fb39e57d50ac433314e880176fef187997d5b3",
+            nilmtk_contrib_git_sha=(
+                "825740b39bcd44b3f4bfaf146f4c0d944843b131"
+            ),
+            container_image="nilmbench:t0-83fb39e-cuda",
+            container_digest=(
+                "sha256:dd977962c2e0d72e2d923f8f5c3e92e538f67a00495e545c2f22571001872e91"
+            ),
+            hardware="NVIDIA A100-SXM4-80GB",
+        ),
+    )
+    historical = [
+        task for task in config.tasks.values() if task.profile == "historical"
+    ]
     corrected = [task for task in config.tasks.values() if task.profile == "corrected"]
     assert len(historical) == 8
     assert len(corrected) == 8
@@ -12,17 +28,16 @@ def test_builtin_config_has_complete_paper_task_matrix():
     assert config.task("corrected-t1-redd").alignment_policy == "per_appliance"
     assert {task.alignment_policy for task in corrected} == {"per_appliance"}
     assert {task.metric_policy for task in historical} == {"legacy-nilmtk-10w"}
-    assert {task.metric_policy for task in corrected} == {
-        "paper-appliance-thresholds"
-    }
+    assert {task.metric_policy for task in corrected} == {"paper-appliance-thresholds"}
     assert {task.shared_meter_policy for task in historical} == {"allow"}
     assert {task.shared_meter_policy for task in corrected} == {"warn"}
-    assert {
-        task.target_data_access for task in corrected if task.family == "T3"
-    } == {"none"}
-    assert {
-        task.target_data_access for task in corrected if task.family != "T3"
-    } == {"not_applicable"}
+    assert {task.minimum_aligned_fraction for task in corrected} == {0.5}
+    assert {task.target_data_access for task in corrected if task.family == "T3"} == {
+        "none"
+    }
+    assert {task.target_data_access for task in corrected if task.family != "T3"} == {
+        "not_applicable"
+    }
 
 
 def test_corrected_redd_t2_matches_paper_building_split():

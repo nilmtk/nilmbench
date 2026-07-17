@@ -30,8 +30,9 @@ The benchmark is now an installable command-line application rather than a set o
 - deterministic Torch algorithms with an explicit cuBLAS workspace policy;
 - structured JSON and CSV results with source, dataset, runtime, parameter/FLOP, and container provenance;
 - separate CPU-smoke and CUDA-benchmark containers.
+- a NILMTK Mean sanity-check baseline alongside the contrib architectures.
 
-The REDD, UK-DALE, and REFIT data are not redistributed. The runner expects user-provided NILMTK HDF5 conversions and verifies them against the recorded file sizes and SHA-256 digests. The exact protocol discrepancies recovered from the old notebooks are documented in [`docs/protocol-audit.md`](docs/protocol-audit.md).
+The REDD, UK-DALE, and REFIT data are not redistributed. The runner expects user-provided NILMTK HDF5 conversions and verifies them against the recorded file sizes and SHA-256 digests. The exact protocol discrepancies recovered from the old notebooks are documented in the [protocol audit](https://github.com/sustainability-lab/nilmbench/blob/main/docs/protocol-audit.md).
 
 ## Install for development
 
@@ -77,12 +78,29 @@ nilmbench validate --task corrected-t1-redd --check-data --max-samples 64
 ```
 
 The dataset mounts in `compose.yaml` are read-only. Results are written to a separate `/results` mount.
+New runs land under `results/candidates`; publication is an explicit review/copy
+into `results/published`, never an automatic side effect of training.
 
 ## CPU smoke and CUDA benchmark
 
 Container builds take nilmtk-contrib as a named BuildKit context. The default Compose configuration expects the two repositories to be sibling directories; set `NILMTK_CONTRIB_CONTEXT` to override that location.
 
-Published images pin their nilmtk-contrib build context to the exact PatchTST commit rather than a moving branch. Update that pin deliberately when a reviewed model release is adopted.
+Published images pin their nilmtk-contrib build context to the exact reviewed integration commit rather than a moving branch. The current dependency and image pin is [`825740b39bcd44b3f4bfaf146f4c0d944843b131`](https://github.com/nilmtk/nilmtk-contrib/commit/825740b39bcd44b3f4bfaf146f4c0d944843b131). Update that pin deliberately when a reviewed model release is adopted. Both image variants synchronize their runtime, NILMTK, and NILM Metadata dependencies from the checked-in `uv.lock` with `--frozen`; the project and named-context contrib source are then installed with `--no-deps`. The CPU-only Torch wheel is installed with `--no-deps` after its common Python dependencies have been synchronized from the same lock, avoiding the CUDA wheel stack in the CPU image.
+
+Model contributions and benchmark-image releases have separate cadences. A
+model can merge after its contrib contract, CPU, and targeted CUDA checks pass;
+it does not trigger a public image by itself. NILMbench periodically batches
+eligible contrib changes, advances its single immutable contrib pin, builds the
+matching `-cpu` and `-cuda` variants once, and runs the real-data matrix against
+the candidate CUDA digest. The versioned images and leaderboard update are
+promoted together only after that matrix passes. Development builds may use a
+local contrib checkout, but their results cannot become verified leaderboard
+rows unless the source revisions and immutable container digest are recorded.
+For an official run, the orchestrator obtains the candidate image's registry or
+local content digest and supplies it as `NILMBENCH_IMAGE_DIGEST`. The exact
+runner commit, contrib commit, image name/digest, and hardware must then be
+reviewed into `configs/runtimes.toml`; self-asserted environment variables alone
+cannot produce a verified row.
 
 For local Compose builds, pass the two source revisions into the OCI labels and
 runtime result metadata:
@@ -111,10 +129,10 @@ To run one inspectable A100 smoke before spending on 20 trials:
 ```bash
 docker compose --profile cuda run --rm cuda-benchmark \
   run --task corrected-t1-redd --model PatchTST --appliance fridge \
-  --seed 42 --epochs 1 --max-samples 1024 --device cuda --results /results
+  --seed 42 --epochs 1 --max-samples 1024 --device cuda --results /results/candidates
 ```
 
-For the full paper matrix, repeat each task at 60 and 900 seconds for seeds 10, 20, and 42. Optuna studies live under `results/optuna/` and resume to the requested total trial count. Their identity hashes the task config, model, seed, appliance subset, resolution, and smoke overrides, preventing incompatible runs from sharing a study.
+For the full paper matrix, repeat each task at 60 and 900 seconds for evaluation seeds 10, 20, and 42. Optuna studies live under `results/optuna/` and resume to the requested total trial count. Model selection uses the fixed tuning seed 42 once per scientific study, then freezes the selected parameters for every evaluation seed; independently tuned seeds are never pooled into one score. Trials are scored only on a blocked 20% holdout from each `task.train` window; `task.test` is loaded only after model selection, during final benchmark evaluation. Fixed epoch and sequence-length overrides apply during every trial. Study identity covers the runner and nilmtk-contrib revisions, container digest, device/runtime, source dataset identity, full task protocol, appliance subset, resolution, and smoke overrides, so an incompatible environment creates a new study instead of resuming an old one. Persistent HPO also fails closed for unknown or dirty source/container provenance.
 
 ## Historical versus corrected protocols
 
@@ -151,11 +169,29 @@ nilmbench leaderboard --results results/published \
 git diff -- leaderboard.json leaderboard.csv
 ```
 
+Those immutable, hashable JSON bundles are the scientific source of truth.
+Each completed HPO trial also has a write-once JSON audit record under its
+`results/optuna/<study>/trials/` directory, and those records are embedded in
+the final result bundle. SQLite is reserved for mutable coordination such as resumable Optuna studies;
+an optional SQLite query index may be generated later, but it must always be
+rebuildable from the result bundles and never replace them.
+The CSV is written before the JSON commit marker; the JSON records the CSV's
+SHA-256 so consumers can reject a partially updated artifact pair.
+
 Every aggregate is separated by task/config revision, model revision, runner
 revision, container digest, hardware, resolution, appliance, target-data access,
-and smoke/full scope. A corrected full run becomes `full-verified` only after the
-required seeds 10, 20, and 42 pass source, container, and dataset provenance
-checks. CI regenerates the artifacts and rejects hand-edited or stale tables.
+smoke/full scope, and a digest of every protocol override. Context length,
+epochs, and sample limits remain visible in the generated table.
+The website's rank groups use a separate comparison-protocol digest covering
+effective context length and epochs, tuning method/trial budget/selection
+protocol, and the immutable runner, contrib, container, and hardware tuple. It
+intentionally excludes model-specific selected parameters and the study digest,
+so different models remain comparable and evaluation seeds from one frozen
+study can still aggregate. A corrected
+full run becomes `full-verified`, and a smoke run becomes `smoke-verified`, only
+after the required seeds 10, 20, and 42 pass source, container, and dataset
+provenance checks. Incomplete clean smoke matrices are labelled `smoke-partial`.
+CI regenerates the artifacts and rejects hand-edited or stale tables.
 
 ## Add a model
 

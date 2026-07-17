@@ -51,7 +51,7 @@ def _parser() -> argparse.ArgumentParser:
     leaderboard = sub.add_parser(
         "leaderboard", help="generate JSON/CSV tables from immutable result bundles"
     )
-    leaderboard.add_argument("--results", type=Path, default=Path("results"))
+    leaderboard.add_argument("--results", type=Path, default=Path("results/published"))
     leaderboard.add_argument("--output", type=Path, default=Path("leaderboard.json"))
     leaderboard.add_argument("--csv", type=Path)
 
@@ -65,11 +65,12 @@ def _parser() -> argparse.ArgumentParser:
     run.add_argument("--model", default="PatchTST", choices=sorted(MODELS))
     run.add_argument("--seed", type=int, default=42)
     run.add_argument("--trials", type=_nonnegative_int, default=0)
-    run.add_argument("--results", type=Path, default=Path("results"))
+    run.add_argument("--results", type=Path, default=Path("results/candidates"))
     run.add_argument("--appliance", action="append", dest="appliances")
     run.add_argument("--sample-period", type=int, choices=(60, 900))
     run.add_argument("--max-samples", type=_positive_int)
     run.add_argument("--epochs", type=_positive_int)
+    run.add_argument("--sequence-length", type=_positive_int)
     run.add_argument("--device")
     run.add_argument("--dry-run", action="store_true")
     return parser
@@ -109,7 +110,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "doctor":
             return _doctor(config, args.checksums)
         if args.command == "leaderboard":
-            leaderboard = build_leaderboard(args.results)
+            leaderboard = build_leaderboard(args.results, config=config)
             write_leaderboard(leaderboard, args.output, args.csv)
             print(args.output)
             return 0
@@ -124,9 +125,7 @@ def main(argv: list[str] | None = None) -> int:
                         "path": str(config.datasets[name].path),
                         "exists": config.datasets[name].path.is_file(),
                     }
-                    for name in sorted(
-                        {w.dataset for w in (*task.train, *task.test)}
-                    )
+                    for name in sorted({w.dataset for w in (*task.train, *task.test)})
                 },
             }
             if args.check_data and not all(
@@ -183,6 +182,7 @@ def main(argv: list[str] | None = None) -> int:
                             "sample_period": args.sample_period or task.sample_period,
                             "max_samples": args.max_samples,
                             "epochs": args.epochs,
+                            "sequence_length": args.sequence_length,
                             "device": args.device,
                         },
                         indent=2,
@@ -202,6 +202,7 @@ def main(argv: list[str] | None = None) -> int:
                 max_samples=args.max_samples,
                 epochs=args.epochs,
                 device=args.device,
+                sequence_length=args.sequence_length,
             )
             print(output)
             return 0

@@ -11,21 +11,31 @@ ENV UV_COMPILE_BYTECODE=1 \
     UV_TORCH_BACKEND=cpu \
     VIRTUAL_ENV=/opt/nilmbench
 RUN uv venv "${VIRTUAL_ENV}"
-ARG NILMTK_COMMIT=25cc3a9df52dec24ea96ab8c7cbc077dddb90ab7
+ARG NILMTK_COMMIT=0768b1b8457eef9de76d123a94e2de8af22a45d0
 ARG NILM_METADATA_COMMIT=59c9990de4836d77c0dcd807bd4293e39e0cc314
 WORKDIR /src
-COPY pyproject.toml README.md ./
+COPY pyproject.toml uv.lock README.md ./
 COPY configs/ configs/
 COPY src/ src/
 COPY --from=contrib . /src/nilmtk-contrib
-RUN uv pip install "--python=${VIRTUAL_ENV}/bin/python" \
-      --torch-backend=cpu "torch==2.6.0" \
+RUN grep -F "${NILMTK_COMMIT}" pyproject.toml \
+    && grep -F "${NILM_METADATA_COMMIT}" pyproject.toml \
+    && uv sync \
+      --frozen \
+      --no-dev \
+      --extra runtime \
+      --extra torch-runtime \
+      --extra build-runtime \
+      --no-install-project \
+      --active \
     && uv pip install "--python=${VIRTUAL_ENV}/bin/python" \
-      "nilm_metadata @ git+https://github.com/nilmtk/nilm_metadata.git@${NILM_METADATA_COMMIT}" \
-      "nilmtk @ git+https://github.com/nilmtk/nilmtk.git@${NILMTK_COMMIT}" \
-      ".[runtime]" \
+      --torch-backend=cpu \
+      --no-deps \
+      "torch==2.6.0" \
     && uv pip install "--python=${VIRTUAL_ENV}/bin/python" \
-      --no-deps /src/nilmtk-contrib
+      --no-build-isolation \
+      --no-deps \
+      . /src/nilmtk-contrib
 
 FROM python:3.11-slim-bookworm@sha256:28255a3ace7eb4c48bc1b57b90af29e1bc82b4fd6c60614a8e3dce61b87ff941
 ARG SOURCE_REVISION=unknown
@@ -41,7 +51,9 @@ ENV PATH=/opt/nilmbench/bin:${PATH} \
     PYTHONDONTWRITEBYTECODE=1 \
     NILMBENCH_IMAGE=ghcr.io/sustainability-lab/nilmbench:cpu \
     NILMBENCH_GIT_SHA=${SOURCE_REVISION} \
-    NILMTK_CONTRIB_GIT_SHA=${NILMTK_CONTRIB_REVISION}
+    NILMBENCH_GIT_DIRTY=false \
+    NILMTK_CONTRIB_GIT_SHA=${NILMTK_CONTRIB_REVISION} \
+    NILMTK_CONTRIB_GIT_DIRTY=false
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libgomp1 \
     && rm -rf /var/lib/apt/lists/* \

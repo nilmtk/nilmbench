@@ -14,6 +14,7 @@ class ModelEntry:
     class_name: str
     family: str
     search_space: Callable[[Any], dict[str, Any]]
+    supports_training_overrides: bool = True
 
     def model_class(self) -> type:
         module = import_module(self.module)
@@ -30,16 +31,30 @@ def _standard_space(trial: Any) -> dict[str, Any]:
         "learning_rate": trial.suggest_float(
             "learning_rate", 1e-5, 1e-2, log=True
         ),
-}
+    }
 
 
-def _entry(name: str, class_name: str, family: str) -> ModelEntry:
+def _no_search_space(trial: Any) -> dict[str, Any]:
+    del trial
+    return {}
+
+
+def _entry(
+    name: str,
+    class_name: str,
+    family: str,
+    *,
+    module: str = "nilmtk_contrib.torch",
+    search_space: Callable[[Any], dict[str, Any]] = _standard_space,
+    supports_training_overrides: bool = True,
+) -> ModelEntry:
     return ModelEntry(
         name=name,
-        module="nilmtk_contrib.torch",
+        module=module,
         class_name=class_name,
         family=family,
-        search_space=_standard_space,
+        search_space=search_space,
+        supports_training_overrides=supports_training_overrides,
     )
 
 
@@ -70,6 +85,14 @@ MODELS = {
         _entry("Seq2Seq", "Seq2Seq", "recurrent"),
         _entry("TCN", "TCN", "convolutional"),
         _entry("WindowGRU", "WindowGRU", "recurrent"),
+        _entry(
+            "Mean",
+            "Mean",
+            "statistical-baseline",
+            module="nilmtk.disaggregate",
+            search_space=_no_search_space,
+            supports_training_overrides=False,
+        ),
     )
 }
 

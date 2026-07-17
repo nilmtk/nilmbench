@@ -67,6 +67,16 @@ class MetricPolicyConfig:
 
 
 @dataclass(frozen=True)
+class TrustedRuntimeConfig:
+    id: str
+    nilmbench_git_sha: str
+    nilmtk_contrib_git_sha: str
+    container_image: str
+    container_digest: str
+    hardware: str
+
+
+@dataclass(frozen=True)
 class TaskConfig:
     id: str
     family: str
@@ -81,6 +91,7 @@ class TaskConfig:
     target_data_access: str
     train: tuple[WindowConfig, ...]
     test: tuple[WindowConfig, ...]
+    minimum_aligned_fraction: float = 0.0
     target_label_fraction: float | None = None
 
 
@@ -89,13 +100,16 @@ class BenchmarkConfig:
     datasets: dict[str, DatasetConfig]
     metric_policies: dict[str, MetricPolicyConfig]
     tasks: dict[str, TaskConfig]
+    trusted_runtimes: tuple[TrustedRuntimeConfig, ...] = ()
 
     def task(self, task_id: str) -> TaskConfig:
         try:
             return self.tasks[task_id]
         except KeyError as exc:
             available = ", ".join(sorted(self.tasks))
-            raise ConfigError(f"Unknown task {task_id!r}. Available: {available}") from exc
+            raise ConfigError(
+                f"Unknown task {task_id!r}. Available: {available}"
+            ) from exc
 
     def metric_policy(self, policy_id: str) -> MetricPolicyConfig:
         try:
@@ -166,6 +180,8 @@ def load_config(config_dir: str | Path | None = None) -> BenchmarkConfig:
     dataset_doc = _read_toml(root / "datasets.toml")
     metric_doc = _read_toml(root / "metrics.toml")
     task_doc = _read_toml(root / "tasks.toml")
+    runtime_path = root / "runtimes.toml"
+    runtime_doc = _read_toml(runtime_path) if runtime_path.is_file() else {}
 
     datasets: dict[str, DatasetConfig] = {}
     for source in _table_entries(dataset_doc, "dataset", root / "datasets.toml"):
@@ -206,21 +222,22 @@ def load_config(config_dir: str | Path | None = None) -> BenchmarkConfig:
             or not dataset.appliance_ac_types
             or any(not isinstance(value, str) or not value for value in ac_types)
             or len(set(dataset.mains_ac_types)) != len(dataset.mains_ac_types)
-            or len(set(dataset.appliance_ac_types))
-            != len(dataset.appliance_ac_types)
+            or len(set(dataset.appliance_ac_types)) != len(dataset.appliance_ac_types)
         ):
             raise ConfigError(f"Dataset {dataset.id} has no AC type preferences")
         datasets[dataset.id] = dataset
 
     metric_policies: dict[str, MetricPolicyConfig] = {}
-    for raw in _table_entries(
-        metric_doc, "metric_policy", root / "metrics.toml"
-    ):
+    for raw in _table_entries(metric_doc, "metric_policy", root / "metrics.toml"):
         try:
             policy = MetricPolicyConfig(**raw)
         except TypeError as exc:
             raise ConfigError(f"Invalid metric policy entry: {exc}") from exc
-        if not _valid_id(policy.id) or not isinstance(policy.thresholds, dict) or not policy.thresholds:
+        if (
+            not _valid_id(policy.id)
+            or not isinstance(policy.thresholds, dict)
+            or not policy.thresholds
+        ):
             raise ConfigError("Metric policies need an id and thresholds")
         for appliance, value in policy.thresholds.items():
             if not isinstance(appliance, str) or not appliance:
@@ -231,9 +248,7 @@ def load_config(config_dir: str | Path | None = None) -> BenchmarkConfig:
                 or not math.isfinite(value)
                 or value <= 0
             ):
-                raise ConfigError(
-                    f"Metric policy {policy.id} has an invalid threshold"
-                )
+                raise ConfigError(f"Metric policy {policy.id} has an invalid threshold")
         if policy.id in metric_policies:
             raise ConfigError(f"Duplicate metric policy id {policy.id}")
         metric_policies[policy.id] = policy
@@ -261,6 +276,14 @@ def load_config(config_dir: str | Path | None = None) -> BenchmarkConfig:
             raise ConfigError(f"Task {task.id} has unsupported family {task.family}")
         if task.coverage_policy not in {"warn", "strict"}:
             raise ConfigError(f"Task {task.id} has invalid coverage_policy")
+        if (
+            isinstance(task.minimum_aligned_fraction, bool)
+            or not isinstance(task.minimum_aligned_fraction, Real)
+            or not math.isfinite(task.minimum_aligned_fraction)
+            or not 0 <= task.minimum_aligned_fraction <= 1
+            or (task.profile == "corrected" and task.minimum_aligned_fraction == 0)
+        ):
+            raise ConfigError(f"Task {task.id} has invalid minimum_aligned_fraction")
         if task.alignment_policy not in {"joint", "per_appliance"}:
             raise ConfigError(f"Task {task.id} has invalid alignment_policy")
         if task.shared_meter_policy not in {"allow", "warn", "strict"}:
@@ -320,7 +343,9 @@ def load_config(config_dir: str | Path | None = None) -> BenchmarkConfig:
                 window.end, task.id
             ):
                 raise ConfigError(f"Task {task.id} has a non-positive window")
-        if len(set(task.train)) != len(task.train) or len(set(task.test)) != len(task.test):
+        if len(set(task.train)) != len(task.train) or len(set(task.test)) != len(
+            task.test
+        ):
             raise ConfigError(f"Task {task.id} contains duplicate windows")
         policy = metric_policies[task.metric_policy]
         for appliance in task.appliances:
@@ -329,8 +354,35 @@ def load_config(config_dir: str | Path | None = None) -> BenchmarkConfig:
 
     if not datasets or not metric_policies or not tasks:
         raise ConfigError("Datasets, metric policies, and tasks are required")
+    raw_runtimes = runtime_doc.get("runtime", [])
+    if not isinstance(raw_runtimes, list):
+        raise ConfigError(f"{runtime_path} runtime entries must be a list")
+    trusted_runtimes = []
+    for raw in raw_runtimes:
+        try:
+            runtime = TrustedRuntimeConfig(**raw)
+        except TypeError as exc:
+            raise ConfigError(f"Invalid trusted runtime entry: {exc}") from exc
+        if not _valid_id(runtime.id):
+            raise ConfigError("Trusted runtime has an invalid id")
+        if not re.fullmatch(r"[0-9a-f]{40}", runtime.nilmtk_contrib_git_sha):
+            raise ConfigError(
+                f"Trusted runtime {runtime.id} has an invalid contrib SHA"
+            )
+        if not re.fullmatch(r"[0-9a-f]{40}", runtime.nilmbench_git_sha):
+            raise ConfigError(f"Trusted runtime {runtime.id} has an invalid runner SHA")
+        if not re.fullmatch(r"sha256:[0-9a-f]{64}", runtime.container_digest):
+            raise ConfigError(
+                f"Trusted runtime {runtime.id} has an invalid image digest"
+            )
+        if not runtime.container_image or not runtime.hardware:
+            raise ConfigError(f"Trusted runtime {runtime.id} is incomplete")
+        if any(item.id == runtime.id for item in trusted_runtimes):
+            raise ConfigError(f"Duplicate trusted runtime id {runtime.id}")
+        trusted_runtimes.append(runtime)
     return BenchmarkConfig(
         datasets=datasets,
         metric_policies=metric_policies,
         tasks=tasks,
+        trusted_runtimes=tuple(trusted_runtimes),
     )
