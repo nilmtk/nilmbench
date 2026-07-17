@@ -1,5 +1,7 @@
 import json
 
+import pytest
+
 from nilmbench.cli import main
 
 
@@ -17,6 +19,8 @@ def test_dry_run_needs_no_ml_dependencies(capsys, tmp_path):
             "1",
             "--max-samples",
             "1024",
+            "--sequence-length",
+            "299",
             "--results",
             str(tmp_path),
             "--dry-run",
@@ -27,6 +31,7 @@ def test_dry_run_needs_no_ml_dependencies(capsys, tmp_path):
     assert payload["appliances"] == ["fridge"]
     assert payload["epochs"] == 1
     assert payload["max_samples"] == 1024
+    assert payload["sequence_length"] == 299
     assert payload["metric_policy"]["thresholds"]["fridge"] == 50.0
 
 
@@ -53,6 +58,21 @@ def test_invalid_run_limits_are_rejected(capsys):
         assert exc.code == 2
     else:
         raise AssertionError("argparse should reject a zero sample limit")
+    assert "positive integer" in capsys.readouterr().err
+
+
+def test_nonpositive_sequence_length_is_rejected(capsys):
+    with pytest.raises(SystemExit, match="2"):
+        main(
+            [
+                "run",
+                "--task",
+                "corrected-t1-redd",
+                "--sequence-length",
+                "0",
+                "--dry-run",
+            ]
+        )
     assert "positive integer" in capsys.readouterr().err
 
 

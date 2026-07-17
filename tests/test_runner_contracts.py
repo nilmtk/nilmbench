@@ -2,7 +2,8 @@ import pandas as pd
 import pytest
 
 from nilmbench.data import LoadedSplit
-from nilmbench.runner import _predict
+from nilmbench.config import load_config
+from nilmbench.runner import _predict, run_benchmark
 
 
 class _Model:
@@ -62,3 +63,18 @@ def test_predict_preserves_final_partial_chunk():
 def test_predict_rejects_dropped_or_corrupt_outputs(chunks, message):
     with pytest.raises(RuntimeError, match=message):
         _predict(_Model(chunks), _split(), ("fridge",))
+
+
+@pytest.mark.parametrize("sequence_length", [False, 0, 1.5, "299"])
+def test_run_rejects_invalid_sequence_length_before_data_access(
+    sequence_length, tmp_path
+):
+    with pytest.raises(ValueError, match="positive integer"):
+        run_benchmark(
+            load_config(),
+            "corrected-t1-redd",
+            "PatchTST",
+            42,
+            tmp_path,
+            sequence_length=sequence_length,
+        )

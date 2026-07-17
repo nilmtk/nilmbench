@@ -251,6 +251,7 @@ def run_benchmark(
     max_samples: int | None = None,
     epochs: int | None = None,
     device: str | None = None,
+    sequence_length: int | None = None,
 ) -> Path:
     task = config.task(task_id)
     chosen_appliances = appliances or task.appliances
@@ -268,10 +269,16 @@ def run_benchmark(
         raise ValueError("max_samples must be positive")
     if epochs is not None and epochs <= 0:
         raise ValueError("epochs must be positive")
+    if sequence_length is not None and (
+        isinstance(sequence_length, bool)
+        or not isinstance(sequence_length, int)
+        or sequence_length <= 0
+    ):
+        raise ValueError("sequence_length must be a positive integer")
     if trials < 0:
         raise ValueError("trials must be non-negative")
     base_params: dict[str, Any] = {
-        "sequence_length": 99,
+        "sequence_length": sequence_length if sequence_length is not None else 99,
         "n_epochs": epochs if epochs is not None else 10,
         "batch_size": 128,
         "learning_rate": 1e-3,
@@ -303,6 +310,7 @@ def run_benchmark(
             "sample_period": resolved_period,
             "max_samples": max_samples,
             "epochs_override": epochs,
+            "sequence_length_override": sequence_length,
             "model_module": get_model(model_name).module,
             "model_class": get_model(model_name).class_name,
             "nilmtk_contrib_git_sha": provenance["nilmtk_contrib_git_sha"],
@@ -347,6 +355,8 @@ def run_benchmark(
         base_params.update(study.best_params)
         if epochs is not None:
             base_params["n_epochs"] = epochs
+        if sequence_length is not None:
+            base_params["sequence_length"] = sequence_length
         if device:
             base_params["device"] = device
         trial_metadata = {
@@ -394,6 +404,7 @@ def run_benchmark(
             "epochs": epochs,
             "appliances": None if chosen_appliances == task.appliances else chosen_appliances,
             "sample_period": None if resolved_period == task.sample_period else resolved_period,
+            "sequence_length": sequence_length,
         },
         "study": trial_metadata,
         "runtime": provenance,

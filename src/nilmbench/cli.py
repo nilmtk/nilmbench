@@ -70,6 +70,7 @@ def _parser() -> argparse.ArgumentParser:
     run.add_argument("--sample-period", type=int, choices=(60, 900))
     run.add_argument("--max-samples", type=_positive_int)
     run.add_argument("--epochs", type=_positive_int)
+    run.add_argument("--sequence-length", type=_positive_int)
     run.add_argument("--device")
     run.add_argument("--dry-run", action="store_true")
     return parser
@@ -183,6 +184,7 @@ def main(argv: list[str] | None = None) -> int:
                             "sample_period": args.sample_period or task.sample_period,
                             "max_samples": args.max_samples,
                             "epochs": args.epochs,
+                            "sequence_length": args.sequence_length,
                             "device": args.device,
                         },
                         indent=2,
@@ -202,6 +204,7 @@ def main(argv: list[str] | None = None) -> int:
                 max_samples=args.max_samples,
                 epochs=args.epochs,
                 device=args.device,
+                sequence_length=args.sequence_length,
             )
             print(output)
             return 0
