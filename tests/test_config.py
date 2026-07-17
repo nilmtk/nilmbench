@@ -17,6 +17,12 @@ def test_builtin_config_has_complete_paper_task_matrix():
     }
     assert {task.shared_meter_policy for task in historical} == {"allow"}
     assert {task.shared_meter_policy for task in corrected} == {"warn"}
+    assert {
+        task.target_data_access for task in corrected if task.family == "T3"
+    } == {"none"}
+    assert {
+        task.target_data_access for task in corrected if task.family != "T3"
+    } == {"not_applicable"}
 
 
 def test_corrected_redd_t2_matches_paper_building_split():
