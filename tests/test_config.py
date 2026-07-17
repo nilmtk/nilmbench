@@ -1,9 +1,22 @@
-from nilmbench.config import load_config
+from nilmbench.config import TrustedRuntimeConfig, load_config
 
 
 def test_builtin_config_has_complete_paper_task_matrix():
     config = load_config()
-    assert config.trusted_runtimes == ()
+    assert config.trusted_runtimes == (
+        TrustedRuntimeConfig(
+            id="t0-redd-a100-83fb39e",
+            nilmbench_git_sha="83fb39e57d50ac433314e880176fef187997d5b3",
+            nilmtk_contrib_git_sha=(
+                "825740b39bcd44b3f4bfaf146f4c0d944843b131"
+            ),
+            container_image="nilmbench:t0-83fb39e-cuda",
+            container_digest=(
+                "sha256:dd977962c2e0d72e2d923f8f5c3e92e538f67a00495e545c2f22571001872e91"
+            ),
+            hardware="NVIDIA A100-SXM4-80GB",
+        ),
+    )
     historical = [
         task for task in config.tasks.values() if task.profile == "historical"
     ]
