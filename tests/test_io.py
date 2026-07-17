@@ -3,7 +3,7 @@ import stat
 
 import pytest
 
-from nilmbench._io import atomic_write_text
+from nilmbench._io import _fsync_directory, atomic_write_text
 
 
 def test_atomic_text_artifacts_are_replaced_and_host_readable(tmp_path):
@@ -34,3 +34,20 @@ def test_atomic_text_write_cleans_temporary_file_on_replace_failure(
 
     assert not path.exists()
     assert list(tmp_path.iterdir()) == []
+
+
+def test_directory_sync_closes_its_descriptor_on_failure(tmp_path, monkeypatch):
+    closed = []
+    monkeypatch.setattr("nilmbench._io.os.open", lambda path, flags: 17)
+    monkeypatch.setattr("nilmbench._io.os.close", closed.append)
+
+    def fail_sync(descriptor):
+        assert descriptor == 17
+        raise OSError("injected sync failure")
+
+    monkeypatch.setattr("nilmbench._io.os.fsync", fail_sync)
+
+    with pytest.raises(OSError, match="injected"):
+        _fsync_directory(tmp_path)
+
+    assert closed == [17]

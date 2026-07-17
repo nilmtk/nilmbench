@@ -830,10 +830,10 @@ results = API(experiment)   # trains, tests &amp; scores every model — cross-b
             <div class="term-pane" id="p-out"><pre class="code" data-lang="shell"># One provenance-recorded real-data smoke
 nilmbench run --task corrected-t1-redd --model Seq2Point \
   --appliance fridge --seed 42 --epochs 3 --max-samples 8192 \
-  --sequence-length 299 --device cuda --results results
+  --sequence-length 299 --device cuda --results results/candidates
 
 # Generate the site artifacts only from immutable result bundles
-nilmbench leaderboard --results results \
+nilmbench leaderboard --results results/published \
   --output leaderboard.json --csv leaderboard.csv</pre></div>
         </div>
     </div>
@@ -925,7 +925,7 @@ experiment['test']['metrics'] = ['mae', 'f1score', 'sae', 'nep']
     <div class="lb-sub" id="live-leaderboard-summary">Loading immutable result bundles&hellip;</div>
     <div class="table-container">
         <table class="lb">
-            <thead><tr><th>#</th><th>Model</th><th>Task / appliance</th><th>MAE&darr; (W)</th><th>F1&uarr;</th><th>Params</th><th>Time&darr;</th><th>Peak VRAM&darr;</th><th>Status</th></tr></thead>
+            <thead><tr><th>Group rank</th><th>Model</th><th>Task / appliance</th><th>MAE&darr; (W)</th><th>F1&uarr;</th><th>Params</th><th>Time&darr;</th><th>Peak VRAM&darr;</th><th>Status</th></tr></thead>
             <tbody id="live-leaderboard-body">
                 <tr><td colspan="9" style="color:var(--text-muted)">Loading&hellip;</td></tr>
             </tbody>
@@ -1558,6 +1558,16 @@ function elapsedWithSpread(mean, spread, count) {
 function memoryInMiB(value) {
   return value == null ? '&mdash;' : `${(Number(value) / 1048576).toFixed(1)} MiB`;
 }
+function comparisonKey(entry) {
+  return [
+    entry.task_config_sha256,
+    entry.sample_period,
+    entry.appliance,
+    entry.scope,
+    entry.target_data_access,
+    entry.max_samples_per_window ?? 'full',
+  ].join('|');
+}
 async function loadLiveLeaderboard() {
   const body = document.getElementById('live-leaderboard-body');
   const summary = document.getElementById('live-leaderboard-summary');
@@ -1572,8 +1582,10 @@ async function loadLiveLeaderboard() {
       return;
     }
     const statusOrder = {'full-verified': 0, 'smoke-verified': 1, 'smoke-partial': 2, 'candidate': 3, 'smoke-unverified': 4};
-    entries.sort((a,b)=>(statusOrder[a.status]??9)-(statusOrder[b.status]??9) || a.mae_mean-b.mae_mean);
-    body.innerHTML = entries.slice(0, 25).map((entry, index) => {
+    entries.sort((a,b)=>comparisonKey(a).localeCompare(comparisonKey(b)) ||
+      (statusOrder[a.status]??9)-(statusOrder[b.status]??9) || a.mae_mean-b.mae_mean);
+    const ranks = new Map();
+    body.innerHTML = entries.map((entry) => {
       const protocol = [
         entry.sequence_length ? `seq ${entry.sequence_length}` : null,
         entry.epochs ? `${entry.epochs} epochs` : null,
@@ -1581,8 +1593,12 @@ async function loadLiveLeaderboard() {
       ].filter(Boolean).join(' / ');
       const task = `${entry.task} / ${entry.appliance} / ${entry.sample_period}s` +
         (protocol ? ` / ${protocol}` : '');
-      const cls = entry.status === 'full-verified' && index === 0 ? ' class="gold"' : '';
-      return `<tr${cls}><td class="rank">${index + 1}</td><td>${escHTML(entry.model)}</td>` +
+      const key = comparisonKey(entry);
+      const isVerified = entry.status === 'full-verified' || entry.status === 'smoke-verified';
+      const rank = isVerified ? (ranks.get(key) ?? 0) + 1 : null;
+      if (rank != null) ranks.set(key, rank);
+      const cls = rank === 1 ? ' class="gold"' : '';
+      return `<tr${cls}><td class="rank">${rank ?? '&mdash;'}</td><td>${escHTML(entry.model)}</td>` +
         `<td class="fam">${escHTML(task)}</td>` +
         `<td>${metricWithSpread(entry.mae_mean, entry.mae_std, entry.run_count)}</td>` +
         `<td>${metricWithSpread(entry.f1_mean, entry.f1_std, entry.run_count)}</td>` +

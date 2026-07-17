@@ -84,8 +84,7 @@ def _verify_file(
     observed_sha256 = _sha256(path)
     if observed_sha256.lower() != expected_sha256.lower():
         raise DataError(
-            f"Dataset {path} has SHA-256 {observed_sha256}; "
-            f"expected {expected_sha256}"
+            f"Dataset {path} has SHA-256 {observed_sha256}; expected {expected_sha256}"
         )
     return observed_sha256
 
@@ -94,7 +93,9 @@ def verify_dataset(dataset: DatasetConfig) -> DatasetIdentity:
     """Fail closed unless the mounted file exactly matches the manifest."""
     path = dataset.path.resolve()
     if not path.is_file():
-        raise DataError(f"Missing {dataset.id} dataset at {path}. Set {dataset.path_env}.")
+        raise DataError(
+            f"Missing {dataset.id} dataset at {path}. Set {dataset.path_env}."
+        )
     stat = path.stat()
     observed_sha256 = _verify_file(
         str(path),
@@ -278,7 +279,9 @@ def _load_one(
         readings = {name: frame.loc[index] for name, frame in readings.items()}
         for name, frame in {"mains": mains, **readings}.items():
             values = frame.to_numpy(dtype=float)
-            if values.size == 0 or not all(math.isfinite(value) for value in values.flat):
+            if values.size == 0 or not all(
+                math.isfinite(value) for value in values.flat
+            ):
                 raise DataError(
                     f"{window.dataset} building {window.building} has non-finite "
                     f"or empty aligned {name} data"
@@ -355,6 +358,15 @@ def load_split(
                 f"{task.id}: requested {window.start} to {window.end} from "
                 f"{window.dataset} building {window.building}, but the common meter "
                 f"envelope is {loaded.available_start} to {loaded.available_end}"
+            )
+            if task.coverage_policy == "strict":
+                raise DataError(message)
+            warnings.warn(message, stacklevel=2)
+        if loaded.aligned_sample_fraction < task.minimum_aligned_fraction:
+            message = (
+                f"{task.id}: {window.dataset} building {window.building} has "
+                f"aligned sample fraction {loaded.aligned_sample_fraction:.3f}; "
+                f"requires at least {task.minimum_aligned_fraction:.3f}"
             )
             if task.coverage_policy == "strict":
                 raise DataError(message)

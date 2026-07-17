@@ -3,7 +3,10 @@ from nilmbench.config import load_config
 
 def test_builtin_config_has_complete_paper_task_matrix():
     config = load_config()
-    historical = [task for task in config.tasks.values() if task.profile == "historical"]
+    assert config.trusted_runtimes == ()
+    historical = [
+        task for task in config.tasks.values() if task.profile == "historical"
+    ]
     corrected = [task for task in config.tasks.values() if task.profile == "corrected"]
     assert len(historical) == 8
     assert len(corrected) == 8
@@ -12,17 +15,16 @@ def test_builtin_config_has_complete_paper_task_matrix():
     assert config.task("corrected-t1-redd").alignment_policy == "per_appliance"
     assert {task.alignment_policy for task in corrected} == {"per_appliance"}
     assert {task.metric_policy for task in historical} == {"legacy-nilmtk-10w"}
-    assert {task.metric_policy for task in corrected} == {
-        "paper-appliance-thresholds"
-    }
+    assert {task.metric_policy for task in corrected} == {"paper-appliance-thresholds"}
     assert {task.shared_meter_policy for task in historical} == {"allow"}
     assert {task.shared_meter_policy for task in corrected} == {"warn"}
-    assert {
-        task.target_data_access for task in corrected if task.family == "T3"
-    } == {"none"}
-    assert {
-        task.target_data_access for task in corrected if task.family != "T3"
-    } == {"not_applicable"}
+    assert {task.minimum_aligned_fraction for task in corrected} == {0.5}
+    assert {task.target_data_access for task in corrected if task.family == "T3"} == {
+        "none"
+    }
+    assert {task.target_data_access for task in corrected if task.family != "T3"} == {
+        "not_applicable"
+    }
 
 
 def test_corrected_redd_t2_matches_paper_building_split():

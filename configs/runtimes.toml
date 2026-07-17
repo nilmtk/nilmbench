@@ -1,0 +1,4 @@
+# A candidate run is not verified until its exact source/image/hardware tuple is
+# reviewed and added here. Runtime entries are publication approvals, not build
+# inputs, so adding one does not change the image whose digest it records.
+runtime = []

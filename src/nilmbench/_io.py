@@ -7,6 +7,15 @@ from pathlib import Path
 import tempfile
 
 
+def _fsync_directory(path: Path) -> None:
+    flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0)
+    descriptor = os.open(path, flags)
+    try:
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
+
+
 def atomic_write_text(path: Path, content: str) -> None:
     """Replace a UTF-8 text artifact and keep container output host-readable."""
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -26,6 +35,7 @@ def atomic_write_text(path: Path, content: str) -> None:
         temporary.chmod(0o644)
         os.replace(temporary, path)
         temporary = None
+        _fsync_directory(path.parent)
     finally:
         if temporary is not None:
             temporary.unlink(missing_ok=True)

@@ -40,11 +40,15 @@ def _split():
 
 
 def test_predict_preserves_final_partial_chunk():
+    split = _split()
     model = _Model(
-        [pd.DataFrame({"fridge": [1.0, 2.0]}), pd.DataFrame({"fridge": [3.0]})]
+        [
+            pd.DataFrame({"fridge": [1.0, 2.0]}, index=split.mains[0].index),
+            pd.DataFrame({"fridge": [3.0]}, index=split.mains[1].index),
+        ]
     )
 
-    prediction = _predict(model, _split(), ("fridge",))
+    prediction = _predict(model, split, ("fridge",))
 
     assert prediction["fridge"].tolist() == [1.0, 2.0, 3.0]
 
@@ -93,6 +97,13 @@ def test_non_neural_baseline_has_no_trainable_parameter_count():
                 pd.DataFrame({"fridge": [3.0]}),
             ],
             "non-finite",
+        ),
+        (
+            [
+                pd.DataFrame({"fridge": [1.0, 2.0]}, index=[1, 0]),
+                pd.DataFrame({"fridge": [3.0]}),
+            ],
+            "index",
         ),
     ],
 )

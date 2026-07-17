@@ -78,6 +78,8 @@ nilmbench validate --task corrected-t1-redd --check-data --max-samples 64
 ```
 
 The dataset mounts in `compose.yaml` are read-only. Results are written to a separate `/results` mount.
+New runs land under `results/candidates`; publication is an explicit review/copy
+into `results/published`, never an automatic side effect of training.
 
 ## CPU smoke and CUDA benchmark
 
@@ -94,6 +96,11 @@ the candidate CUDA digest. The versioned images and leaderboard update are
 promoted together only after that matrix passes. Development builds may use a
 local contrib checkout, but their results cannot become verified leaderboard
 rows unless the source revisions and immutable container digest are recorded.
+For an official run, the orchestrator obtains the candidate image's registry or
+local content digest and supplies it as `NILMBENCH_IMAGE_DIGEST`. The exact
+runner commit, contrib commit, image name/digest, and hardware must then be
+reviewed into `configs/runtimes.toml`; self-asserted environment variables alone
+cannot produce a verified row.
 
 For local Compose builds, pass the two source revisions into the OCI labels and
 runtime result metadata:
@@ -122,7 +129,7 @@ To run one inspectable A100 smoke before spending on 20 trials:
 ```bash
 docker compose --profile cuda run --rm cuda-benchmark \
   run --task corrected-t1-redd --model PatchTST --appliance fridge \
-  --seed 42 --epochs 1 --max-samples 1024 --device cuda --results /results
+  --seed 42 --epochs 1 --max-samples 1024 --device cuda --results /results/candidates
 ```
 
 For the full paper matrix, repeat each task at 60 and 900 seconds for seeds 10, 20, and 42. Optuna studies live under `results/optuna/` and resume to the requested total trial count. Their identity hashes the task config, model, seed, appliance subset, resolution, and smoke overrides, preventing incompatible runs from sharing a study.
@@ -166,6 +173,8 @@ Those immutable, hashable JSON bundles are the scientific source of truth.
 SQLite is reserved for mutable coordination such as resumable Optuna studies;
 an optional SQLite query index may be generated later, but it must always be
 rebuildable from the result bundles and never replace them.
+The CSV is written before the JSON commit marker; the JSON records the CSV's
+SHA-256 so consumers can reject a partially updated artifact pair.
 
 Every aggregate is separated by task/config revision, model revision, runner
 revision, container digest, hardware, resolution, appliance, target-data access,

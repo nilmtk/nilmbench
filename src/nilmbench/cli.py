@@ -51,7 +51,7 @@ def _parser() -> argparse.ArgumentParser:
     leaderboard = sub.add_parser(
         "leaderboard", help="generate JSON/CSV tables from immutable result bundles"
     )
-    leaderboard.add_argument("--results", type=Path, default=Path("results"))
+    leaderboard.add_argument("--results", type=Path, default=Path("results/published"))
     leaderboard.add_argument("--output", type=Path, default=Path("leaderboard.json"))
     leaderboard.add_argument("--csv", type=Path)
 
@@ -65,7 +65,7 @@ def _parser() -> argparse.ArgumentParser:
     run.add_argument("--model", default="PatchTST", choices=sorted(MODELS))
     run.add_argument("--seed", type=int, default=42)
     run.add_argument("--trials", type=_nonnegative_int, default=0)
-    run.add_argument("--results", type=Path, default=Path("results"))
+    run.add_argument("--results", type=Path, default=Path("results/candidates"))
     run.add_argument("--appliance", action="append", dest="appliances")
     run.add_argument("--sample-period", type=int, choices=(60, 900))
     run.add_argument("--max-samples", type=_positive_int)
@@ -125,9 +125,7 @@ def main(argv: list[str] | None = None) -> int:
                         "path": str(config.datasets[name].path),
                         "exists": config.datasets[name].path.is_file(),
                     }
-                    for name in sorted(
-                        {w.dataset for w in (*task.train, *task.test)}
-                    )
+                    for name in sorted({w.dataset for w in (*task.train, *task.test)})
                 },
             }
             if args.check_data and not all(

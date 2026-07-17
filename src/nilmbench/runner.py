@@ -106,9 +106,7 @@ def _patchtst_flops(model: Any) -> int | None:
     feed_forward = 4 * tokens * d_model * d_ff
     head = 2 * tokens * d_model
     return int(
-        patch_projection
-        + layers * (attention_and_projections + feed_forward)
-        + head
+        patch_projection + layers * (attention_and_projections + feed_forward) + head
     )
 
 
@@ -135,6 +133,10 @@ def _predict(
         if len(chunk) != len(mains):
             raise RuntimeError(
                 f"Prediction chunk {index} has {len(chunk)} rows; expected {len(mains)}"
+            )
+        if not chunk.index.equals(mains.index):
+            raise RuntimeError(
+                f"Prediction chunk {index} index must exactly match its input chunk"
             )
         if not np.isfinite(chunk.to_numpy(dtype=float)).all():
             raise RuntimeError(f"Prediction chunk {index} contains non-finite values")
@@ -179,12 +181,8 @@ def _run_once(
     for group in groups:
         group_started = time.perf_counter()
         label = group[0] if len(group) == 1 else "joint"
-        train = load_split(
-            config, task, task.train, group, sample_period, max_samples
-        )
-        test = load_split(
-            config, task, task.test, group, sample_period, max_samples
-        )
+        train = load_split(config, task, task.train, group, sample_period, max_samples)
+        test = load_split(config, task, task.test, group, sample_period, max_samples)
         mains_mean, mains_std = _normalization(train)
         resolved_params = {
             **params,
@@ -278,7 +276,9 @@ def run_benchmark(
         raise ValueError("seed must be an integer")
     unknown = set(chosen_appliances) - set(task.appliances)
     if unknown:
-        raise ValueError(f"Task {task.id} does not include: {', '.join(sorted(unknown))}")
+        raise ValueError(
+            f"Task {task.id} does not include: {', '.join(sorted(unknown))}"
+        )
     resolved_period = sample_period or task.sample_period
     if resolved_period <= 0:
         raise ValueError("sample_period must be positive")
@@ -295,7 +295,10 @@ def run_benchmark(
     if trials < 0:
         raise ValueError("trials must be non-negative")
     if not model_entry.supports_training_overrides and (
-        trials or epochs is not None or sequence_length is not None or device is not None
+        trials
+        or epochs is not None
+        or sequence_length is not None
+        or device is not None
     ):
         raise ValueError(
             f"{model_name} does not accept trials, epochs, sequence length, or device"
@@ -408,8 +411,11 @@ def run_benchmark(
         resolved_period,
         max_samples,
     )
+    model_params_sha256 = hashlib.sha256(
+        json.dumps(base_params, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
     result = {
-        "schema_version": "1.1",
+        "schema_version": "1.2",
         "created_at": datetime.now(timezone.utc).isoformat(),
         "task": asdict(task),
         "task_config_sha256": config.digest(task_id),
@@ -420,16 +426,29 @@ def run_benchmark(
         },
         "dataset_identities": dataset_identities,
         "model": model_name,
+        "model_spec": {
+            "module": model_entry.module,
+            "class_name": model_entry.class_name,
+            "family": model_entry.family,
+        },
+        "model_params": base_params,
+        "model_params_sha256": model_params_sha256,
         "seed": seed,
         "sample_period": resolved_period,
         "appliances": chosen_appliances,
         "max_samples_per_window": max_samples,
-        "run_scope": "smoke" if max_samples is not None or epochs is not None else "full",
+        "run_scope": "smoke"
+        if max_samples is not None or epochs is not None
+        else "full",
         "protocol_overrides": {
             "max_samples_per_window": max_samples,
             "epochs": epochs,
-            "appliances": None if chosen_appliances == task.appliances else chosen_appliances,
-            "sample_period": None if resolved_period == task.sample_period else resolved_period,
+            "appliances": None
+            if chosen_appliances == task.appliances
+            else chosen_appliances,
+            "sample_period": None
+            if resolved_period == task.sample_period
+            else resolved_period,
             "sequence_length": sequence_length,
         },
         "study": trial_metadata,
@@ -439,7 +458,9 @@ def run_benchmark(
     if not math.isfinite(run["objective_mae"]):
         raise RuntimeError("Benchmark produced a non-finite objective")
     result["result_id"] = hashlib.sha256(
-        json.dumps(result, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+        json.dumps(
+            result, sort_keys=True, separators=(",", ":"), allow_nan=False
+        ).encode()
     ).hexdigest()
     _write_result(result, output_dir)
     return output_dir

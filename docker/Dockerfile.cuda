@@ -39,7 +39,9 @@ ENV PATH=/opt/nilmbench/bin:${PATH} \
     PYTHONDONTWRITEBYTECODE=1 \
     NILMBENCH_IMAGE=ghcr.io/sustainability-lab/nilmbench:cuda \
     NILMBENCH_GIT_SHA=${SOURCE_REVISION} \
-    NILMTK_CONTRIB_GIT_SHA=${NILMTK_CONTRIB_REVISION}
+    NILMBENCH_GIT_DIRTY=false \
+    NILMTK_CONTRIB_GIT_SHA=${NILMTK_CONTRIB_REVISION} \
+    NILMTK_CONTRIB_GIT_DIRTY=false
 RUN useradd --create-home --uid 10001 benchmark
 COPY --from=builder /opt/nilmbench /opt/nilmbench
 USER benchmark

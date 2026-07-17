@@ -25,7 +25,7 @@ def test_non_hex_dataset_digest_is_rejected(tmp_path):
     root = _copy_configs(tmp_path)
     datasets = root / "datasets.toml"
     _replace(datasets, 'sha256 = "', 'sha256 = "zz')
-    _replace(datasets, 'zz757e', 'zz57e')
+    _replace(datasets, "zz757e", "zz57e")
 
     with pytest.raises(ConfigError, match="SHA-256"):
         load_config(root)
@@ -34,7 +34,7 @@ def test_non_hex_dataset_digest_is_rejected(tmp_path):
 def test_non_finite_metric_threshold_is_rejected(tmp_path):
     root = _copy_configs(tmp_path)
     metrics = root / "metrics.toml"
-    _replace(metrics, 'fridge = 10.0', 'fridge = nan')
+    _replace(metrics, "fridge = 10.0", "fridge = nan")
 
     with pytest.raises(ConfigError, match="threshold"):
         load_config(root)
@@ -65,7 +65,39 @@ def test_invalid_window_timestamp_is_a_config_error(tmp_path):
 def test_missing_required_task_field_is_a_config_error(tmp_path):
     root = _copy_configs(tmp_path)
     tasks = root / "tasks.toml"
-    _replace(tasks, 'sample_period = 60\n', '')
+    _replace(tasks, "sample_period = 60\n", "")
 
     with pytest.raises(ConfigError, match="Invalid task entry"):
+        load_config(root)
+
+
+@pytest.mark.parametrize("value", ["0.0", "1.1", "nan"])
+def test_corrected_task_requires_finite_positive_alignment_coverage(tmp_path, value):
+    root = _copy_configs(tmp_path)
+    tasks = root / "tasks.toml"
+    _replace(
+        tasks, "minimum_aligned_fraction = 0.5", f"minimum_aligned_fraction = {value}"
+    )
+
+    with pytest.raises(ConfigError, match="minimum_aligned_fraction"):
+        load_config(root)
+
+
+def test_nonhex_trusted_runtime_digest_is_rejected(tmp_path):
+    root = _copy_configs(tmp_path)
+    (root / "runtimes.toml").write_text(
+        """
+[[runtime]]
+id = "bad-runtime"
+nilmbench_git_sha = "cccccccccccccccccccccccccccccccccccccccc"
+nilmtk_contrib_git_sha = "dddddddddddddddddddddddddddddddddddddddd"
+container_image = "ghcr.io/nilmtk/nilmbench:test"
+container_digest = "sha256:zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+hardware = "Test GPU"
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ConfigError, match="image digest"):
         load_config(root)

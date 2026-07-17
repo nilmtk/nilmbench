@@ -13,6 +13,8 @@ def test_cpu_and_cuda_images_pin_the_same_core_revisions():
         assert f"ARG NILMTK_COMMIT={NILMTK_REVISION}" in source
         assert f"ARG NILM_METADATA_COMMIT={NILM_METADATA_REVISION}" in source
         assert "USER benchmark" in source
+        assert "NILMBENCH_GIT_DIRTY=false" in source
+        assert "NILMTK_CONTRIB_GIT_DIRTY=false" in source
 
 
 def test_public_images_are_released_as_one_cpu_cuda_family():

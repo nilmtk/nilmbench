@@ -1,4 +1,8 @@
 {
+  "artifacts": {
+    "csv_name": "leaderboard.csv",
+    "csv_sha256": "2b967f2b309749005ffb9834077be4f0653106f31fbe01068d4520209ac4a24f"
+  },
   "entries": [],
   "required_seeds": [
     10,
