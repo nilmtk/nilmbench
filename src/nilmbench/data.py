@@ -2,17 +2,30 @@
 
 from __future__ import annotations
 
+import hashlib
+import math
 import warnings
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterable
 
-from nilmbench.config import BenchmarkConfig, TaskConfig, WindowConfig
+from nilmbench.config import BenchmarkConfig, DatasetConfig, TaskConfig, WindowConfig
 
 
 class DataError(RuntimeError):
     """Raised when real benchmark data cannot satisfy a task."""
+
+
+@dataclass(frozen=True)
+class DatasetIdentity:
+    """Observed identity of one immutable benchmark input file."""
+
+    id: str
+    path: str
+    size_bytes: int
+    sha256: str
 
 
 @dataclass(frozen=True)
@@ -43,6 +56,59 @@ class LoadedSplit:
 
     def metadata(self) -> list[dict[str, Any]]:
         return [asdict(item) for item in self.windows]
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(8 * 1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+@lru_cache(maxsize=16)
+def _verify_file(
+    path_text: str,
+    observed_size: int,
+    observed_mtime_ns: int,
+    expected_size: int,
+    expected_sha256: str,
+) -> str:
+    """Hash once per process and invalidate the cache when file metadata changes."""
+    del observed_mtime_ns
+    path = Path(path_text)
+    if observed_size != expected_size:
+        raise DataError(
+            f"Dataset {path} has {observed_size} bytes; expected {expected_size}"
+        )
+    observed_sha256 = _sha256(path)
+    if observed_sha256.lower() != expected_sha256.lower():
+        raise DataError(
+            f"Dataset {path} has SHA-256 {observed_sha256}; "
+            f"expected {expected_sha256}"
+        )
+    return observed_sha256
+
+
+def verify_dataset(dataset: DatasetConfig) -> DatasetIdentity:
+    """Fail closed unless the mounted file exactly matches the manifest."""
+    path = dataset.path.resolve()
+    if not path.is_file():
+        raise DataError(f"Missing {dataset.id} dataset at {path}. Set {dataset.path_env}.")
+    stat = path.stat()
+    observed_sha256 = _verify_file(
+        str(path),
+        stat.st_size,
+        stat.st_mtime_ns,
+        dataset.size_bytes,
+        dataset.sha256,
+    )
+    return DatasetIdentity(
+        id=dataset.id,
+        path=str(path),
+        size_bytes=stat.st_size,
+        sha256=observed_sha256,
+    )
 
 
 def _first_column(frame: Any) -> Any:
@@ -210,6 +276,13 @@ def _load_one(
             )
         mains = mains.loc[index]
         readings = {name: frame.loc[index] for name, frame in readings.items()}
+        for name, frame in {"mains": mains, **readings}.items():
+            values = frame.to_numpy(dtype=float)
+            if values.size == 0 or not all(math.isfinite(value) for value in values.flat):
+                raise DataError(
+                    f"{window.dataset} building {window.building} has non-finite "
+                    f"or empty aligned {name} data"
+                )
         requested_seconds = (effective_end - effective_start).total_seconds()
         expected_samples = max(1, int(requested_seconds // sample_period))
         if max_samples is not None:
@@ -253,11 +326,8 @@ def load_split(
     loaded_windows: list[LoadedWindow] = []
     for window in windows:
         dataset = config.datasets[window.dataset]
-        path = dataset.path
-        if not path.is_file():
-            raise DataError(
-                f"Missing {dataset.id} dataset at {path}. Set {dataset.path_env}."
-            )
+        identity = verify_dataset(dataset)
+        path = Path(identity.path)
         main_frame, readings, loaded = _load_one(
             path,
             window,

@@ -609,6 +609,7 @@ benchmark = [
 ]
 dev = [
     { name = "numpy" },
+    { name = "pandas" },
     { name = "pytest" },
     { name = "ruff" },
 ]
@@ -627,6 +628,7 @@ requires-dist = [
     { name = "optuna", marker = "extra == 'benchmark'", specifier = ">=4,<5" },
     { name = "optuna", marker = "extra == 'runtime'", specifier = ">=4,<5" },
     { name = "pandas", marker = "extra == 'benchmark'", specifier = ">=2,<3" },
+    { name = "pandas", marker = "extra == 'dev'", specifier = ">=2,<3" },
     { name = "pandas", marker = "extra == 'runtime'", specifier = ">=2,<3" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8,<9" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.11,<1" },
