@@ -121,6 +121,71 @@ def _validate_trusted_contract(
     if result["sample_period"] != expected_period:
         raise LeaderboardError(f"{path} sample period does not match its protocol")
 
+    study = result["study"]
+    model_selection = overrides.get("model_selection")
+    if study is None:
+        if model_selection is not None:
+            raise LeaderboardError(f"{path} declares model selection without a study")
+    elif not isinstance(study, dict):
+        raise LeaderboardError(f"{path} study must be null or an object")
+    else:
+        try:
+            study_digest = study["study_digest"]
+            study_spec = study["study_spec"]
+            completed_trials = study["completed_trials"]
+            trial_records = study["trial_records"]
+            best_params = study["best_params"]
+        except KeyError as exc:
+            raise LeaderboardError(f"{path} has an incomplete study") from exc
+        expected_study_digest = hashlib.sha256(
+            json.dumps(
+                study_spec,
+                sort_keys=True,
+                separators=(",", ":"),
+                allow_nan=False,
+            ).encode()
+        ).hexdigest()
+        if study_digest != expected_study_digest:
+            raise LeaderboardError(f"{path} study identity does not match its spec")
+        if (
+            isinstance(completed_trials, bool)
+            or not isinstance(completed_trials, int)
+            or completed_trials <= 0
+            or not isinstance(trial_records, list)
+            or len(trial_records) != completed_trials
+            or best_params != model_params
+        ):
+            raise LeaderboardError(f"{path} study summary is inconsistent")
+        for record in trial_records:
+            if not isinstance(record, dict):
+                raise LeaderboardError(f"{path} has an invalid trial audit record")
+            payload = {
+                key: value for key, value in record.items() if key != "record_id"
+            }
+            record_id = hashlib.sha256(
+                json.dumps(
+                    payload,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                    allow_nan=False,
+                ).encode()
+            ).hexdigest()
+            if (
+                record.get("record_id") != record_id
+                or record.get("study_identity_sha256") != study_digest
+                or record.get("study_spec") != study_spec
+            ):
+                raise LeaderboardError(f"{path} has a modified trial audit record")
+        expected_selection = {
+            "method": "optuna-tpe",
+            "study_identity_sha256": study_digest,
+            "completed_trials": completed_trials,
+            "validation_protocol": "source-train-blocked-holdout-v1",
+            "selected_parameters": best_params,
+        }
+        if model_selection != expected_selection:
+            raise LeaderboardError(f"{path} model-selection disclosure is inconsistent")
+
     appliances = result["appliances"]
     if (
         not isinstance(appliances, list)

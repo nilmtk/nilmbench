@@ -65,6 +65,7 @@ def immutable_write_text(path: Path, content: str) -> None:
         temporary.chmod(0o444)
         try:
             os.link(temporary, path)
+            _fsync_directory(path.parent)
         except FileExistsError:
             try:
                 existing = path.read_text(encoding="utf-8")

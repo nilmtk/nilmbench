@@ -413,6 +413,7 @@ def test_end_to_end_hpo_defers_target_dataset_until_final_evaluation(
         supports_training_overrides=True,
         module="fake.contrib",
         class_name="FakeModel",
+        family="transformer",
         search_space=fake_space,
     )
 

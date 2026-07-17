@@ -399,6 +399,19 @@ def test_sparse_aligned_windows_are_rejected_even_when_resealed(tmp_path):
         _build(tmp_path)
 
 
+def test_resealed_model_selection_without_trial_audit_is_rejected(tmp_path):
+    path = _write_result(tmp_path, 42, scope="smoke", max_samples=1024)
+    result = json.loads(path.read_text(encoding="utf-8"))
+    result["protocol_overrides"]["model_selection"] = {
+        "method": "optuna-tpe",
+        "study_identity_sha256": "f" * 64,
+    }
+    _reseal(path, result)
+
+    with pytest.raises(LeaderboardError, match="without a study"):
+        _build(tmp_path)
+
+
 @pytest.mark.parametrize("bad_value", [float("nan"), float("inf"), -1.0])
 def test_invalid_metrics_are_rejected(tmp_path, bad_value):
     _write_result(tmp_path, 42, mae=bad_value)
