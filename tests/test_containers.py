@@ -13,9 +13,44 @@ def test_cpu_and_cuda_images_pin_the_same_core_revisions():
 
         assert f"ARG NILMTK_COMMIT={NILMTK_REVISION}" in source
         assert f"ARG NILM_METADATA_COMMIT={NILM_METADATA_REVISION}" in source
+        assert "COPY pyproject.toml uv.lock README.md ./" in source
+        assert 'grep -F "${NILMTK_COMMIT}" pyproject.toml' in source
+        assert 'grep -F "${NILM_METADATA_COMMIT}" pyproject.toml' in source
+        assert "uv sync \\\n      --frozen" in source
+        assert "--no-dev" in source
+        assert "--extra runtime" in source
+        assert "--extra build-runtime" in source
+        assert "--no-install-project" in source
+        assert "--active" in source
+        assert "--no-build-isolation" in source
+        assert ". /src/nilmtk-contrib" in source
+        assert '".[runtime]"' not in source
+        assert "uv pip install" in source
+        assert "git+https://github.com/nilmtk/" not in source
         assert "USER benchmark" in source
         assert "NILMBENCH_GIT_DIRTY=false" in source
         assert "NILMTK_CONTRIB_GIT_DIRTY=false" in source
+
+
+def test_locked_runtime_selects_exact_core_sources_and_cpu_torch_dependencies():
+    pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    lock = (ROOT / "uv.lock").read_text(encoding="utf-8")
+    cpu = (ROOT / "docker" / "Dockerfile.cpu").read_text(encoding="utf-8")
+    cuda = (ROOT / "docker" / "Dockerfile.cuda").read_text(encoding="utf-8")
+
+    for revision in (NILMTK_REVISION, NILM_METADATA_REVISION):
+        assert revision in pyproject
+        assert revision in lock
+    assert "--extra torch-runtime" in cpu
+    assert "--torch-backend=cpu" in cpu
+    assert '--no-deps \\\n      "torch==2.6.0"' in cpu
+    assert "--extra torch-runtime" not in cuda
+    for source in (cpu, cuda):
+        installs = source.split("uv pip install")[1:]
+        assert installs
+        assert all("--no-deps" in command.split("&&", 1)[0] for command in installs)
+        source_install = installs[-1].split("&&", 1)[0]
+        assert "--no-build-isolation" in source_install
 
 
 def test_public_images_are_released_as_one_cpu_cuda_family():

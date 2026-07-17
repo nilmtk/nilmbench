@@ -2,6 +2,12 @@ version = 1
 revision = 1
 requires-python = "==3.11.*"
 
+[manifest]
+overrides = [
+    { name = "nilm-metadata", git = "https://github.com/nilmtk/nilm_metadata.git?rev=59c9990de4836d77c0dcd807bd4293e39e0cc314" },
+    { name = "nilmtk", git = "https://github.com/nilmtk/nilmtk.git?rev=0768b1b8457eef9de76d123a94e2de8af22a45d0" },
+]
+
 [[package]]
 name = "alembic"
 version = "1.18.5"
@@ -246,6 +252,21 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/4c/42/2193ed41ccee78baba8fcc0cff2c925b8b9ee3793305b23e1f22c20bf4c7/h5py-3.16.0-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:ffbab2fedd6581f6aa31cf1639ca2cb86e02779de525667892ebf4cc9fd26434", size = 5034013 },
     { url = "https://files.pythonhosted.org/packages/f7/20/e6c0ff62ca2ad1a396a34f4380bafccaaf8791ff8fccf3d995a1fc12d417/h5py-3.16.0-cp311-cp311-win_amd64.whl", hash = "sha256:17d1f1630f92ad74494a9a7392ab25982ce2b469fc62da6074c0ce48366a2999", size = 3191673 },
     { url = "https://files.pythonhosted.org/packages/f2/48/239cbe352ac4f2b8243a8e620fa1a2034635f633731493a7ff1ed71e8658/h5py-3.16.0-cp311-cp311-win_arm64.whl", hash = "sha256:85b9c49dd58dc44cf70af944784e2c2038b6f799665d0dcbbc812a26e0faa859", size = 2673834 },
+]
+
+[[package]]
+name = "hatchling"
+version = "1.31.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+    { name = "pathspec" },
+    { name = "pluggy" },
+    { name = "trove-classifiers" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/25/e2/dfa73fe78f773018dcaebc6d09b819bc10d328ff5a6b4a66efa1e3d71f52/hatchling-1.31.0.tar.gz", hash = "sha256:6b48ad4068a482ed7239b3a8215bc55b47aad3345d58dfc94e553c5d2d46211b", size = 57208 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/64/e2/2c0af0a52d16be74a4f194564fcdc417521ed863e9b65e4bc9052dacba6f/hatchling-1.31.0-py3-none-any.whl", hash = "sha256:aac80bec8b6fe35e8480f1c335be8910fa210a0e6f735a139be205dadcacb544", size = 77747 },
 ]
 
 [[package]]
@@ -589,7 +610,7 @@ wheels = [
 [[package]]
 name = "nilm-metadata"
 version = "0.2.6.dev6+g59c9990de"
-source = { git = "https://github.com/nilmtk/nilm_metadata.git#59c9990de4836d77c0dcd807bd4293e39e0cc314" }
+source = { git = "https://github.com/nilmtk/nilm_metadata.git?rev=59c9990de4836d77c0dcd807bd4293e39e0cc314#59c9990de4836d77c0dcd807bd4293e39e0cc314" }
 dependencies = [
     { name = "pandas" },
     { name = "pyyaml" },
@@ -602,10 +623,15 @@ source = { editable = "." }
 
 [package.optional-dependencies]
 benchmark = [
+    { name = "nilm-metadata" },
+    { name = "nilmtk" },
     { name = "nilmtk-contrib", extra = ["torch"] },
     { name = "numpy" },
     { name = "optuna" },
     { name = "pandas" },
+]
+build-runtime = [
+    { name = "hatchling" },
 ]
 dev = [
     { name = "numpy" },
@@ -614,13 +640,32 @@ dev = [
     { name = "ruff" },
 ]
 runtime = [
+    { name = "nilm-metadata" },
+    { name = "nilmtk" },
     { name = "numpy" },
     { name = "optuna" },
     { name = "pandas" },
 ]
+torch-runtime = [
+    { name = "filelock" },
+    { name = "fsspec" },
+    { name = "jinja2" },
+    { name = "networkx" },
+    { name = "sympy" },
+    { name = "typing-extensions" },
+]
 
 [package.metadata]
 requires-dist = [
+    { name = "filelock", marker = "extra == 'torch-runtime'", specifier = ">=3,<4" },
+    { name = "fsspec", marker = "extra == 'torch-runtime'", specifier = ">=2024,<2027" },
+    { name = "hatchling", marker = "extra == 'build-runtime'", specifier = ">=1.27,<2" },
+    { name = "jinja2", marker = "extra == 'torch-runtime'", specifier = ">=3.1,<4" },
+    { name = "networkx", marker = "extra == 'torch-runtime'", specifier = ">=3,<4" },
+    { name = "nilm-metadata", marker = "extra == 'benchmark'", git = "https://github.com/nilmtk/nilm_metadata.git?rev=59c9990de4836d77c0dcd807bd4293e39e0cc314" },
+    { name = "nilm-metadata", marker = "extra == 'runtime'", git = "https://github.com/nilmtk/nilm_metadata.git?rev=59c9990de4836d77c0dcd807bd4293e39e0cc314" },
+    { name = "nilmtk", marker = "extra == 'benchmark'", git = "https://github.com/nilmtk/nilmtk.git?rev=0768b1b8457eef9de76d123a94e2de8af22a45d0" },
+    { name = "nilmtk", marker = "extra == 'runtime'", git = "https://github.com/nilmtk/nilmtk.git?rev=0768b1b8457eef9de76d123a94e2de8af22a45d0" },
     { name = "nilmtk-contrib", extras = ["torch"], marker = "extra == 'benchmark'", git = "https://github.com/nilmtk/nilmtk-contrib.git?rev=2b686a5b779a17ac94dedd706355d013d2cc63fb" },
     { name = "numpy", marker = "extra == 'benchmark'", specifier = ">=1.26,<2" },
     { name = "numpy", marker = "extra == 'dev'", specifier = ">=1.26,<2" },
@@ -632,13 +677,15 @@ requires-dist = [
     { name = "pandas", marker = "extra == 'runtime'", specifier = ">=2,<3" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8,<9" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.11,<1" },
+    { name = "sympy", marker = "extra == 'torch-runtime'", specifier = "==1.13.1" },
+    { name = "typing-extensions", marker = "extra == 'torch-runtime'", specifier = ">=4.10,<5" },
 ]
-provides-extras = ["runtime", "benchmark", "dev"]
+provides-extras = ["runtime", "torch-runtime", "build-runtime", "benchmark", "dev"]
 
 [[package]]
 name = "nilmtk"
 version = "0.4.1"
-source = { git = "https://github.com/nilmtk/nilmtk.git#25cc3a9df52dec24ea96ab8c7cbc077dddb90ab7" }
+source = { git = "https://github.com/nilmtk/nilmtk.git?rev=0768b1b8457eef9de76d123a94e2de8af22a45d0#0768b1b8457eef9de76d123a94e2de8af22a45d0" }
 dependencies = [
     { name = "h5py" },
     { name = "hmmlearn" },
@@ -889,6 +936,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/30/4b/90c937815137d43ce71ba043cd3566221e9df6b9c805f24b5d138c9d40a7/parso-0.8.7.tar.gz", hash = "sha256:eaaac4c9fdd5e9e8852dc778d2d7405897ec510f2a298071453e5e3a07914bb1", size = 401824 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/99/5d/8268b644392ee874ee82a635cd0df1773de230bde356c38de28e298392cc/parso-0.8.7-py2.py3-none-any.whl", hash = "sha256:a8926eb2a1b915486941fdbd31e86a4baf88fe8c210f25f2f35ecec5b574ca1c", size = 107025 },
+]
+
+[[package]]
+name = "pathspec"
+version = "1.1.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/5a/82/42f767fc1c1143d6fd36efb827202a2d997a375e160a71eb2888a925aac1/pathspec-1.1.1.tar.gz", hash = "sha256:17db5ecd524104a120e173814c90367a96a98d07c45b2e10c2f3919fff91bf5a", size = 135180 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f1/d9/7fb5aa316bc299258e68c73ba3bddbc499654a07f151cba08f6153988714/pathspec-1.1.1-py3-none-any.whl", hash = "sha256:a00ce642f577bf7f473932318056212bc4f8bfdf53128c78bbd5af0b9b20b189", size = 57328 },
 ]
 
 [[package]]
@@ -1334,6 +1390,15 @@ version = "3.2.0"
 source = { registry = "https://pypi.org/simple" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a7/2e/757d2280d4fefe7d33af7615124e7e298ae7b8e3bc4446cdb8e88b0f9bab/triton-3.2.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:8009a1fb093ee8546495e96731336a33fb8856a38e45bb4ab6affd6dbc3ba220", size = 253157636 },
+]
+
+[[package]]
+name = "trove-classifiers"
+version = "2026.6.1.19"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/c2/e3/7ca82ee24c82d344584abd5b8637b3bd056f2900226e8d82fc22f1184b92/trove_classifiers-2026.6.1.19.tar.gz", hash = "sha256:c5132b4b61a829d11cfbd2d72e97f20a45ed6edb95e45c5efdeb5e00836b2745", size = 17059 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7c/a4/81502f486f01db95bc8320646a8a12511f5e556cb63d5e224d91816605c4/trove_classifiers-2026.6.1.19-py3-none-any.whl", hash = "sha256:ab4c4ec93cc4a4e7815fa759906e05e6bb3f2fbd92ea0f897288c6a43efd15b3", size = 14211 },
 ]
 
 [[package]]
