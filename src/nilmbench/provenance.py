@@ -6,6 +6,7 @@ import os
 import platform
 import subprocess
 import sys
+from importlib import import_module
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Any
@@ -24,6 +25,44 @@ def _git_sha(path: Path) -> str | None:
         return None
 
 
+def _git_dirty(path: Path) -> bool | None:
+    try:
+        return bool(
+            subprocess.run(
+                ["git", "-C", str(path), "status", "--porcelain"],
+                check=True,
+                capture_output=True,
+                text=True,
+                timeout=5,
+            ).stdout.strip()
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+
+def _module_repo_root(module_name: str) -> Path | None:
+    try:
+        origin = Path(import_module(module_name).__file__).resolve()
+    except (AttributeError, ModuleNotFoundError, OSError, TypeError):
+        return None
+    for parent in (origin.parent, *origin.parents):
+        if (parent / ".git").exists():
+            return parent
+    return None
+
+
+def _environment_bool(name: str) -> bool | None:
+    value = os.environ.get(name)
+    if value is None:
+        return None
+    normalized = value.strip().lower()
+    if normalized in {"1", "true", "yes"}:
+        return True
+    if normalized in {"0", "false", "no"}:
+        return False
+    return None
+
+
 def _package_version(name: str) -> str | None:
     try:
         return version(name)
@@ -32,17 +71,26 @@ def _package_version(name: str) -> str | None:
 
 
 def runtime_provenance(repo_root: Path) -> dict[str, Any]:
+    contrib_root = _module_repo_root("nilmtk_contrib")
     result: dict[str, Any] = {
         "python": sys.version.split()[0],
         "platform": platform.platform(),
         "nilmbench_git_sha": os.environ.get("NILMBENCH_GIT_SHA")
         or _git_sha(repo_root),
-        "nilmtk_contrib_git_sha": os.environ.get("NILMTK_CONTRIB_GIT_SHA"),
+        "nilmbench_git_dirty": _environment_bool("NILMBENCH_GIT_DIRTY")
+        if os.environ.get("NILMBENCH_GIT_DIRTY") is not None
+        else _git_dirty(repo_root),
+        "nilmtk_contrib_git_sha": os.environ.get("NILMTK_CONTRIB_GIT_SHA")
+        or (_git_sha(contrib_root) if contrib_root else None),
+        "nilmtk_contrib_git_dirty": _environment_bool("NILMTK_CONTRIB_GIT_DIRTY")
+        if os.environ.get("NILMTK_CONTRIB_GIT_DIRTY") is not None
+        else (_git_dirty(contrib_root) if contrib_root else None),
         "container_image": os.environ.get("NILMBENCH_IMAGE"),
         "container_digest": os.environ.get("NILMBENCH_IMAGE_DIGEST"),
         "nilmtk_contrib_version": _package_version("nilmtk-contrib"),
         "nilmtk_version": _package_version("nilmtk"),
         "nilm_metadata_version": _package_version("nilm-metadata"),
+        "cpu": platform.processor() or platform.machine(),
     }
     try:
         import torch

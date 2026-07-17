@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import csv
 import hashlib
 import json
 import math
 import os
 import statistics
+import tempfile
 import time
 from dataclasses import asdict
 from datetime import datetime, timezone
@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from nilmbench.config import BenchmarkConfig, TaskConfig
-from nilmbench.data import LoadedSplit, load_split
+from nilmbench.data import LoadedSplit, load_split, verify_dataset
 from nilmbench.provenance import runtime_provenance
 from nilmbench.registry import get_model
 
@@ -24,10 +24,16 @@ def metrics(truth: Any, prediction: Any, threshold: float = 10.0) -> dict[str, f
     """Compute MAE and thresholded F1 without an sklearn dependency."""
     import numpy as np
 
+    if isinstance(threshold, bool) or not isinstance(threshold, (int, float)):
+        raise ValueError("Activation threshold must be a positive finite number")
+    if not math.isfinite(threshold) or threshold <= 0:
+        raise ValueError("Activation threshold must be a positive finite number")
     actual = np.asarray(truth, dtype=np.float64).reshape(-1)
-    predicted = np.asarray(prediction, dtype=np.float64).reshape(-1)[: len(actual)]
+    predicted = np.asarray(prediction, dtype=np.float64).reshape(-1)
     if actual.size == 0 or predicted.size != actual.size:
         raise ValueError("Truth and prediction must be non-empty and equally sized")
+    if not np.isfinite(actual).all() or not np.isfinite(predicted).all():
+        raise ValueError("Truth and prediction must contain only finite values")
     mae = float(np.mean(np.abs(actual - predicted)))
     actual_on = actual >= threshold
     predicted_on = predicted >= threshold
@@ -57,8 +63,13 @@ def _normalization(split: LoadedSplit) -> tuple[float, float]:
     import numpy as np
 
     values = np.concatenate([frame.to_numpy().reshape(-1) for frame in split.mains])
+    if values.size == 0 or not np.isfinite(values).all():
+        raise ValueError("Training mains must contain finite values")
     std = float(np.std(values))
-    return float(np.mean(values)), max(std, 1.0)
+    mean = float(np.mean(values))
+    if not math.isfinite(mean) or not math.isfinite(std):
+        raise ValueError("Training mains statistics must be finite")
+    return mean, max(std, 1.0)
 
 
 def _model_size(model: Any) -> int:
@@ -94,10 +105,32 @@ def _patchtst_flops(model: Any) -> int | None:
     )
 
 
-def _predict(model: Any, split: LoadedSplit) -> dict[str, Any]:
+def _predict(
+    model: Any, split: LoadedSplit, expected_appliances: tuple[str, ...]
+) -> dict[str, Any]:
+    import numpy as np
     import pandas as pd
 
-    chunks = model.disaggregate_chunk(split.mains)
+    chunks = list(model.disaggregate_chunk(split.mains))
+    if len(chunks) != len(split.mains):
+        raise RuntimeError(
+            "Model returned a different number of prediction chunks than input chunks"
+        )
+    expected_columns = set(expected_appliances)
+    for index, (mains, chunk) in enumerate(zip(split.mains, chunks, strict=True)):
+        if not isinstance(chunk, pd.DataFrame):
+            raise RuntimeError(f"Prediction chunk {index} is not a pandas DataFrame")
+        if chunk.columns.has_duplicates or set(chunk.columns) != expected_columns:
+            raise RuntimeError(
+                f"Prediction chunk {index} columns must exactly match "
+                f"{sorted(expected_columns)}"
+            )
+        if len(chunk) != len(mains):
+            raise RuntimeError(
+                f"Prediction chunk {index} has {len(chunk)} rows; expected {len(mains)}"
+            )
+        if not np.isfinite(chunk.to_numpy(dtype=float)).all():
+            raise RuntimeError(f"Prediction chunk {index} contains non-finite values")
     predictions = pd.concat(chunks, axis=0, ignore_index=True)
     return {name: predictions[name].to_numpy() for name in predictions.columns}
 
@@ -154,7 +187,7 @@ def _run_once(
             train.mains,
             [(name, train.appliances[name]) for name in group],
         )
-        predictions = _predict(model, test)
+        predictions = _predict(model, test, group)
         for name in group:
             scores[name] = metrics(
                 _truth(test, name),
@@ -180,19 +213,29 @@ def _run_once(
     }
 
 
+def _atomic_write_text(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(
+        "w", encoding="utf-8", dir=path.parent, prefix=f".{path.name}.", delete=False
+    ) as handle:
+        handle.write(content)
+        temporary = Path(handle.name)
+    os.replace(temporary, path)
+
+
 def _write_result(result: dict[str, Any], output_dir: Path) -> None:
-    output_dir.mkdir(parents=True, exist_ok=True)
-    (output_dir / "result.json").write_text(
-        json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-    )
-    with (output_dir / "metrics.csv").open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(
-            handle,
-            fieldnames=["appliance", "mae", "f1", "activation_threshold_watts"],
+    output_dir.mkdir(parents=True, exist_ok=False)
+    csv_rows = ["appliance,mae,f1,activation_threshold_watts"]
+    for appliance, values in result["run"]["metrics"].items():
+        csv_rows.append(
+            f"{appliance},{values['mae']},{values['f1']},"
+            f"{values['activation_threshold_watts']}"
         )
-        writer.writeheader()
-        for appliance, values in result["run"]["metrics"].items():
-            writer.writerow({"appliance": appliance, **values})
+    _atomic_write_text(output_dir / "metrics.csv", "\n".join(csv_rows) + "\n")
+    _atomic_write_text(
+        output_dir / "result.json",
+        json.dumps(result, indent=2, sort_keys=True, allow_nan=False) + "\n",
+    )
 
 
 def run_benchmark(
@@ -211,6 +254,10 @@ def run_benchmark(
 ) -> Path:
     task = config.task(task_id)
     chosen_appliances = appliances or task.appliances
+    if len(set(chosen_appliances)) != len(chosen_appliances):
+        raise ValueError("Appliances must not contain duplicates")
+    if isinstance(seed, bool) or not isinstance(seed, int):
+        raise ValueError("seed must be an integer")
     unknown = set(chosen_appliances) - set(task.appliances)
     if unknown:
         raise ValueError(f"Task {task.id} does not include: {', '.join(sorted(unknown))}")
@@ -232,6 +279,12 @@ def run_benchmark(
     if device:
         base_params["device"] = device
 
+    root = Path(__file__).resolve().parents[2]
+    provenance = runtime_provenance(root)
+    dataset_identities = {
+        name: asdict(verify_dataset(config.datasets[name]))
+        for name in sorted({w.dataset for w in (*task.train, *task.test)})
+    }
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ")
     output_dir = output_root / f"{task_id}--{model_name}--seed{seed}--{timestamp}"
     trial_metadata: dict[str, Any] | None = None
@@ -250,6 +303,10 @@ def run_benchmark(
             "sample_period": resolved_period,
             "max_samples": max_samples,
             "epochs_override": epochs,
+            "model_module": get_model(model_name).module,
+            "model_class": get_model(model_name).class_name,
+            "nilmtk_contrib_git_sha": provenance["nilmtk_contrib_git_sha"],
+            "nilmtk_contrib_version": provenance["nilmtk_contrib_version"],
         }
         study_digest = hashlib.sha256(
             json.dumps(study_spec, sort_keys=True).encode()
@@ -315,9 +372,8 @@ def run_benchmark(
         resolved_period,
         max_samples,
     )
-    root = Path(__file__).resolve().parents[2]
     result = {
-        "schema_version": "1.0",
+        "schema_version": "1.1",
         "created_at": datetime.now(timezone.utc).isoformat(),
         "task": asdict(task),
         "task_config_sha256": config.digest(task_id),
@@ -326,16 +382,27 @@ def run_benchmark(
             name: asdict(config.datasets[name])
             for name in sorted({w.dataset for w in (*task.train, *task.test)})
         },
+        "dataset_identities": dataset_identities,
         "model": model_name,
         "seed": seed,
         "sample_period": resolved_period,
         "appliances": chosen_appliances,
         "max_samples_per_window": max_samples,
+        "run_scope": "smoke" if max_samples is not None or epochs is not None else "full",
+        "protocol_overrides": {
+            "max_samples_per_window": max_samples,
+            "epochs": epochs,
+            "appliances": None if chosen_appliances == task.appliances else chosen_appliances,
+            "sample_period": None if resolved_period == task.sample_period else resolved_period,
+        },
         "study": trial_metadata,
-        "runtime": runtime_provenance(root),
+        "runtime": provenance,
         "run": run,
     }
     if not math.isfinite(run["objective_mae"]):
         raise RuntimeError("Benchmark produced a non-finite objective")
+    result["result_id"] = hashlib.sha256(
+        json.dumps(result, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+    ).hexdigest()
     _write_result(result, output_dir)
     return output_dir
