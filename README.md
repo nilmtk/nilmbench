@@ -139,6 +139,24 @@ The website still has no build step:
 python3 -m http.server 8000
 ```
 
+## Living leaderboard
+
+The live table is generated from immutable `result.json` bundles under
+`results/published`; its numbers are never edited into the website. Regenerate
+both reviewable artifacts after adding a result bundle:
+
+```bash
+nilmbench leaderboard --results results/published \
+  --output leaderboard.json --csv leaderboard.csv
+git diff -- leaderboard.json leaderboard.csv
+```
+
+Every aggregate is separated by task/config revision, model revision, runner
+revision, container digest, hardware, resolution, appliance, target-data access,
+and smoke/full scope. A corrected full run becomes `full-verified` only after the
+required seeds 10, 20, and 42 pass source, container, and dataset provenance
+checks. CI regenerates the artifacts and rejects hand-edited or stale tables.
+
 ## Add a model
 
 Models belong in nilmtk-contrib. Once a model has its own tests and lazy export there, add a small entry and search space in `src/nilmbench/registry.py`; task/data logic should not be copied into model notebooks. PatchTST is the first model using this route.

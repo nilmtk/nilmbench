@@ -25,6 +25,11 @@ jobs:
         run: uv run ruff check src tests
       - name: Test
         run: uv run pytest
+      - name: Verify generated leaderboard artifacts
+        run: |
+          uv run nilmbench leaderboard --results results/published --output /tmp/leaderboard.json --csv /tmp/leaderboard.csv
+          diff -u leaderboard.json /tmp/leaderboard.json
+          diff -u leaderboard.csv /tmp/leaderboard.csv
       - name: Validate CPU smoke specification
         run: >-
           uv run nilmbench run
