@@ -15,6 +15,7 @@ class ModelEntry:
     family: str
     search_space: Callable[[Any], dict[str, Any]]
     supports_training_overrides: bool = True
+    fixed_params: tuple[tuple[str, Any], ...] = ()
 
     def model_class(self) -> type:
         module = import_module(self.module)
@@ -47,6 +48,7 @@ def _entry(
     module: str = "nilmtk_contrib.torch",
     search_space: Callable[[Any], dict[str, Any]] = _standard_space,
     supports_training_overrides: bool = True,
+    fixed_params: tuple[tuple[str, Any], ...] = (),
 ) -> ModelEntry:
     return ModelEntry(
         name=name,
@@ -55,6 +57,7 @@ def _entry(
         family=family,
         search_space=search_space,
         supports_training_overrides=supports_training_overrides,
+        fixed_params=fixed_params,
     )
 
 
@@ -65,6 +68,20 @@ MODELS = {
         _entry("ConvLSTM", "ConvLSTM", "hybrid"),
         _entry("DAE", "DAE", "autoencoder"),
         _entry("DLinear", "DLinear", "decomposition-linear"),
+        _entry(
+            "HSMM",
+            "HSMM",
+            "explicit-duration",
+            search_space=_no_search_space,
+            supports_training_overrides=False,
+            fixed_params=(
+                ("num_states", 2),
+                ("max_duration", 180),
+                ("pseudocount", 1.0),
+                ("variance_floor", 1.0),
+                ("kmeans_max_iterations", 100),
+            ),
+        ),
         _entry("MSDC", "MSDC", "specialized"),
         _entry("ModernTCN", "ModernTCN", "convolutional"),
         _entry("NILMFormer", "NILMFormer", "transformer"),
