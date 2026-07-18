@@ -41,12 +41,16 @@ def test_every_registry_entry_has_traceable_identity():
     assert MODELS["Mean"].module == "nilmtk.disaggregate"
     assert MODELS["Mean"].family == "statistical-baseline"
     assert not MODELS["Mean"].supports_training_overrides
+    assert not MODELS["Mean"].requires_trainable_parameters
+    assert not MODELS["Mean"].requires_accelerator_memory
     assert MODELS["Mean"].search_space(object()) == {}
     assert MODELS["TSMixer"].family == "mlp-mixer"
     assert MODELS["NILMMoE"].family == "mixture-of-experts"
     assert MODELS["ResidualMoE"].family == "residual-mixture-of-experts"
     assert MODELS["HSMM"].family == "explicit-duration"
     assert not MODELS["HSMM"].supports_training_overrides
+    assert not MODELS["HSMM"].requires_trainable_parameters
+    assert MODELS["HSMM"].requires_accelerator_memory
     assert dict(MODELS["HSMM"].fixed_params) == {
         "num_states": 2,
         "max_duration": 180,
@@ -59,3 +63,5 @@ def test_every_registry_entry_has_traceable_identity():
             assert entry.module == "nilmtk_contrib.torch"
         if name not in {"HSMM", "Mean"}:
             assert entry.supports_training_overrides
+            assert entry.requires_trainable_parameters
+            assert entry.requires_accelerator_memory
