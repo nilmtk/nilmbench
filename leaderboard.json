@@ -1,7 +1,7 @@
 {
   "artifacts": {
     "csv_name": "leaderboard.csv",
-    "csv_sha256": "1c96f3b1a593fd01fe9c7bd4a6e8915066bacdf6a9878e322792a05ac2170863"
+    "csv_sha256": "79255bcce7aa429db230af9b60a536debb25f4186666ff0f081e67641998f6b9"
   },
   "entries": [
     {
@@ -2672,6 +2672,2675 @@
       "trainable_parameters_std": 0.0,
       "tuning_study_digest": null,
       "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": 3,
+        "effective_sequence_length": 49,
+        "epochs_override": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "4a5f37a7eecb739dc2d2dc7654bed96029b16187f9b48cd18525dfdb9485020a",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 12.923163959678883,
+      "elapsed_seconds_std": 1.2369579019766024,
+      "epochs": 3,
+      "f1_mean": 0.7145889851203862,
+      "f1_std": 0.03658142497179899,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 51.172867667855634,
+      "mae_std": 2.7590935816455664,
+      "max_samples_per_window": 264,
+      "model": "ResidualMoE",
+      "model_family": "residual-mixture-of-experts",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {
+        "batch_size": 128,
+        "device": "cuda",
+        "learning_rate": 0.001,
+        "n_epochs": 3,
+        "sequence_length": 49
+      },
+      "model_params_sha256": "059f22dd4e84c594a08c2d0a1dabec1c2b9990fe3b46becc01196bfbe0967c2a",
+      "peak_accelerator_memory_bytes_mean": 130185728.0,
+      "peak_accelerator_memory_bytes_std": 219928.88334186576,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": 49
+      },
+      "protocol_overrides_sha256": "22e8ad9925e0589361f4d497f66ba29ea28166d8574c963d9a45780b187ade06",
+      "provenance_verified": true,
+      "rank": 1,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "43a37d628f5f026098cc7481663a3f1a9b1f113738f35b9e0872c4456c2f45d5",
+        "888fc946e3ab66954ece58add890160318270db5522bc757edd188e62227d22e",
+        "a4f09fd6cec218d6e8a8ab857136a98242c0ec93d67289af195c66e47aaf2245"
+      ],
+      "result_ids": [
+        "959bbd884a36ad5b2c41768c5bc7e822eb8aff312b6bae48f9c66cc0eaa7841c",
+        "a803b25287b081232d82395c0229d6015bcd3476a357eca1c87f5c67c93781ef",
+        "da38713ab023b2f55c1a3f8e2bfb79b94b9649f2ff88695da60506463de6cb52"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": 49,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": 432934.0,
+      "trainable_parameters_std": 0.0,
+      "tuning_study_digest": null,
+      "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": 3,
+        "effective_sequence_length": 49,
+        "epochs_override": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "4a5f37a7eecb739dc2d2dc7654bed96029b16187f9b48cd18525dfdb9485020a",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 11.687571420373084,
+      "elapsed_seconds_std": 0.19080944481296835,
+      "epochs": 3,
+      "f1_mean": 0.6674221062710272,
+      "f1_std": 0.008484428004050994,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 52.496309837909656,
+      "mae_std": 2.013720412665773,
+      "max_samples_per_window": 264,
+      "model": "TimesNet",
+      "model_family": "periodic-2d",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {
+        "batch_size": 128,
+        "device": "cuda",
+        "learning_rate": 0.001,
+        "n_epochs": 3,
+        "sequence_length": 49
+      },
+      "model_params_sha256": "059f22dd4e84c594a08c2d0a1dabec1c2b9990fe3b46becc01196bfbe0967c2a",
+      "peak_accelerator_memory_bytes_mean": 127781888.0,
+      "peak_accelerator_memory_bytes_std": 219928.88334186576,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": 49
+      },
+      "protocol_overrides_sha256": "22e8ad9925e0589361f4d497f66ba29ea28166d8574c963d9a45780b187ade06",
+      "provenance_verified": true,
+      "rank": 2,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "5c2e53c24cbf89b3cd95562ab6f78d85d21b78c1556c41fd2e700af772e1c641",
+        "767618afa829f16f43e662f31dadf01e319a041f5e8a385abb22f2dc4264c148",
+        "95d2a5eb4ff3b868ed44a9991e592126bd7040c5e87f7a49ca2358d93d9370e2"
+      ],
+      "result_ids": [
+        "74c83ec0eff5462b2c82d95b93599f3fa83c1af4e04b6e2ad0781cd0ee0cfa46",
+        "895874e6a86bb63ef99ceaf2977e78e9e1f1a227a4a28cb23a0433872a5ee082",
+        "9b88eac8ef8f7a986e2cfd98e7b02a00703b84bb0d41b5503a3a192b43f153f1"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": 49,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": 287617.0,
+      "trainable_parameters_std": 0.0,
+      "tuning_study_digest": null,
+      "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": 3,
+        "effective_sequence_length": 49,
+        "epochs_override": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "4a5f37a7eecb739dc2d2dc7654bed96029b16187f9b48cd18525dfdb9485020a",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 12.078678562267063,
+      "elapsed_seconds_std": 0.37295914847200357,
+      "epochs": 3,
+      "f1_mean": 0.5858753245068985,
+      "f1_std": 0.12773728180205957,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 59.20188452971704,
+      "mae_std": 8.765047799145085,
+      "max_samples_per_window": 264,
+      "model": "NILMMoE",
+      "model_family": "mixture-of-experts",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {
+        "batch_size": 128,
+        "device": "cuda",
+        "learning_rate": 0.001,
+        "n_epochs": 3,
+        "sequence_length": 49
+      },
+      "model_params_sha256": "059f22dd4e84c594a08c2d0a1dabec1c2b9990fe3b46becc01196bfbe0967c2a",
+      "peak_accelerator_memory_bytes_mean": 130883584.0,
+      "peak_accelerator_memory_bytes_std": 219928.88334186576,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": 49
+      },
+      "protocol_overrides_sha256": "22e8ad9925e0589361f4d497f66ba29ea28166d8574c963d9a45780b187ade06",
+      "provenance_verified": true,
+      "rank": 3,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "2c282f8ef0fbbd8b6135a890e124ad599744f9504423521597a2fc34e3ca929b",
+        "3f9803ddf192cc1792e63f4c48a7cccba3985c644b71f75a45013204fd260f2a",
+        "6c2d7b0cf743ff7397f87593e9cf266d351eb113ab288ba6a716e4fe93565f31"
+      ],
+      "result_ids": [
+        "95e27067889815c929affe1f06fc0b35d5afc1c9c03b28dd89c4145877b3a0c3",
+        "b89f33adbc208cd78f65c9fbd26524c792ee4a14de6141cf2b8f655f7d6967fc",
+        "f47d997c38c878a4f4b1fcaf6a9af9ec964e06f9d6541b33058a628116a893cb"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": 49,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": 329993.0,
+      "trainable_parameters_std": 0.0,
+      "tuning_study_digest": null,
+      "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": 3,
+        "effective_sequence_length": 49,
+        "epochs_override": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "4a5f37a7eecb739dc2d2dc7654bed96029b16187f9b48cd18525dfdb9485020a",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 10.867264296665477,
+      "elapsed_seconds_std": 0.09017019486503094,
+      "epochs": 3,
+      "f1_mean": 0.009950248756218905,
+      "f1_std": 0.01723433639372017,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 61.03289515168378,
+      "mae_std": 0.5280306030610595,
+      "max_samples_per_window": 264,
+      "model": "ResNetClassification",
+      "model_family": "convolutional-classification",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {
+        "batch_size": 128,
+        "device": "cuda",
+        "learning_rate": 0.001,
+        "n_epochs": 3,
+        "sequence_length": 49
+      },
+      "model_params_sha256": "059f22dd4e84c594a08c2d0a1dabec1c2b9990fe3b46becc01196bfbe0967c2a",
+      "peak_accelerator_memory_bytes_mean": 88598016.0,
+      "peak_accelerator_memory_bytes_std": 0.0,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": 49
+      },
+      "protocol_overrides_sha256": "22e8ad9925e0589361f4d497f66ba29ea28166d8574c963d9a45780b187ade06",
+      "provenance_verified": true,
+      "rank": 4,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "12841a06f4aa143f0aa8ef9ec6bdd9b169d51f089ab1671264630e2656d6013e",
+        "39ed12973ea719d8b4713e607189a497439aa18efdd90cd1486caedc0eaa6aa8",
+        "c7143009a9879561610e7343bd68a7b6eeb692f583f716cb1c819b9013779965"
+      ],
+      "result_ids": [
+        "655e39bc88c8566898a26b08ce43428f42610538e64d375e2eb053f4144e1436",
+        "b00b8553bae66b571c71a573cca58f7e91d272d95ef087424c8c8beba5d0a258",
+        "edabb90933d98b6a905f3d63c73df24eb77202d1676d23c0946050a6ed040cc0"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": 49,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": 1139198.0,
+      "trainable_parameters_std": 0.0,
+      "tuning_study_digest": null,
+      "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": 3,
+        "effective_sequence_length": 49,
+        "epochs_override": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "4a5f37a7eecb739dc2d2dc7654bed96029b16187f9b48cd18525dfdb9485020a",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 11.643952769692987,
+      "elapsed_seconds_std": 0.8508744294056163,
+      "epochs": 3,
+      "f1_mean": 0.0,
+      "f1_std": 0.0,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 61.18350185378633,
+      "mae_std": 0.18467666704077876,
+      "max_samples_per_window": 264,
+      "model": "RNNAttentionClassification",
+      "model_family": "recurrent-attention-classification",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {
+        "batch_size": 128,
+        "device": "cuda",
+        "learning_rate": 0.001,
+        "n_epochs": 3,
+        "sequence_length": 49
+      },
+      "model_params_sha256": "059f22dd4e84c594a08c2d0a1dabec1c2b9990fe3b46becc01196bfbe0967c2a",
+      "peak_accelerator_memory_bytes_mean": 361089024.0,
+      "peak_accelerator_memory_bytes_std": 0.0,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": 49
+      },
+      "protocol_overrides_sha256": "22e8ad9925e0589361f4d497f66ba29ea28166d8574c963d9a45780b187ade06",
+      "provenance_verified": true,
+      "rank": 5,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "5377676c31541d46b91f1f7b065bd096e30fb2d63b6feb9b1be239b3a5edcc5b",
+        "824eca9779fab6af581769468bae8ec3dcd167bdea6ed4ef2ba4170a4525c50c",
+        "f8d2138900a89d5471498a48dadb1c8212ba47713fd57a6de0e49e13c5c42aa8"
+      ],
+      "result_ids": [
+        "577b5f81c86d77759e50c316aafee93310f58416ca538290afada0087e0c7e26",
+        "67e774a96e47d2aadeaf3c009674fb0ce6ef7f4a69729201ba017cbd84ad6cfd",
+        "7470a94ec616c7332004ae355563d37badfa5199d880015e3ce8341c77924e2c"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": 49,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": 2326225.0,
+      "trainable_parameters_std": 0.0,
+      "tuning_study_digest": null,
+      "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": 3,
+        "effective_sequence_length": 19,
+        "epochs_override": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "3a55757094032c6e6993cfc82360697e87f6828338ad24770593cfea72d93c7f",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 14.266846684001697,
+      "elapsed_seconds_std": 1.216721910301764,
+      "epochs": 3,
+      "f1_mean": 0.5574067753172232,
+      "f1_std": 0.013732034965538065,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 61.95032196430245,
+      "mae_std": 4.375904341689981,
+      "max_samples_per_window": 264,
+      "model": "NILMFormer",
+      "model_family": "transformer",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {
+        "batch_size": 128,
+        "device": "cuda",
+        "learning_rate": 0.001,
+        "n_epochs": 3,
+        "sequence_length": 19
+      },
+      "model_params_sha256": "99b3a5ad90511b3a936238e2a16aa13693f7d33e329a2d70b4ff384b90e433cb",
+      "peak_accelerator_memory_bytes_mean": 150708224.0,
+      "peak_accelerator_memory_bytes_std": 0.0,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": 19
+      },
+      "protocol_overrides_sha256": "52918fa319fabace57b31cac3197af32a2ab6c861a421c72b98813d893498b82",
+      "provenance_verified": true,
+      "rank": 6,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "0ea1d979f6e379c391534d02af7628680cb229035f1902739fa31dd2830bc668",
+        "97afe8952e4a9d4be7b5faa89e6855eae9cb68c22a512bbfc95a361e99ef651f",
+        "eabbf834098f928426f7e9f020b61e9cee224ca2b9c44db0c3d0bc942c206331"
+      ],
+      "result_ids": [
+        "71939f3533565a7391dda92b2f6c4d45fd6564710fa8601d70acc12ca725642f",
+        "b8374e6bca9fd608590c408694ada8e31a0ea7a8b086af299994407d13fefdb6",
+        "f3dfc4e2e106cec6377a2e119af9719864d815785c778caf7444dea138225b5c"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": 19,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": 383283.0,
+      "trainable_parameters_std": 0.0,
+      "tuning_study_digest": null,
+      "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": 3,
+        "effective_sequence_length": 49,
+        "epochs_override": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "4a5f37a7eecb739dc2d2dc7654bed96029b16187f9b48cd18525dfdb9485020a",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 10.663384965698546,
+      "elapsed_seconds_std": 0.37715560557291095,
+      "epochs": 3,
+      "f1_mean": 0.41029049303645243,
+      "f1_std": 0.06142928799658131,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 62.172831857678325,
+      "mae_std": 2.941454948449899,
+      "max_samples_per_window": 264,
+      "model": "SGN",
+      "model_family": "subtask-gated",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {
+        "batch_size": 128,
+        "device": "cuda",
+        "learning_rate": 0.001,
+        "n_epochs": 3,
+        "sequence_length": 49
+      },
+      "model_params_sha256": "059f22dd4e84c594a08c2d0a1dabec1c2b9990fe3b46becc01196bfbe0967c2a",
+      "peak_accelerator_memory_bytes_mean": 102795776.0,
+      "peak_accelerator_memory_bytes_std": 0.0,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": 49
+      },
+      "protocol_overrides_sha256": "22e8ad9925e0589361f4d497f66ba29ea28166d8574c963d9a45780b187ade06",
+      "provenance_verified": true,
+      "rank": 7,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "06af33444a0c55c84310ecc27857164c8d0fa722ab8af95fc78a829d7a0c1cd3",
+        "1b2880a1a0c0de7697e35990030244d7e09f0786143d0d00192bee42b7e297aa",
+        "c0253aae418d413a79117077bb8b7aa2baf9045d1a97714e1e6da40c1c0bc2b7"
+      ],
+      "result_ids": [
+        "491b55492e8e99a16239cab4b22291cee358983e6f350c5c82180a96318281cc",
+        "8ace4ce37501b7648600be8e6234e957208ceacfab874f4e95de1e573e3ca160",
+        "dbf5aa2825aae4f18331f19ef3fa816cd8d2f1aa9c857d1ea837bc392f148128"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": 49,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": 1742398.0,
+      "trainable_parameters_std": 0.0,
+      "tuning_study_digest": null,
+      "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": 3,
+        "effective_sequence_length": 49,
+        "epochs_override": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "4a5f37a7eecb739dc2d2dc7654bed96029b16187f9b48cd18525dfdb9485020a",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 10.842557072639465,
+      "elapsed_seconds_std": 0.5762019656523469,
+      "epochs": 3,
+      "f1_mean": 0.5589342065261659,
+      "f1_std": 0.0471131597560551,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 62.21215075320668,
+      "mae_std": 4.647100336091754,
+      "max_samples_per_window": 264,
+      "model": "PatchTST",
+      "model_family": "transformer",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {
+        "batch_size": 128,
+        "device": "cuda",
+        "learning_rate": 0.001,
+        "n_epochs": 3,
+        "sequence_length": 49
+      },
+      "model_params_sha256": "059f22dd4e84c594a08c2d0a1dabec1c2b9990fe3b46becc01196bfbe0967c2a",
+      "peak_accelerator_memory_bytes_mean": 84803072.0,
+      "peak_accelerator_memory_bytes_std": 0.0,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": 49
+      },
+      "protocol_overrides_sha256": "22e8ad9925e0589361f4d497f66ba29ea28166d8574c963d9a45780b187ade06",
+      "provenance_verified": true,
+      "rank": 8,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "a8370d5f0149bd3ec676e14be3344db8c1256c36e3dcb6f31ce4021557c2e530",
+        "f0131e878d179d7b75d896a8caa8f762d3a45d3bd5e91f88e6c021690d69786e",
+        "f8f3d9e411d4efff66c55adad6ae6c9b3e16059a94160db171acfeedf623429f"
+      ],
+      "result_ids": [
+        "4980caf394a0753feebe37613e81e9033c0e3d7e3d4e9c383ec25fbcf077a6a0",
+        "67ece75a731e93e10945e2a3c424407be3cf85a2c468c87793d5e5a6a4085e47",
+        "b8421ef5b9192e8dd47faeed68b13e29482b6c7ae7c7be8ce0f1d1f55357ca5d"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": 49,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": 103041.0,
+      "trainable_parameters_std": 0.0,
+      "tuning_study_digest": null,
+      "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": 3,
+        "effective_sequence_length": 99,
+        "epochs_override": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "ac1248df47eedf27d9903746735dddbba73b79a8f82962345856d64b602e715d",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 10.800130698635863,
+      "elapsed_seconds_std": 0.925839061701689,
+      "epochs": 3,
+      "f1_mean": 0.25763928594117275,
+      "f1_std": 0.08130986158023012,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 64.28210968634095,
+      "mae_std": 0.2503544656497598,
+      "max_samples_per_window": 264,
+      "model": "Seq2Seq",
+      "model_family": "recurrent",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {
+        "batch_size": 128,
+        "device": "cuda",
+        "learning_rate": 0.001,
+        "n_epochs": 3,
+        "sequence_length": 99
+      },
+      "model_params_sha256": "07f5562c93a226b28c0f287f72c181f6a7d322c0939fb2d5ca379e6449fc5445",
+      "peak_accelerator_memory_bytes_mean": 79921152.0,
+      "peak_accelerator_memory_bytes_std": 0.0,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": 99
+      },
+      "protocol_overrides_sha256": "9d1159428ae43d5fa937f5e9d6583cfb52fdf4695bfcf85ae0983fdb5511f39c",
+      "provenance_verified": true,
+      "rank": 9,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "055769191860ae04aa1afc9c36d1277b693d63d584204585642954694efe7f38",
+        "17a2e697bee2b73391d951e0baad10966c119b75cb3cfc45e026629bd4b313ad",
+        "699d3e45950834aab489bdf50887c40dac1331fcc479af330632743da5f7b262"
+      ],
+      "result_ids": [
+        "0180a7ce8e3a6a6962b538dd2c2f970492f1fe4a15a8c57505024f7abc0c0245",
+        "1f48e2991deeb2f215db996a8484bfbadc85ee7f9b795b2eb3fc3e43e761b22a",
+        "ee06ac39bcfbbfdc8eb26b9cdf2c2b1fb1bce137a5d0c3fb733c9ec6ef04e065"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": 99,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": 447099.0,
+      "trainable_parameters_std": 0.0,
+      "tuning_study_digest": null,
+      "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": 3,
+        "effective_sequence_length": 19,
+        "epochs_override": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "3a55757094032c6e6993cfc82360697e87f6828338ad24770593cfea72d93c7f",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 17.712102669368807,
+      "elapsed_seconds_std": 3.8136280607356956,
+      "epochs": 3,
+      "f1_mean": 0.6045810729355033,
+      "f1_std": 0.05742181700800983,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 64.32810146447383,
+      "mae_std": 0.7899675943966844,
+      "max_samples_per_window": 264,
+      "model": "MSDC",
+      "model_family": "specialized",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {
+        "batch_size": 128,
+        "device": "cuda",
+        "learning_rate": 0.001,
+        "n_epochs": 3,
+        "sequence_length": 19
+      },
+      "model_params_sha256": "99b3a5ad90511b3a936238e2a16aa13693f7d33e329a2d70b4ff384b90e433cb",
+      "peak_accelerator_memory_bytes_mean": 83536896.0,
+      "peak_accelerator_memory_bytes_std": 0.0,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": 19
+      },
+      "protocol_overrides_sha256": "52918fa319fabace57b31cac3197af32a2ab6c861a421c72b98813d893498b82",
+      "provenance_verified": true,
+      "rank": 10,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "024fde72d70abbf1085d218f1a5636f46b990cffd961c9221423218564d1e11c",
+        "86dae4f9bb330ee7ac489e69fbcbea0485c38e649053d16762cc588fc3727862",
+        "df6d1e377ce8be88f8c8a89782f2f084f147d37321b70ae948a3f2c22c8deb8a"
+      ],
+      "result_ids": [
+        "05f793401f1daea6cff5c3f7fb0d0030c5793db0d8138df4b6bf4c49535a81d9",
+        "663670144d03eabdeca97a03f7686c765dc78befe58a363a5887253643127049",
+        "ab6eab8c68c517d8132c8672d5826e86293ac3a5c8cca03358b3b83c487801ff"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": 19,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": 23765.0,
+      "trainable_parameters_std": 0.0,
+      "tuning_study_digest": null,
+      "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": 3,
+        "effective_sequence_length": 99,
+        "epochs_override": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "ac1248df47eedf27d9903746735dddbba73b79a8f82962345856d64b602e715d",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 10.11888502103587,
+      "elapsed_seconds_std": 0.1992750791673553,
+      "epochs": 3,
+      "f1_mean": 0.5262364676772727,
+      "f1_std": 0.02806860561582672,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 64.68949759897559,
+      "mae_std": 0.2885520776432176,
+      "max_samples_per_window": 264,
+      "model": "BERT",
+      "model_family": "transformer",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {
+        "batch_size": 128,
+        "device": "cuda",
+        "learning_rate": 0.001,
+        "n_epochs": 3,
+        "sequence_length": 99
+      },
+      "model_params_sha256": "07f5562c93a226b28c0f287f72c181f6a7d322c0939fb2d5ca379e6449fc5445",
+      "peak_accelerator_memory_bytes_mean": 95548416.0,
+      "peak_accelerator_memory_bytes_std": 0.0,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": 99
+      },
+      "protocol_overrides_sha256": "9d1159428ae43d5fa937f5e9d6583cfb52fdf4695bfcf85ae0983fdb5511f39c",
+      "provenance_verified": true,
+      "rank": 11,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "33046c4485caee217d2d0aef9f214d13822f778a13a4899b36bcc0d20dedacaa",
+        "d1e4cfc86142c43be722163f8ebce367a03610e36f24e52220c131fc7026d9e0",
+        "f1c69f3bcce386b3ef03345a460bcb19f52aeed0dcf2cfa32385534d6f6159ad"
+      ],
+      "result_ids": [
+        "6dfa6674d6620d760608ecba86b0b89cb6ece5321b60785fd4e96c7ac6ae5a94",
+        "7afa0e66fc0ab79c0f3cfcbd573b578c4cdf27dcb52aab46b9cd4a3c1c2e6e34",
+        "b3377140c37dafec098fa5873407cc2803bd7cd4421db9043b827e3afb31539e"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": 99,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": 803443.0,
+      "trainable_parameters_std": 0.0,
+      "tuning_study_digest": null,
+      "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": 3,
+        "effective_sequence_length": 49,
+        "epochs_override": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "4a5f37a7eecb739dc2d2dc7654bed96029b16187f9b48cd18525dfdb9485020a",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 11.18068929334792,
+      "elapsed_seconds_std": 0.595057423935841,
+      "epochs": 3,
+      "f1_mean": 0.5637366818873668,
+      "f1_std": 0.009181913418603166,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 65.0966699773615,
+      "mae_std": 0.050299616758984145,
+      "max_samples_per_window": 264,
+      "model": "ResNet",
+      "model_family": "convolutional",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {
+        "batch_size": 128,
+        "device": "cuda",
+        "learning_rate": 0.001,
+        "n_epochs": 3,
+        "sequence_length": 49
+      },
+      "model_params_sha256": "059f22dd4e84c594a08c2d0a1dabec1c2b9990fe3b46becc01196bfbe0967c2a",
+      "peak_accelerator_memory_bytes_mean": 72814080.0,
+      "peak_accelerator_memory_bytes_std": 0.0,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": 49
+      },
+      "protocol_overrides_sha256": "22e8ad9925e0589361f4d497f66ba29ea28166d8574c963d9a45780b187ade06",
+      "provenance_verified": true,
+      "rank": 12,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "250014c8cb9d0e7e80ba35d3e3ae2971a9e883a4948dc14b4bf05e1aaf568573",
+        "59d3bae865bb302f00c88c612d77c1dcb31b07c55d000e33c0365e2780bdfce9",
+        "d569d87303a65468f186fcfd715eb0728c57c06050d14973bb1b064d730abefb"
+      ],
+      "result_ids": [
+        "58c6e3f1383e0bfe30439f0a018ba45c4e09fe54a6aa66af38fdea540045d5c5",
+        "ab5f909143da99d9362704eb0c3cc216ece9a9c5826fdb82cac7b896d985b8c0",
+        "e2ee31530f85be401d18ed81df631a993f988ab2a0a8c23a3d801ebb99257789"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": 49,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": 218799.0,
+      "trainable_parameters_std": 0.0,
+      "tuning_study_digest": null,
+      "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": 3,
+        "effective_sequence_length": 19,
+        "epochs_override": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "3a55757094032c6e6993cfc82360697e87f6828338ad24770593cfea72d93c7f",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 12.93223089670452,
+      "elapsed_seconds_std": 1.060557072458325,
+      "epochs": 3,
+      "f1_mean": 0.5384851714943247,
+      "f1_std": 0.011107198923709137,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 65.16681493508695,
+      "mae_std": 0.057762966785185145,
+      "max_samples_per_window": 264,
+      "model": "ConvLSTM",
+      "model_family": "hybrid",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {
+        "batch_size": 128,
+        "device": "cuda",
+        "learning_rate": 0.001,
+        "n_epochs": 3,
+        "sequence_length": 19
+      },
+      "model_params_sha256": "99b3a5ad90511b3a936238e2a16aa13693f7d33e329a2d70b4ff384b90e433cb",
+      "peak_accelerator_memory_bytes_mean": 147919872.0,
+      "peak_accelerator_memory_bytes_std": 0.0,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": 19
+      },
+      "protocol_overrides_sha256": "52918fa319fabace57b31cac3197af32a2ab6c861a421c72b98813d893498b82",
+      "provenance_verified": true,
+      "rank": 13,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "6447f78bfed0e0eeebf9f6811297fc211b0a36451978a715d316e3f6e78a962f",
+        "a55143147302f610206f2268bd1bebfe9318eea3d45c76e25a931f0766154bc9",
+        "f68e420b74857d9a14c96257218816993949c644c7a20212191438727a604904"
+      ],
+      "result_ids": [
+        "47bc4a838121bab2659d7e813cae45c1e2f6d3f9e3ecfab0ccb9550339d10130",
+        "d4f84152be35ddb50fa11004e508aa7b72d69407702f674739c667159f423bab",
+        "da5b24d2f7841a8605aafe7a273116ee52d9f2a395712bead0a9c41f09cb5ebd"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": 19,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": 482913.0,
+      "trainable_parameters_std": 0.0,
+      "tuning_study_digest": null,
+      "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": null,
+        "effective_sequence_length": null,
+        "epochs_override": null,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "d690bec4fdc5a71023d154e9d9b73ba9b8a6f7ae99b8a45384de1f599564e04b",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 9.288726943700263,
+      "elapsed_seconds_std": 1.1518671221929062,
+      "epochs": null,
+      "f1_mean": 0.5714285714285714,
+      "f1_std": 0.0,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 65.41159857547645,
+      "mae_std": 0.0,
+      "max_samples_per_window": 264,
+      "model": "Mean",
+      "model_family": "statistical-baseline",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {},
+      "model_params_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "peak_accelerator_memory_bytes_mean": null,
+      "peak_accelerator_memory_bytes_std": null,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": null,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": null
+      },
+      "protocol_overrides_sha256": "74fa8e7b2a1c11832f718e0420283bdb1d65f215141904fb4a071f68c540141c",
+      "provenance_verified": true,
+      "rank": 14,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "07a62d1ced29f252636fd730e6a9d2cd9e37d684eff79b7246842f589814d07f",
+        "18a718dcc492d762967a58c29a48e529ef44227ab46705e501f0c858414b4ce8",
+        "9e4f7d8cd40d9224528008f31dc692edd8fdbd3b2cf4d963a0f30fd1eabe9697"
+      ],
+      "result_ids": [
+        "88f169901b9bc819c0593fbc2ecffae891da403b585b06f872b52e26ab494ae6",
+        "95f5e1c349047f105e0873c9cbbd06fef1497af28a0667db63f205b0c9b09230",
+        "a3d0fc7415336f48534217e901e78da8d7d1973ab7a064dd195ecd492b3dabe6"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": null,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": null,
+      "trainable_parameters_std": null,
+      "tuning_study_digest": null,
+      "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": 3,
+        "effective_sequence_length": 49,
+        "epochs_override": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "4a5f37a7eecb739dc2d2dc7654bed96029b16187f9b48cd18525dfdb9485020a",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 10.315937769017182,
+      "elapsed_seconds_std": 0.24050870920932654,
+      "epochs": 3,
+      "f1_mean": 0.5029965859868126,
+      "f1_std": 0.06639607577365393,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 65.47041602086539,
+      "mae_std": 0.5449725006760794,
+      "max_samples_per_window": 264,
+      "model": "DAE",
+      "model_family": "autoencoder",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {
+        "batch_size": 128,
+        "device": "cuda",
+        "learning_rate": 0.001,
+        "n_epochs": 3,
+        "sequence_length": 49
+      },
+      "model_params_sha256": "059f22dd4e84c594a08c2d0a1dabec1c2b9990fe3b46becc01196bfbe0967c2a",
+      "peak_accelerator_memory_bytes_mean": 72397824.0,
+      "peak_accelerator_memory_bytes_std": 0.0,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": 49
+      },
+      "protocol_overrides_sha256": "22e8ad9925e0589361f4d497f66ba29ea28166d8574c963d9a45780b187ade06",
+      "provenance_verified": true,
+      "rank": 15,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "145ae4303d7448d5841c5e9c2872c26f2cba6d35558ee6ca2e3c620fca1e9689",
+        "561d86643aa96b34566c71ae1dd89be77e4aa1178345a8c29ebebf3a68d77405",
+        "972506c55c113ebf2a337ea08525f0fee45348a039aee1c38bb35b66ce93a36e"
+      ],
+      "result_ids": [
+        "0461c04d6f8c484e04ffd4df9278354f97473eacb8c3e4164e940ba8ce2ef734",
+        "3b851b9cb1e54ddb7ef821eed488726da5dd88c38a12c65fc0d93ff922875575",
+        "fb14f82c052933d10d5e24bd8248337d4824e4dfb129da73fbde3f607827bb0f"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": 49,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": 255001.0,
+      "trainable_parameters_std": 0.0,
+      "tuning_study_digest": null,
+      "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": 3,
+        "effective_sequence_length": 49,
+        "epochs_override": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "4a5f37a7eecb739dc2d2dc7654bed96029b16187f9b48cd18525dfdb9485020a",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 10.621308831342807,
+      "elapsed_seconds_std": 0.8864125286015792,
+      "epochs": 3,
+      "f1_mean": 0.44927832244008714,
+      "f1_std": 0.0627652049485499,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 65.67139509567106,
+      "mae_std": 0.11008875167004234,
+      "max_samples_per_window": 264,
+      "model": "RNNAttention",
+      "model_family": "recurrent-attention",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {
+        "batch_size": 128,
+        "device": "cuda",
+        "learning_rate": 0.001,
+        "n_epochs": 3,
+        "sequence_length": 49
+      },
+      "model_params_sha256": "059f22dd4e84c594a08c2d0a1dabec1c2b9990fe3b46becc01196bfbe0967c2a",
+      "peak_accelerator_memory_bytes_mean": 359916032.0,
+      "peak_accelerator_memory_bytes_std": 0.0,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": 49
+      },
+      "protocol_overrides_sha256": "22e8ad9925e0589361f4d497f66ba29ea28166d8574c963d9a45780b187ade06",
+      "provenance_verified": true,
+      "rank": 16,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "7196e6c13dea8ab6d11a9a2880fe7249add27d1a32c49a3c69f44eb446cb3b40",
+        "e1abc868599cc3b82f06e08d3ed605147b576641bc0f52534afd811597ffecaf",
+        "e2e147927242570a9da31cf6ecdada73beed0f545b709d2f6896970b3cf528a9"
+      ],
+      "result_ids": [
+        "a26a1f28cf95a859eff3cca3d785f0ebc1df0690a02f9e0e74202d6853ecf906",
+        "b3d264610fff006ec201cbcfd171b538a814e81a15255dbe8266f0138e0c07ac",
+        "bb663ad77acf9a01c17eac2b48969a471ce5669c7385e215e3478fab982e517d"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": 49,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": 1333842.0,
+      "trainable_parameters_std": 0.0,
+      "tuning_study_digest": null,
+      "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": 3,
+        "effective_sequence_length": 49,
+        "epochs_override": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "4a5f37a7eecb739dc2d2dc7654bed96029b16187f9b48cd18525dfdb9485020a",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 10.48665609199088,
+      "elapsed_seconds_std": 0.937542768340575,
+      "epochs": 3,
+      "f1_mean": 0.5930544593528019,
+      "f1_std": 0.0191237046563621,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 65.83670441983925,
+      "mae_std": 2.70605360738133,
+      "max_samples_per_window": 264,
+      "model": "Seq2Point",
+      "model_family": "convolutional",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {
+        "batch_size": 128,
+        "device": "cuda",
+        "learning_rate": 0.001,
+        "n_epochs": 3,
+        "sequence_length": 49
+      },
+      "model_params_sha256": "059f22dd4e84c594a08c2d0a1dabec1c2b9990fe3b46becc01196bfbe0967c2a",
+      "peak_accelerator_memory_bytes_mean": 92963328.0,
+      "peak_accelerator_memory_bytes_std": 0.0,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": 49
+      },
+      "protocol_overrides_sha256": "22e8ad9925e0589361f4d497f66ba29ea28166d8574c963d9a45780b187ade06",
+      "provenance_verified": true,
+      "rank": 17,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "9c7c1e98391083074e1faea449712b8d1af5ee81c1691ba9971e533f6ee2747d",
+        "a5b35c93ba2a6252a4d0d0f7cb4dd3a043e5f2faf0898632478ddf4ffa303ff5",
+        "dddb4b01b733d4e81141aa1ec9d33c586ac984ec733ce62cf54c4ebc1750167e"
+      ],
+      "result_ids": [
+        "38601cfd17586260c85c7ea452142d889dafe66c675fd0fb247f2d0e04a0df63",
+        "a244c48cbc876f994fdb5d3827b7e48d6b557fef93011324dbdfb058c38eb05e",
+        "b4910a183150403a1107a43aee5b9ef774f8bc5b33d0bc758fe9f1a81fba47ab"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": 49,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": 1063449.0,
+      "trainable_parameters_std": 0.0,
+      "tuning_study_digest": null,
+      "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": 3,
+        "effective_sequence_length": 49,
+        "epochs_override": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "4a5f37a7eecb739dc2d2dc7654bed96029b16187f9b48cd18525dfdb9485020a",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 10.187018022329235,
+      "elapsed_seconds_std": 0.42781172414088914,
+      "epochs": 3,
+      "f1_mean": 0.508391677460683,
+      "f1_std": 0.06034952160435065,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 66.46491092335094,
+      "mae_std": 0.9211318781670982,
+      "max_samples_per_window": 264,
+      "model": "RNN",
+      "model_family": "recurrent",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {
+        "batch_size": 128,
+        "device": "cuda",
+        "learning_rate": 0.001,
+        "n_epochs": 3,
+        "sequence_length": 49
+      },
+      "model_params_sha256": "059f22dd4e84c594a08c2d0a1dabec1c2b9990fe3b46becc01196bfbe0967c2a",
+      "peak_accelerator_memory_bytes_mean": 358861824.0,
+      "peak_accelerator_memory_bytes_std": 0.0,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": 49
+      },
+      "protocol_overrides_sha256": "22e8ad9925e0589361f4d497f66ba29ea28166d8574c963d9a45780b187ade06",
+      "provenance_verified": true,
+      "rank": 18,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "8fd8893b2330d734c28555aa503e569dee250f0f98196829110d2e7dc8a70c24",
+        "c87a3a967c0239258aae1961a53aa5eb6c3530946df48c7204b3e15fb4ad9059",
+        "f6db2205a087b08a2ff241e917018e7856ed280557a71ebe9c97152b4adde1ee"
+      ],
+      "result_ids": [
+        "4dad7b30f774317f22ad7a766810d94e7ed7a5954f0ac064c6a6c4cbb28e0ebf",
+        "4f3d4aae1c23ca5b56a615d13641bda082edbee420128561739f5086456dc760",
+        "6d78534ea3b19b1a7f21f6c31b9cb043682d7ed963e1de1ebd4fcc97ef750c0d"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": 49,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": 1268049.0,
+      "trainable_parameters_std": 0.0,
+      "tuning_study_digest": null,
+      "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": null,
+        "effective_sequence_length": null,
+        "epochs_override": null,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "d690bec4fdc5a71023d154e9d9b73ba9b8a6f7ae99b8a45384de1f599564e04b",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 10.340834351993786,
+      "elapsed_seconds_std": 1.0759271984289087,
+      "epochs": null,
+      "f1_mean": 0.5714285714285714,
+      "f1_std": 0.0,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 66.90765348492246,
+      "mae_std": 0.0,
+      "max_samples_per_window": 264,
+      "model": "HSMM",
+      "model_family": "explicit-duration",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {
+        "kmeans_max_iterations": 100,
+        "max_duration": 180,
+        "num_states": 2,
+        "pseudocount": 1.0,
+        "variance_floor": 1.0
+      },
+      "model_params_sha256": "fd5659f27351ecde1510dd952bec6a67e48634e801a67e526a0181626291891f",
+      "peak_accelerator_memory_bytes_mean": 40448.0,
+      "peak_accelerator_memory_bytes_std": 0.0,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": null,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": null
+      },
+      "protocol_overrides_sha256": "74fa8e7b2a1c11832f718e0420283bdb1d65f215141904fb4a071f68c540141c",
+      "provenance_verified": true,
+      "rank": 19,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "04aa74b39ee47aa52676b20a0b20796a9be8a9c3302f00764d284925282ea909",
+        "1aced5241ccf6aebc082c6eefc72ac0832e9194464c7fca35efdb609afe2b2e1",
+        "20521108a9e960654c03a2dc48d10294c9a0c37f01fa5685b06ddb4e9b45d195"
+      ],
+      "result_ids": [
+        "a126077e15d8ee5465af9e8b4ef7ad22da1b77ea3dcf744a1fef04ab24dabf9b",
+        "bf4337312166dfbee7d97ddd93d825e4ff8a230580836153014d040b01af1d04",
+        "ca75b7f775456a85618bece78a25e65843bcaa3aca3f61b9eccc0713dbbd0676"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": null,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": null,
+      "trainable_parameters_std": null,
+      "tuning_study_digest": null,
+      "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": 3,
+        "effective_sequence_length": 49,
+        "epochs_override": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "4a5f37a7eecb739dc2d2dc7654bed96029b16187f9b48cd18525dfdb9485020a",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 10.066126696687812,
+      "elapsed_seconds_std": 0.11293508962008549,
+      "epochs": 3,
+      "f1_mean": 0.4740605530079214,
+      "f1_std": 0.0013167256985328539,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 67.34759072944371,
+      "mae_std": 1.5805779439904972,
+      "max_samples_per_window": 264,
+      "model": "ModernTCN",
+      "model_family": "convolutional",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {
+        "batch_size": 128,
+        "device": "cuda",
+        "learning_rate": 0.001,
+        "n_epochs": 3,
+        "sequence_length": 49
+      },
+      "model_params_sha256": "059f22dd4e84c594a08c2d0a1dabec1c2b9990fe3b46becc01196bfbe0967c2a",
+      "peak_accelerator_memory_bytes_mean": 75679744.0,
+      "peak_accelerator_memory_bytes_std": 0.0,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": 49
+      },
+      "protocol_overrides_sha256": "22e8ad9925e0589361f4d497f66ba29ea28166d8574c963d9a45780b187ade06",
+      "provenance_verified": true,
+      "rank": 20,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "553b5eebe40c23309bb42a5ebcb4b7eeaa45a672767b805506af3cf3c5545f44",
+        "9d23aee10ed1e99b71f6b662c871f099e21d7c930a7874d824642c568fac48f4",
+        "d6a8151396b617590d9c2f7e726dc956b75051c9b046fe6ece62f4baaa771882"
+      ],
+      "result_ids": [
+        "411e97e86579e57fe41cca16422f2fdc25bc668e130f8345ae58a87d734c5725",
+        "69416370e40f6ef95cc7ed6b40b8b1089691b557808864e02f7de89457d440e0",
+        "752c4bbec13b577499ba51a67a23dc3095d7422298d70ffad26c3e63fd2fbd11"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": 49,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": 41921.0,
+      "trainable_parameters_std": 0.0,
+      "tuning_study_digest": null,
+      "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": 3,
+        "effective_sequence_length": 49,
+        "epochs_override": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "4a5f37a7eecb739dc2d2dc7654bed96029b16187f9b48cd18525dfdb9485020a",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 10.318701705352092,
+      "elapsed_seconds_std": 0.3463489068254447,
+      "epochs": 3,
+      "f1_mean": 0.5724727484612632,
+      "f1_std": 0.005927487469645997,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 71.77255628951872,
+      "mae_std": 2.83462980187556,
+      "max_samples_per_window": 264,
+      "model": "WindowGRU",
+      "model_family": "recurrent",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {
+        "batch_size": 128,
+        "device": "cuda",
+        "learning_rate": 0.001,
+        "n_epochs": 3,
+        "sequence_length": 49
+      },
+      "model_params_sha256": "059f22dd4e84c594a08c2d0a1dabec1c2b9990fe3b46becc01196bfbe0967c2a",
+      "peak_accelerator_memory_bytes_mean": 277179392.0,
+      "peak_accelerator_memory_bytes_std": 0.0,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": 49
+      },
+      "protocol_overrides_sha256": "22e8ad9925e0589361f4d497f66ba29ea28166d8574c963d9a45780b187ade06",
+      "provenance_verified": true,
+      "rank": 21,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "0491a195200ec490726153d18ef3cfe38e2b58e14124df6969d7f543539a7021",
+        "8f0f1e251db0d7cb54a783f8406f2b9e0c538395b8a1f93434520ea073050a4c",
+        "e945b8c991d7628dfbc0e76a236c2ce9caa5443c585c5e8fe0250513366912af"
+      ],
+      "result_ids": [
+        "38b7687b622cbd908a261457e333835348599a075a21a02afaf48a14b25d8562",
+        "e845223618383acc0a00ff403c5b36147c6782a1f96f06a4374eb93d0af0dd68",
+        "ecd837a546ac8b21fa52df8ae51a3a192f0cbd976d3bb51ba6b6baa563f1b704"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": 49,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": 427345.0,
+      "trainable_parameters_std": 0.0,
+      "tuning_study_digest": null,
+      "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": 3,
+        "effective_sequence_length": 49,
+        "epochs_override": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "4a5f37a7eecb739dc2d2dc7654bed96029b16187f9b48cd18525dfdb9485020a",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 10.8492929059236,
+      "elapsed_seconds_std": 1.3166107630989738,
+      "epochs": 3,
+      "f1_mean": 0.517950885086435,
+      "f1_std": 0.006650355131620452,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 74.19478793674045,
+      "mae_std": 0.3615854545117276,
+      "max_samples_per_window": 264,
+      "model": "DLinear",
+      "model_family": "decomposition-linear",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {
+        "batch_size": 128,
+        "device": "cuda",
+        "learning_rate": 0.001,
+        "n_epochs": 3,
+        "sequence_length": 49
+      },
+      "model_params_sha256": "059f22dd4e84c594a08c2d0a1dabec1c2b9990fe3b46becc01196bfbe0967c2a",
+      "peak_accelerator_memory_bytes_mean": 67228672.0,
+      "peak_accelerator_memory_bytes_std": 0.0,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": 49
+      },
+      "protocol_overrides_sha256": "22e8ad9925e0589361f4d497f66ba29ea28166d8574c963d9a45780b187ade06",
+      "provenance_verified": true,
+      "rank": 22,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "7014428ca0f465aa677af39d857146f453cb71447f8832cc5e5f71b7d2cc9800",
+        "ed3976fd4cca96349a2ad1ae3f8da30ffdb01b1f5921f782ccb5dd9bdd56bd03",
+        "f346251353e6f2aed152e0c0ffc10d26ac48b5cb385e29feec562a6e380d2b7d"
+      ],
+      "result_ids": [
+        "0e855ee101c56dda9e8db6a37d7c1b2fa13874c55ce0026a549313b80c3c437c",
+        "698940d7714214e6cf9017d12a5be1ec3d084283a542894465862ac7547e20ad",
+        "aefa7201a77ac1c7c2c56e583fa3d7cc679d1f02493ec62e210be31902a6a332"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": 49,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": 100.0,
+      "trainable_parameters_std": 0.0,
+      "tuning_study_digest": null,
+      "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": 3,
+        "effective_sequence_length": 19,
+        "epochs_override": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "3a55757094032c6e6993cfc82360697e87f6828338ad24770593cfea72d93c7f",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 18.95194196565232,
+      "elapsed_seconds_std": 0.3421844930823652,
+      "epochs": 3,
+      "f1_mean": 0.5395545314900153,
+      "f1_std": 0.034255767248231456,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 77.21525223760894,
+      "mae_std": 2.80628181641476,
+      "max_samples_per_window": 264,
+      "model": "TCN",
+      "model_family": "convolutional",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {
+        "batch_size": 128,
+        "device": "cuda",
+        "learning_rate": 0.001,
+        "n_epochs": 3,
+        "sequence_length": 19
+      },
+      "model_params_sha256": "99b3a5ad90511b3a936238e2a16aa13693f7d33e329a2d70b4ff384b90e433cb",
+      "peak_accelerator_memory_bytes_mean": 97742336.0,
+      "peak_accelerator_memory_bytes_std": 0.0,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": 19
+      },
+      "protocol_overrides_sha256": "52918fa319fabace57b31cac3197af32a2ab6c861a421c72b98813d893498b82",
+      "provenance_verified": true,
+      "rank": 23,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "39b47972be8b17daf5a79191ed22efd356a9a57f92bd88ba58260d2b77636238",
+        "7849efcdcf73e4404610b59f2febd12570fcd5d86dce82be3c7023d5fdfad8c6",
+        "d0087c86857ee9f35eaddd4588f122d74beec396368f4c7ac6e8a73f25d60be4"
+      ],
+      "result_ids": [
+        "e4ca865b6b300bddc578e90b9a4a58e9686a72e074226140b77dae30c99cc535",
+        "e5a01bfa0ac82e40baade2689800eb0b9a2577c0be0f1a5724f64001d959dc4d",
+        "fe4ed002d90cdbf87c1fad8467f559d44391824fd8b11b8e911fe72f7d7764fa"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": 19,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": 67151.0,
+      "trainable_parameters_std": 0.0,
+      "tuning_study_digest": null,
+      "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": 3,
+        "effective_sequence_length": 49,
+        "epochs_override": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "4a5f37a7eecb739dc2d2dc7654bed96029b16187f9b48cd18525dfdb9485020a",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 10.54149563664881,
+      "elapsed_seconds_std": 0.39280864787184117,
+      "epochs": 3,
+      "f1_mean": 0.48136347695677806,
+      "f1_std": 0.08005818851242617,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 138.47989247736305,
+      "mae_std": 24.098988600717,
+      "max_samples_per_window": 264,
+      "model": "TSMixer",
+      "model_family": "mlp-mixer",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {
+        "batch_size": 128,
+        "device": "cuda",
+        "learning_rate": 0.001,
+        "n_epochs": 3,
+        "sequence_length": 49
+      },
+      "model_params_sha256": "059f22dd4e84c594a08c2d0a1dabec1c2b9990fe3b46becc01196bfbe0967c2a",
+      "peak_accelerator_memory_bytes_mean": 76357632.0,
+      "peak_accelerator_memory_bytes_std": 0.0,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": 49
+      },
+      "protocol_overrides_sha256": "22e8ad9925e0589361f4d497f66ba29ea28166d8574c963d9a45780b187ade06",
+      "provenance_verified": true,
+      "rank": 24,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "53c30cf4f0743162019c0c2a4c024e42507ea893bc89a3f4369c53e42fe93931",
+        "844d32b7063d7fefa620e3810379776dbfc5e6ac7c66e6c5ebc218a8b5918cd3",
+        "ae66b9b17ed38f1a9c43bc83ec7f7cd8c7c042887b5b10cfbaeb248275a73f98"
+      ],
+      "result_ids": [
+        "1d38d1147126b97efd6ed767f00eb1cefa120d4ab1f7689ee07bb4ba73aaf358",
+        "236f214d9c6da472cd398a5b65384b69ed3dd76d95d72c81b4841ed6118c956b",
+        "c98965d46369b9b66384d2288baeaff90741afbee067c4a13596bdee4336b766"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": 49,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": 5728.0,
+      "trainable_parameters_std": 0.0,
+      "tuning_study_digest": null,
+      "verification_failures": []
+    },
+    {
+      "appliance": "fridge",
+      "comparison_protocol": {
+        "appliances": [
+          "fridge"
+        ],
+        "effective_epochs": 3,
+        "effective_sequence_length": 19,
+        "epochs_override": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "runtime": {
+          "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+          "container_image": "nilmbench:t0-65b1c52-b619d1f-cuda",
+          "cuda_runtime": "12.4",
+          "hardware": "NVIDIA A100-SXM4-80GB",
+          "nilmbench_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+          "nilmtk_contrib_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+          "torch": "2.6.0+cu124"
+        },
+        "sample_period": 900,
+        "schema": "nilmbench.comparison-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "comparison_protocol_sha256": "3a55757094032c6e6993cfc82360697e87f6828338ad24770593cfea72d93c7f",
+      "container_digest": "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3",
+      "elapsed_seconds_mean": 12.16772515361663,
+      "elapsed_seconds_std": 1.058549070030298,
+      "epochs": 3,
+      "f1_mean": 0.19047619047619047,
+      "f1_std": 0.329914439536929,
+      "family": "T1",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "mae_mean": 189.67854292513144,
+      "mae_std": 214.6778828728768,
+      "max_samples_per_window": 264,
+      "model": "Reformer",
+      "model_family": "transformer",
+      "model_git_sha": "b619d1f14373202aa4d20649e334bf2fe5d5fa81",
+      "model_params": {
+        "batch_size": 128,
+        "device": "cuda",
+        "learning_rate": 0.001,
+        "n_epochs": 3,
+        "sequence_length": 19
+      },
+      "model_params_sha256": "99b3a5ad90511b3a936238e2a16aa13693f7d33e329a2d70b4ff384b90e433cb",
+      "peak_accelerator_memory_bytes_mean": 913259008.0,
+      "peak_accelerator_memory_bytes_std": 0.0,
+      "profile": "corrected",
+      "protocol_overrides": {
+        "appliances": [
+          "fridge"
+        ],
+        "epochs": 3,
+        "max_samples_per_window": 264,
+        "model_selection": null,
+        "sample_period": 900,
+        "sequence_length": 19
+      },
+      "protocol_overrides_sha256": "52918fa319fabace57b31cac3197af32a2ab6c861a421c72b98813d893498b82",
+      "provenance_verified": true,
+      "rank": 25,
+      "ranking_protocol": {
+        "appliance": "fridge",
+        "max_samples_per_window": 264,
+        "profile": "corrected",
+        "sample_period": 900,
+        "schema": "nilmbench.ranking-protocol.v1",
+        "scope": "smoke",
+        "target_data_access": "not_applicable",
+        "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+        "task_id": "corrected-t1-redd"
+      },
+      "ranking_protocol_sha256": "3f43db15c77f424fc23d519e14f719a23cf3a6dc2e99a72abac21ebea3d5b280",
+      "result_file_sha256": [
+        "01bcd1fbeac9d2d01fa5561bee3e7b2c4d14f234921c5f7a274c1707dbd51b0a",
+        "399f74e40cf6f609917f8ce81053fa6b8aaa4d26c609c48bc2296dba07e7119d",
+        "82830518a592f157cb26b7c0c3dc607706b90230d9cd6691f80048d53ccadbff"
+      ],
+      "result_ids": [
+        "40b5e3dcea0f9e3e1f7074d877dbb8ace60aca5d32d6183c159bce8a08bfdd6a",
+        "99b40badeb3051ca5a21ffd23c3474b0c4adb74fc07c356eade902ddc6ca8f87",
+        "f008cc7cf21cdd4006e0356de24d040f3642af1c42084df9fa50e87e783d88b6"
+      ],
+      "run_count": 3,
+      "runner_git_sha": "65b1c5203f347d1ccff2240409c3ff0417e9c374",
+      "sample_period": 900,
+      "scope": "smoke",
+      "seeds": [
+        10,
+        20,
+        42
+      ],
+      "sequence_length": 19,
+      "status": "smoke-verified",
+      "target_data_access": "not_applicable",
+      "task": "corrected-t1-redd",
+      "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4",
+      "trainable_parameters_mean": 19536897.0,
+      "trainable_parameters_std": 0.0,
+      "tuning_study_digest": null,
+      "verification_failures": []
     }
   ],
   "required_seeds": [
@@ -2680,5 +5349,5 @@
     42
   ],
   "schema_version": "1.0",
-  "source_result_count": 75
+  "source_result_count": 150
 }

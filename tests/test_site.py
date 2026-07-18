@@ -35,6 +35,7 @@ def test_site_separates_fixed_paper_from_living_leaderboard():
 
     assert "T0 smoke leaderboard — not a full benchmark claim." in renderer
     assert "One cohort at a time" in board
+    assert 'id="filter-resolution"' in board
     assert '<th scope="col">Rank</th>' in board
     assert 'src="static/leaderboard.js"' in board
 
@@ -44,6 +45,8 @@ def test_site_separates_fixed_paper_from_living_leaderboard():
     assert "entry.sequence_length" in renderer
     assert "entry.epochs" in renderer
     assert "entry.max_samples_per_window" in renderer
+    assert "String(entry.sample_period) === filters.resolution.value" in renderer
+    assert "resolutionLabel(first.sample_period)" in renderer
     assert "entry.trainable_parameters_mean" in renderer
     assert "entry.elapsed_seconds_mean" in renderer
     assert "entry.peak_accelerator_memory_bytes_mean" in renderer

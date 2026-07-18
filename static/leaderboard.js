@@ -3,6 +3,7 @@
 const filters = {
   task: document.getElementById("filter-task"),
   appliance: document.getElementById("filter-appliance"),
+  resolution: document.getElementById("filter-resolution"),
   scope: document.getElementById("filter-scope"),
   status: document.getElementById("filter-status"),
   model: document.getElementById("filter-model"),
@@ -25,6 +26,19 @@ function addOptions(select, values) {
     const option = document.createElement("option");
     option.value = value;
     option.textContent = value;
+    select.append(option);
+  }
+}
+
+function resolutionLabel(seconds) {
+  return seconds % 60 === 0 ? `${seconds / 60} min` : `${seconds} s`;
+}
+
+function addResolutionOptions(select, values) {
+  for (const seconds of values) {
+    const option = document.createElement("option");
+    option.value = seconds;
+    option.textContent = resolutionLabel(seconds);
     select.append(option);
   }
 }
@@ -140,7 +154,7 @@ function cohortFor(entries, key) {
 
   title.textContent = `${first.task} · ${first.appliance}`;
   meta.textContent = [
-    `${first.sample_period}s resolution`,
+    `${resolutionLabel(first.sample_period)} resolution`,
     first.profile,
     first.scope,
     protocol.max_samples_per_window
@@ -175,6 +189,8 @@ function matchesFilters(entry) {
     (!filters.task.value || entry.task === filters.task.value) &&
     (!filters.appliance.value ||
       entry.appliance === filters.appliance.value) &&
+    (!filters.resolution.value ||
+      String(entry.sample_period) === filters.resolution.value) &&
     (!filters.scope.value || entry.scope === filters.scope.value) &&
     (!filters.status.value || entry.status === filters.status.value) &&
     (!modelQuery || String(entry.model).toLowerCase().includes(modelQuery))
@@ -241,6 +257,10 @@ function setStats(entries, runCount) {
 function configureFilters(entries) {
   addOptions(filters.task, uniqueValues(entries, "task"));
   addOptions(filters.appliance, uniqueValues(entries, "appliance"));
+  addResolutionOptions(
+    filters.resolution,
+    uniqueValues(entries, "sample_period"),
+  );
   addOptions(filters.scope, uniqueValues(entries, "scope"));
   addOptions(filters.status, uniqueValues(entries, "status"));
 
