@@ -71,6 +71,7 @@ MODELS = {
         _entry("NILMMoE", "NILMMoE", "mixture-of-experts"),
         _entry("PatchTST", "PatchTST", "transformer"),
         _entry("Reformer", "Reformer", "transformer"),
+        _entry("ResidualMoE", "ResidualMoE", "residual-mixture-of-experts"),
         _entry("ResNet", "ResNet", "convolutional"),
         _entry(
             "ResNetClassification",
