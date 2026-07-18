@@ -85,7 +85,9 @@ MODELS = {
         ),
         _entry("Seq2Point", "Seq2PointTorch", "convolutional"),
         _entry("Seq2Seq", "Seq2Seq", "recurrent"),
+        _entry("SGN", "SGN", "subtask-gated"),
         _entry("TCN", "TCN", "convolutional"),
+        _entry("TimesNet", "TimesNet", "periodic-2d"),
         _entry("WindowGRU", "WindowGRU", "recurrent"),
         _entry(
             "Mean",

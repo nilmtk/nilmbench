@@ -86,4 +86,6 @@ container build context to the reviewed batch commit, refreshes `uv.lock`, and
 runs CPU and CUDA checks against that same revision. ModernTCN and DLinear were
 adopted together at `8d745493ed9f84dd00fb502ffe85943eaeedc4c8`, avoiding a
 separate benchmark image for every algorithm while preserving an immutable
-campaign environment.
+campaign environment. TimesNet and SGN were similarly batched at
+`c130293e24e16817b9859d1b78ae18bd988b1219` after their independent model and
+shared-runtime PRs passed.

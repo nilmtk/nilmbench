@@ -19,7 +19,9 @@ def test_registry_exposes_baseline_and_all_smoke_tested_contrib_models():
         "RNNAttentionClassification",
         "Seq2Point",
         "Seq2Seq",
+        "SGN",
         "TCN",
+        "TimesNet",
         "WindowGRU",
         "Mean",
     }
