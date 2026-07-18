@@ -805,6 +805,7 @@ def _rows(
     result: dict[str, Any], path: Path, config: BenchmarkConfig
 ) -> Iterable[dict[str, Any]]:
     verified, failures = _verified_provenance(result, config)
+    model_entry = MODELS[result["model"]]
     task = result["task"]
     overrides = result["protocol_overrides"]
     overrides_sha256 = hashlib.sha256(
@@ -893,10 +894,15 @@ def _rows(
         row_failures = list(failures)
         if elapsed is None:
             row_failures.append("missing elapsed efficiency measurement")
-        is_neural = result["model_spec"]["family"] != "statistical-baseline"
-        if is_neural and parameters is None:
+        if model_entry.requires_trainable_parameters and parameters is None:
             row_failures.append("missing trainable parameter count")
-        if is_neural and result["runtime"].get("gpu") and peak_memory is None:
+        if not model_entry.requires_trainable_parameters and parameters is not None:
+            row_failures.append("unexpected trainable parameter count")
+        if (
+            model_entry.requires_accelerator_memory
+            and result["runtime"].get("gpu")
+            and peak_memory is None
+        ):
             row_failures.append("missing peak accelerator memory")
         tuning_study_digest = (
             result["study"].get("study_digest")

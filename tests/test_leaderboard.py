@@ -218,6 +218,31 @@ def _write_result(
     return path
 
 
+def _convert_to_hsmm(path):
+    result = json.loads(path.read_text(encoding="utf-8"))
+    entry = MODELS["HSMM"]
+    params = dict(entry.fixed_params)
+    result["model"] = entry.name
+    result["model_spec"] = {
+        "module": entry.module,
+        "class_name": entry.class_name,
+        "family": entry.family,
+    }
+    result["model_params"] = params
+    result["model_params_sha256"] = canonical_digest(params)
+    result["protocol_overrides"]["epochs"] = None
+    result["protocol_overrides"]["sequence_length"] = None
+    result["run"]["params_by_alignment_group"]["fridge"] = {
+        **params,
+        "seed": result["seed"],
+        "mains_mean": 100.0,
+        "mains_std": 20.0,
+    }
+    result["run"]["trainable_parameters"]["fridge"] = None
+    _reseal(path, result)
+    return path
+
+
 def _rekey_study(result):
     study = result["study"]
     spec = study["study_spec"]
@@ -626,6 +651,36 @@ def test_missing_efficiency_measurement_prevents_verification(tmp_path):
     assert len(entries) == 1
     assert entries[0]["status"] == "smoke-unverified"
     assert "missing peak accelerator memory" in entries[0]["verification_failures"]
+
+
+def test_fixed_accelerator_model_is_verified_without_trainable_parameters(tmp_path):
+    for seed in (10, 20, 42):
+        _convert_to_hsmm(
+            _write_result(tmp_path, seed, scope="smoke", max_samples=1024)
+        )
+
+    entry = _build(tmp_path)["entries"][0]
+
+    assert entry["model"] == "HSMM"
+    assert entry["status"] == "smoke-verified"
+    assert entry["trainable_parameters_mean"] is None
+    assert entry["peak_accelerator_memory_bytes_mean"] == 4096
+
+
+def test_fixed_accelerator_model_still_requires_gpu_measurement(tmp_path):
+    for seed in (10, 20, 42):
+        path = _convert_to_hsmm(
+            _write_result(tmp_path, seed, scope="smoke", max_samples=1024)
+        )
+        if seed == 20:
+            result = json.loads(path.read_text(encoding="utf-8"))
+            result["run"]["peak_accelerator_memory_bytes"]["fridge"] = None
+            _reseal(path, result)
+
+    entry = _build(tmp_path)["entries"][0]
+
+    assert entry["status"] == "smoke-unverified"
+    assert "missing peak accelerator memory" in entry["verification_failures"]
 
 
 def test_sparse_aligned_windows_are_rejected_even_when_resealed(tmp_path):

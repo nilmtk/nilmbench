@@ -16,6 +16,8 @@ class ModelEntry:
     search_space: Callable[[Any], dict[str, Any]]
     supports_training_overrides: bool = True
     fixed_params: tuple[tuple[str, Any], ...] = ()
+    requires_trainable_parameters: bool = True
+    requires_accelerator_memory: bool = True
 
     def model_class(self) -> type:
         module = import_module(self.module)
@@ -49,6 +51,8 @@ def _entry(
     search_space: Callable[[Any], dict[str, Any]] = _standard_space,
     supports_training_overrides: bool = True,
     fixed_params: tuple[tuple[str, Any], ...] = (),
+    requires_trainable_parameters: bool = True,
+    requires_accelerator_memory: bool = True,
 ) -> ModelEntry:
     return ModelEntry(
         name=name,
@@ -58,6 +62,8 @@ def _entry(
         search_space=search_space,
         supports_training_overrides=supports_training_overrides,
         fixed_params=fixed_params,
+        requires_trainable_parameters=requires_trainable_parameters,
+        requires_accelerator_memory=requires_accelerator_memory,
     )
 
 
@@ -74,6 +80,7 @@ MODELS = {
             "explicit-duration",
             search_space=_no_search_space,
             supports_training_overrides=False,
+            requires_trainable_parameters=False,
             fixed_params=(
                 ("num_states", 2),
                 ("max_duration", 180),
@@ -116,6 +123,8 @@ MODELS = {
             module="nilmtk.disaggregate",
             search_space=_no_search_space,
             supports_training_overrides=False,
+            requires_trainable_parameters=False,
+            requires_accelerator_memory=False,
         ),
     )
 }
