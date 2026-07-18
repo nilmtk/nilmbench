@@ -86,7 +86,7 @@ into `results/published`, never an automatic side effect of training.
 
 Container builds take nilmtk-contrib as a named BuildKit context. The default Compose configuration expects the two repositories to be sibling directories; set `NILMTK_CONTRIB_CONTEXT` to override that location.
 
-Published images pin their nilmtk-contrib build context to the exact reviewed integration commit rather than a moving branch. The current dependency and image pin is [`0769d00893a178277d06e83ccd2e92c03a5ba9ef`](https://github.com/nilmtk/nilmtk-contrib/commit/0769d00893a178277d06e83ccd2e92c03a5ba9ef). Update that pin deliberately when a reviewed model release is adopted. Both image variants synchronize their runtime, NILMTK, and NILM Metadata dependencies from the checked-in `uv.lock` with `--frozen`; the project and named-context contrib source are then installed with `--no-deps`. The CPU-only Torch wheel is installed with `--no-deps` after its common Python dependencies have been synchronized from the same lock, avoiding the CUDA wheel stack in the CPU image.
+Published images pin their nilmtk-contrib build context to the exact reviewed integration commit rather than a moving branch. The current dependency and image pin is [`1148e1c65f43878dfa1b8e08dc6411f5991d7dbd`](https://github.com/nilmtk/nilmtk-contrib/commit/1148e1c65f43878dfa1b8e08dc6411f5991d7dbd). Update that pin deliberately when a reviewed model release is adopted. Both image variants synchronize their runtime, NILMTK, and NILM Metadata dependencies from the checked-in `uv.lock` with `--frozen`; the project and named-context contrib source are then installed with `--no-deps`. The CPU-only Torch wheel is installed with `--no-deps` after its common Python dependencies have been synchronized from the same lock, avoiding the CUDA wheel stack in the CPU image.
 
 Model contributions and benchmark-image releases have separate cadences. A
 model can merge after its contrib contract, CPU, and targeted CUDA checks pass;
@@ -203,7 +203,7 @@ CI regenerates the artifacts and rejects hand-edited or stale tables.
 
 ## Add a model
 
-Models belong in nilmtk-contrib. Once a model has its own tests and lazy export there, add a small entry and search space in `src/nilmbench/registry.py`; task/data logic should not be copied into model notebooks. PatchTST, ModernTCN, DLinear, TimesNet, SGN, TSMixer, NILMMoE, and ResidualMoE use this route.
+Models belong in nilmtk-contrib. Once a model has its own tests and lazy export there, add a small entry and search space in `src/nilmbench/registry.py`; task/data logic should not be copied into model notebooks. PatchTST, ModernTCN, DLinear, TimesNet, SGN, TSMixer, NILMMoE, ResidualMoE, and HSMM use this route. Non-neural models such as HSMM record their scientific settings as fixed registry parameters instead of pretending to have neural training epochs or a sequence length.
 
 ## Cite
 

@@ -93,3 +93,5 @@ shared-runtime PRs passed. TSMixer then advanced the same single image family to
 complete model suite and is not a model-specific image. NILMMoE then advanced
 that same image family to `9d28870d0df378c34092d95ea8a11479e0fe7db3`,
 and ResidualMoE advanced it to `0769d00893a178277d06e83ccd2e92c03a5ba9ef`.
+The explicit-duration HSMM baseline advanced it to
+`1148e1c65f43878dfa1b8e08dc6411f5991d7dbd`.

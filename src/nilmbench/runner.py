@@ -346,7 +346,8 @@ def _trial_parameters(
         fixed["n_epochs"] = epochs
     if sequence_length is not None:
         fixed["sequence_length"] = sequence_length
-    params = model_entry.search_space(_FixedSuggestionTrial(trial, fixed))
+    params = dict(getattr(model_entry, "fixed_params", ()))
+    params.update(model_entry.search_space(_FixedSuggestionTrial(trial, fixed)))
     params.update(fixed)
     if device:
         params["device"] = device
@@ -697,21 +698,24 @@ def run_benchmark(
         raise ValueError(
             f"{model_name} does not accept trials, epochs, sequence length, or device"
         )
+    base_params: dict[str, Any] = dict(getattr(model_entry, "fixed_params", ()))
     if model_entry.supports_training_overrides:
-        base_params: dict[str, Any] = {
-            "sequence_length": (
-                sequence_length
-                if sequence_length is not None
-                else DEFAULT_SEQUENCE_LENGTH
-            ),
-            "n_epochs": (epochs if epochs is not None else DEFAULT_TRAINING_EPOCHS),
-            "batch_size": 128,
-            "learning_rate": 1e-3,
-        }
+        base_params.update(
+            {
+                "sequence_length": (
+                    sequence_length
+                    if sequence_length is not None
+                    else DEFAULT_SEQUENCE_LENGTH
+                ),
+                "n_epochs": (
+                    epochs if epochs is not None else DEFAULT_TRAINING_EPOCHS
+                ),
+                "batch_size": 128,
+                "learning_rate": 1e-3,
+            }
+        )
         if device:
             base_params["device"] = device
-    else:
-        base_params = {}
 
     root = Path(__file__).resolve().parents[2]
     provenance = runtime_provenance(root)

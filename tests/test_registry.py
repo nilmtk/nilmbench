@@ -7,6 +7,7 @@ def test_registry_exposes_baseline_and_all_smoke_tested_contrib_models():
         "ConvLSTM",
         "DAE",
         "DLinear",
+        "HSMM",
         "MSDC",
         "ModernTCN",
         "NILMFormer",
@@ -44,7 +45,17 @@ def test_every_registry_entry_has_traceable_identity():
     assert MODELS["TSMixer"].family == "mlp-mixer"
     assert MODELS["NILMMoE"].family == "mixture-of-experts"
     assert MODELS["ResidualMoE"].family == "residual-mixture-of-experts"
+    assert MODELS["HSMM"].family == "explicit-duration"
+    assert not MODELS["HSMM"].supports_training_overrides
+    assert dict(MODELS["HSMM"].fixed_params) == {
+        "num_states": 2,
+        "max_duration": 180,
+        "pseudocount": 1.0,
+        "variance_floor": 1.0,
+        "kmeans_max_iterations": 100,
+    }
     for name, entry in MODELS.items():
         if name != "Mean":
             assert entry.module == "nilmtk_contrib.torch"
+        if name not in {"HSMM", "Mean"}:
             assert entry.supports_training_overrides

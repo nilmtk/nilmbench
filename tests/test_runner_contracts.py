@@ -167,26 +167,77 @@ def test_run_rejects_invalid_sequence_length_before_data_access(
 
 
 @pytest.mark.parametrize(
-    "overrides",
+    ("model_name", "overrides"),
     [
-        {"trials": 1},
-        {"epochs": 1},
-        {"sequence_length": 99},
-        {"device": "cpu"},
+        (model_name, overrides)
+        for model_name in ("HSMM", "Mean")
+        for overrides in (
+            {"trials": 1},
+            {"epochs": 1},
+            {"sequence_length": 99},
+            {"device": "cpu"},
+        )
     ],
 )
-def test_mean_rejects_irrelevant_neural_overrides_before_data_access(
-    overrides, tmp_path
+def test_non_neural_models_reject_irrelevant_overrides_before_data_access(
+    model_name, overrides, tmp_path
 ):
     with pytest.raises(ValueError, match="does not accept"):
         run_benchmark(
             load_config(),
             "corrected-t1-redd",
-            "Mean",
+            model_name,
             42,
             tmp_path,
             **overrides,
         )
+
+
+def test_hsmm_fixed_parameters_are_passed_and_recorded(monkeypatch, tmp_path):
+    captured = []
+
+    def fake_verify(dataset):
+        return DatasetIdentity(
+            id=dataset.id,
+            path=f"/data/{dataset.id}.h5",
+            size_bytes=dataset.size_bytes,
+            sha256=dataset.sha256,
+        )
+
+    def fake_run(*args, **kwargs):
+        del kwargs
+        captured.append(args[4])
+        return {
+            "metrics": {
+                "fridge": {
+                    "mae": 1.0,
+                    "f1": 0.5,
+                    "activation_threshold_watts": 50.0,
+                }
+            },
+            "objective_mae": 1.0,
+        }
+
+    monkeypatch.setattr(runner, "verify_dataset", fake_verify)
+    monkeypatch.setattr(runner, "runtime_provenance", lambda root: _provenance())
+    monkeypatch.setattr(runner, "_run_once", fake_run)
+
+    output = run_benchmark(
+        load_config(),
+        "corrected-t1-redd",
+        "HSMM",
+        42,
+        tmp_path,
+        appliances=("fridge",),
+        max_samples=3960,
+    )
+
+    expected = dict(get_model("HSMM").fixed_params)
+    result = json.loads((output / "result.json").read_text(encoding="utf-8"))
+    assert captured == [expected]
+    assert result["model_params"] == expected
+    assert result["protocol_overrides"]["epochs"] is None
+    assert result["protocol_overrides"]["sequence_length"] is None
 
 
 class _ValidationModel:
