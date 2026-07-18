@@ -88,6 +88,18 @@ def test_builtin_config_has_complete_paper_task_matrix():
             ),
             hardware="NVIDIA A100-SXM4-80GB",
         ),
+        TrustedRuntimeConfig(
+            id="t0-redd-fridge-15min-a100-65b1c52",
+            nilmbench_git_sha="65b1c5203f347d1ccff2240409c3ff0417e9c374",
+            nilmtk_contrib_git_sha=(
+                "b619d1f14373202aa4d20649e334bf2fe5d5fa81"
+            ),
+            container_image="nilmbench:t0-65b1c52-b619d1f-cuda",
+            container_digest=(
+                "sha256:5f6d9f1625b1f46098976dc3dbdfcb6070ea316c8997ea20471d39ade5672ec3"
+            ),
+            hardware="NVIDIA A100-SXM4-80GB",
+        ),
     )
     historical = [
         task for task in config.tasks.values() if task.profile == "historical"
