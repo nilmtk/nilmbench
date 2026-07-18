@@ -666,7 +666,7 @@ requires-dist = [
     { name = "nilm-metadata", marker = "extra == 'runtime'", git = "https://github.com/nilmtk/nilm_metadata.git?rev=59c9990de4836d77c0dcd807bd4293e39e0cc314" },
     { name = "nilmtk", marker = "extra == 'benchmark'", git = "https://github.com/nilmtk/nilmtk.git?rev=0768b1b8457eef9de76d123a94e2de8af22a45d0" },
     { name = "nilmtk", marker = "extra == 'runtime'", git = "https://github.com/nilmtk/nilmtk.git?rev=0768b1b8457eef9de76d123a94e2de8af22a45d0" },
-    { name = "nilmtk-contrib", extras = ["torch"], marker = "extra == 'benchmark'", git = "https://github.com/nilmtk/nilmtk-contrib.git?rev=8d745493ed9f84dd00fb502ffe85943eaeedc4c8" },
+    { name = "nilmtk-contrib", extras = ["torch"], marker = "extra == 'benchmark'", git = "https://github.com/nilmtk/nilmtk-contrib.git?rev=c130293e24e16817b9859d1b78ae18bd988b1219" },
     { name = "numpy", marker = "extra == 'benchmark'", specifier = ">=1.26,<2" },
     { name = "numpy", marker = "extra == 'dev'", specifier = ">=1.26,<2" },
     { name = "numpy", marker = "extra == 'runtime'", specifier = ">=1.26,<2" },
@@ -706,7 +706,7 @@ dependencies = [
 [[package]]
 name = "nilmtk-contrib"
 version = "0.1.2"
-source = { git = "https://github.com/nilmtk/nilmtk-contrib.git?rev=8d745493ed9f84dd00fb502ffe85943eaeedc4c8#8d745493ed9f84dd00fb502ffe85943eaeedc4c8" }
+source = { git = "https://github.com/nilmtk/nilmtk-contrib.git?rev=c130293e24e16817b9859d1b78ae18bd988b1219#c130293e24e16817b9859d1b78ae18bd988b1219" }
 
 [package.optional-dependencies]
 torch = [
