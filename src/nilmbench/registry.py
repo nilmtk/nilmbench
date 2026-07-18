@@ -68,6 +68,7 @@ MODELS = {
         _entry("MSDC", "MSDC", "specialized"),
         _entry("ModernTCN", "ModernTCN", "convolutional"),
         _entry("NILMFormer", "NILMFormer", "transformer"),
+        _entry("NILMMoE", "NILMMoE", "mixture-of-experts"),
         _entry("PatchTST", "PatchTST", "transformer"),
         _entry("Reformer", "Reformer", "transformer"),
         _entry("ResNet", "ResNet", "convolutional"),

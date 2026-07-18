@@ -10,6 +10,7 @@ def test_registry_exposes_baseline_and_all_smoke_tested_contrib_models():
         "MSDC",
         "ModernTCN",
         "NILMFormer",
+        "NILMMoE",
         "PatchTST",
         "Reformer",
         "ResNet",
@@ -40,6 +41,7 @@ def test_every_registry_entry_has_traceable_identity():
     assert not MODELS["Mean"].supports_training_overrides
     assert MODELS["Mean"].search_space(object()) == {}
     assert MODELS["TSMixer"].family == "mlp-mixer"
+    assert MODELS["NILMMoE"].family == "mixture-of-experts"
     for name, entry in MODELS.items():
         if name != "Mean":
             assert entry.module == "nilmtk_contrib.torch"
