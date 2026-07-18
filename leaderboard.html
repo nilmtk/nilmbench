@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NILMbench leaderboard — provenance-checked NILM results</title>
+  <meta name="description" content="The living NILMbench leaderboard, generated from immutable, provenance-checked result bundles and separated by evaluation cohort.">
+  <meta property="og:title" content="NILMbench leaderboard">
+  <meta property="og:description" content="Measured NILM results with visible protocol, seed, source, container, and verification status.">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/site.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M4 38h13l7-25 10 39 8-26 6 12h12' fill='none' stroke='%231f5b45' stroke-width='6' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <script src="static/leaderboard.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to leaderboard</a>
+
+  <header class="site-header">
+    <a class="brand" href="./">
+      <svg viewBox="0 0 60 36" aria-hidden="true">
+        <polyline points="2,26 9,26 12,10 16,30 21,18 26,18 30,6 35,28 40,20 46,20 50,13 58,13"/>
+      </svg>
+      <span>NILMbench</span>
+    </a>
+    <nav aria-label="Primary navigation">
+      <a href="paper.html">Paper</a>
+      <a href="leaderboard.html" aria-current="page">Leaderboard</a>
+      <a href="paper.html#run">Run it</a>
+      <a href="https://github.com/nilmtk/nilmbench">GitHub</a>
+    </nav>
+  </header>
+
+  <main id="main-content">
+    <section class="board-hero" aria-labelledby="board-title">
+      <div>
+        <p class="eyebrow"><span class="live-dot" aria-hidden="true"></span>Living benchmark</p>
+        <h1 id="board-title">Leaderboard</h1>
+      </div>
+      <div>
+        <p class="board-copy">
+          Ranks only compare runs in the same evaluation cohort. Every row comes from
+          immutable result files; the page does not contain hand-entered scores.
+        </p>
+        <div class="board-actions">
+          <a class="button button-primary" href="https://github.com/nilmtk/nilmbench#add-a-model">Submit a model</a>
+          <a class="text-link" href="leaderboard.csv">CSV</a>
+          <a class="text-link" href="leaderboard.json">JSON</a>
+        </div>
+      </div>
+    </section>
+
+    <aside class="scope-notice" id="scope-notice" aria-live="polite">
+      <strong>Reading benchmark scope…</strong>
+      The leaderboard will state whether these are smoke or full protocol results.
+    </aside>
+
+    <dl class="board-stats" aria-label="Leaderboard summary">
+      <div><dt>Source runs</dt><dd id="stat-runs">—</dd></div>
+      <div><dt>Aggregates</dt><dd id="stat-entries">—</dd></div>
+      <div><dt>Models</dt><dd id="stat-models">—</dd></div>
+      <div><dt>Cohorts</dt><dd id="stat-cohorts">—</dd></div>
+    </dl>
+
+    <form class="filters" id="leaderboard-filters" aria-label="Filter leaderboard">
+      <div class="field">
+        <label for="filter-task">Task</label>
+        <select id="filter-task" name="task"><option value="">All tasks</option></select>
+      </div>
+      <div class="field">
+        <label for="filter-appliance">Appliance</label>
+        <select id="filter-appliance" name="appliance"><option value="">All appliances</option></select>
+      </div>
+      <div class="field">
+        <label for="filter-scope">Scope</label>
+        <select id="filter-scope" name="scope"><option value="">All scopes</option></select>
+      </div>
+      <div class="field">
+        <label for="filter-status">Verification</label>
+        <select id="filter-status" name="status"><option value="">All statuses</option></select>
+      </div>
+      <div class="field">
+        <label for="filter-model">Model</label>
+        <input id="filter-model" name="model" type="search" autocomplete="off" placeholder="Find a model">
+      </div>
+    </form>
+
+    <p class="board-status" id="board-status" aria-live="polite">Loading leaderboard.json…</p>
+    <div id="leaderboard-root" aria-live="polite" aria-busy="true">
+      <div class="loading-block" aria-label="Loading leaderboard"></div>
+    </div>
+
+    <section class="method" aria-labelledby="method-title">
+      <p class="eyebrow">How to read the board</p>
+      <h2 id="method-title">The rank has boundaries.</h2>
+      <div class="method-grid">
+        <article>
+          <h3>One cohort at a time</h3>
+          <p>Task, appliance, resolution, data access, scope, profile, and sample limit define who can be ranked together.</p>
+        </article>
+        <article>
+          <h3>Smoke is not full</h3>
+          <p>Smoke runs check the real pipeline cheaply. Only complete full-protocol runs support benchmark or paper claims.</p>
+        </article>
+        <article>
+          <h3>Three required seeds</h3>
+          <p>Verified aggregates require seeds 10, 20, and 42 plus source, dataset, runtime, container, and protocol provenance.</p>
+        </article>
+      </div>
+      <div class="route-actions">
+        <a class="button button-primary" href="docs/protocol-audit.md">Read protocol audit</a>
+        <a class="text-link" href="paper.html#run">Reproduce a run</a>
+        <a class="text-link" href="paper.html">Return to paper</a>
+      </div>
+    </section>
+  </main>
+
+  <template id="cohort-template">
+    <section class="cohort">
+      <header class="cohort-head">
+        <div>
+          <h2 class="cohort-title"></h2>
+          <p class="cohort-meta"></p>
+        </div>
+        <p class="cohort-digest"></p>
+      </header>
+      <div class="table-scroll">
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th scope="col">Rank</th>
+              <th scope="col">Model</th>
+              <th scope="col">MAE ↓ (W)</th>
+              <th scope="col">F1 ↑</th>
+              <th scope="col">Parameters</th>
+              <th scope="col">Time ↓</th>
+              <th scope="col">Peak memory ↓</th>
+              <th scope="col">Runs</th>
+              <th scope="col">Run setup</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </template>
+
+  <footer class="site-footer">
+    <span>NILMbench · generated leaderboard</span>
+    <span><a href="paper.html#cite">Cite the paper</a> · <a href="https://github.com/nilmtk/nilmbench">Source</a> · <a href="./">Home</a></span>
+  </footer>
+</body>
+</html>
