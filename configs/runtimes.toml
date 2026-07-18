@@ -40,3 +40,11 @@ nilmtk_contrib_git_sha = "9d28870d0df378c34092d95ea8a11479e0fe7db3"
 container_image = "nilmbench:t0-6d567b1-cuda"
 container_digest = "sha256:f3a61875a1e7d10787034307fcba86719988e26df2515d4c3ca0cc64153b6f56"
 hardware = "NVIDIA A100-SXM4-80GB"
+
+[[runtime]]
+id = "t0-redd-fridge-a100-e33b94d"
+nilmbench_git_sha = "e33b94d44d07b098f774e8569298c9853dd71422"
+nilmtk_contrib_git_sha = "0769d00893a178277d06e83ccd2e92c03a5ba9ef"
+container_image = "nilmbench:t0-e33b94d-cuda"
+container_digest = "sha256:3eb89c6d2bcdc8942426e359ed8b1b6ed74108060d86a293101a186844347c86"
+hardware = "NVIDIA A100-SXM4-80GB"

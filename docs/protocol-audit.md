@@ -91,4 +91,5 @@ campaign environment. TimesNet and SGN were similarly batched at
 shared-runtime PRs passed. TSMixer then advanced the same single image family to
 `5767286078f5853a2ef1d6f431eb95a1c47ba4e8`; the image still contains the
 complete model suite and is not a model-specific image. NILMMoE then advanced
-that same image family to `9d28870d0df378c34092d95ea8a11479e0fe7db3`.
+that same image family to `9d28870d0df378c34092d95ea8a11479e0fe7db3`,
+and ResidualMoE advanced it to `0769d00893a178277d06e83ccd2e92c03a5ba9ef`.
