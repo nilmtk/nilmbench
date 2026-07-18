@@ -58,6 +58,7 @@ def _parser() -> argparse.ArgumentParser:
     validate = sub.add_parser("validate", help="validate one task without training")
     validate.add_argument("--task", required=True)
     validate.add_argument("--check-data", action="store_true")
+    validate.add_argument("--sample-period", type=int, choices=(60, 900))
     validate.add_argument("--max-samples", type=_positive_int)
 
     run = sub.add_parser("run", help="run one model on one benchmark task")
@@ -116,10 +117,12 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         if args.command == "validate":
             task = config.task(args.task)
+            sample_period = args.sample_period or task.sample_period
             payload = {
                 "task": asdict(task),
                 "config_sha256": config.digest(task.id),
                 "metric_policy": asdict(config.metric_policy(task.metric_policy)),
+                "sample_period": sample_period,
                 "datasets": {
                     name: {
                         "path": str(config.datasets[name].path),
@@ -146,7 +149,7 @@ def main(argv: list[str] | None = None) -> int:
                         task,
                         task.train,
                         group,
-                        task.sample_period,
+                        sample_period,
                         args.max_samples,
                     )
                     test = load_split(
@@ -154,7 +157,7 @@ def main(argv: list[str] | None = None) -> int:
                         task,
                         task.test,
                         group,
-                        task.sample_period,
+                        sample_period,
                         args.max_samples,
                     )
                     observed[label] = {
