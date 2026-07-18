@@ -14,6 +14,7 @@ Reproducible runner and project website for **[NILMBench2026](https://nilmtk.git
 - 📄 **Paper:** https://sustainability-lab.github.io/papers/2026/nilmbench2026_buildsys.pdf
 - 💻 **Code (modernized NILMTK):** https://github.com/nilmtk/nilmtk-contrib
 - 🌐 **Website:** https://nilmtk.github.io/nilmbench/
+- 📊 **Living leaderboard:** https://nilmtk.github.io/nilmbench/leaderboard.html
 
 ## What is reproducible here
 
@@ -147,7 +148,11 @@ configs/                 # dataset manifests and T1/T2/T3 task definitions
 src/nilmbench/           # CLI, data loading, registry, runner, provenance
 docker/                  # separate CPU-only and CUDA 12.4 images
 tests/                   # dependency-light runner/config tests
-index.html               # self-contained project website
+index.html               # short chooser: paper, leaderboard, or runner
+paper.html               # fixed NILMBench2026 paper website
+leaderboard.html         # living board generated from leaderboard.json
+static/site.css          # shared landing/leaderboard styles
+static/leaderboard.js    # cohort-aware leaderboard renderer
 static/images/           # paper figures
 ```
 
@@ -159,8 +164,9 @@ python3 -m http.server 8000
 
 ## Living leaderboard
 
-The live table is generated from immutable `result.json` bundles under
-`results/published`; its numbers are never edited into the website. Regenerate
+The dedicated `leaderboard.html` page reads a generated table from immutable
+`result.json` bundles under `results/published`; its numbers are never edited
+into the website. Regenerate
 both reviewable artifacts after adding a result bundle:
 
 ```bash
