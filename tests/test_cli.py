@@ -1,4 +1,5 @@
 import json
+from types import SimpleNamespace
 
 import pytest
 
@@ -40,7 +41,48 @@ def test_validate_without_data_access(capsys):
     assert main(["validate", "--task", "historical-t1-redd"]) == 0
     payload = json.loads(capsys.readouterr().out)
     assert payload["task"]["family"] == "T1"
+    assert payload["sample_period"] == 60
     assert "observed" not in payload
+
+
+def test_validate_checks_data_at_requested_resolution(
+    capsys, monkeypatch, tmp_path
+):
+    redd = tmp_path / "redd.h5"
+    redd.touch()
+    monkeypatch.setenv("NILMBENCH_REDD", str(redd))
+    calls = []
+
+    def fake_load_split(
+        config, task, windows, appliances, sample_period, max_samples
+    ):
+        del config, task
+        calls.append((windows, appliances, sample_period, max_samples))
+        return SimpleNamespace(metadata=lambda: [{"samples": 12}])
+
+    monkeypatch.setattr(cli, "load_split", fake_load_split)
+
+    assert (
+        main(
+            [
+                "validate",
+                "--task",
+                "corrected-t1-redd",
+                "--check-data",
+                "--sample-period",
+                "900",
+                "--max-samples",
+                "3960",
+            ]
+        )
+        == 0
+    )
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["sample_period"] == 900
+    assert payload["observed"]["fridge"]["train"] == [{"samples": 12}]
+    assert calls
+    assert {call[2] for call in calls} == {900}
+    assert {call[3] for call in calls} == {3960}
 
 
 def test_invalid_run_limits_are_rejected(capsys):
