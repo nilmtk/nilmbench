@@ -1313,7 +1313,7 @@ class PatchTSTDisaggregator(Disaggregator):
 </div>
 </div>
 
-<p class="outlook-link">Project page · <a href="https://sustainability-lab.github.io/nilmbench/">sustainability-lab.github.io/nilmbench</a></p>
+<p class="outlook-link">Project page · <a href="https://nilmtk.github.io/nilmbench/">nilmtk.github.io/nilmbench</a></p>
 <div class="outlook-qr"><img src="figs/qr_project.png" alt="Project page QR code"></div>
 
 </div>

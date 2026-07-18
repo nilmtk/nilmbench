@@ -1,6 +1,6 @@
 # NILMbench
 
-Reproducible runner and project website for **[NILMBench2026](https://sustainability-lab.github.io/nilmbench/)** — *A Benchmark for Energy Disaggregation* (BuildSys '26, **Best Paper Candidate**).
+Reproducible runner and project website for **[NILMBench2026](https://nilmtk.github.io/nilmbench/)** — *A Benchmark for Energy Disaggregation* (BuildSys '26, **Best Paper Candidate**).
 
 > One aggregate power signal in. Appliance-level estimates out. We benchmark **16 NILM models**
 > across **3 datasets** and **2 resolutions** — on accuracy, efficiency, and generalization —
@@ -13,7 +13,7 @@ Reproducible runner and project website for **[NILMBench2026](https://sustainabi
 
 - 📄 **Paper:** https://sustainability-lab.github.io/papers/2026/nilmbench2026_buildsys.pdf
 - 💻 **Code (modernized NILMTK):** https://github.com/nilmtk/nilmtk-contrib
-- 🌐 **Website:** https://sustainability-lab.github.io/nilmbench/
+- 🌐 **Website:** https://nilmtk.github.io/nilmbench/
 
 ## What is reproducible here
 
@@ -32,7 +32,7 @@ The benchmark is now an installable command-line application rather than a set o
 - separate CPU-smoke and CUDA-benchmark containers.
 - a NILMTK Mean sanity-check baseline alongside the contrib architectures.
 
-The REDD, UK-DALE, and REFIT data are not redistributed. The runner expects user-provided NILMTK HDF5 conversions and verifies them against the recorded file sizes and SHA-256 digests. The exact protocol discrepancies recovered from the old notebooks are documented in the [protocol audit](https://github.com/sustainability-lab/nilmbench/blob/main/docs/protocol-audit.md).
+The REDD, UK-DALE, and REFIT data are not redistributed. The runner expects user-provided NILMTK HDF5 conversions and verifies them against the recorded file sizes and SHA-256 digests. The exact protocol discrepancies recovered from the old notebooks are documented in the [protocol audit](https://github.com/nilmtk/nilmbench/blob/main/docs/protocol-audit.md).
 
 ## Install for development
 
@@ -40,7 +40,7 @@ Use Python 3.11, which is the version currently supported by nilmtk-contrib:
 
 ```bash
 git clone https://github.com/nilmtk/nilmtk-contrib.git
-git clone https://github.com/sustainability-lab/nilmbench.git
+git clone https://github.com/nilmtk/nilmbench.git
 cd nilmbench
 
 uv venv --python 3.11
@@ -50,8 +50,8 @@ nilmbench list
 pytest
 ```
 
-For a non-editable install using the exact PatchTST revision pinned by this
-repository:
+For a non-editable install using the exact reviewed nilmtk-contrib revision
+pinned by this repository:
 
 ```bash
 uv venv --python 3.11
