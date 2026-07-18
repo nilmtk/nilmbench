@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 import json
 import math
 import os
@@ -93,10 +94,13 @@ def _model_size(model: Any) -> int | None:
     parameters: dict[int, Any] = {}
     for attribute in ("models", "att_models"):
         networks = getattr(model, attribute, None)
-        if not isinstance(networks, dict):
+        if not isinstance(networks, Mapping):
             continue
         for network in networks.values():
-            for parameter in network.parameters():
+            parameter_source = getattr(network, "parameters", None)
+            if not callable(parameter_source):
+                continue
+            for parameter in parameter_source():
                 parameters[id(parameter)] = parameter
     if not parameters:
         return None

@@ -90,6 +90,28 @@ def test_non_neural_baseline_has_no_trainable_parameter_count():
     assert _model_size(type("Baseline", (), {"model": {"fridge": 42.0}})()) is None
 
 
+def test_non_neural_fitted_records_in_models_have_no_parameter_count():
+    fitted_record = SimpleNamespace(state_means=(0.0, 100.0))
+    model = type("StateSpaceModel", (), {"models": {"fridge": fitted_record}})()
+
+    assert _model_size(model) is None
+
+
+def test_model_size_counts_networks_and_ignores_non_neural_records():
+    model = type(
+        "HybridModel",
+        (),
+        {
+            "models": {
+                "fridge": _Network(_Parameter(17)),
+                "duration_prior": SimpleNamespace(max_duration=720),
+            }
+        },
+    )()
+
+    assert _model_size(model) == 17
+
+
 @pytest.mark.parametrize(
     ("chunks", "message"),
     [
