@@ -21,6 +21,7 @@ def test_registry_exposes_baseline_and_all_smoke_tested_contrib_models():
         "Seq2Seq",
         "SGN",
         "TCN",
+        "TSMixer",
         "TimesNet",
         "WindowGRU",
         "Mean",
@@ -38,6 +39,7 @@ def test_every_registry_entry_has_traceable_identity():
     assert MODELS["Mean"].family == "statistical-baseline"
     assert not MODELS["Mean"].supports_training_overrides
     assert MODELS["Mean"].search_space(object()) == {}
+    assert MODELS["TSMixer"].family == "mlp-mixer"
     for name, entry in MODELS.items():
         if name != "Mean":
             assert entry.module == "nilmtk_contrib.torch"

@@ -88,4 +88,6 @@ adopted together at `8d745493ed9f84dd00fb502ffe85943eaeedc4c8`, avoiding a
 separate benchmark image for every algorithm while preserving an immutable
 campaign environment. TimesNet and SGN were similarly batched at
 `c130293e24e16817b9859d1b78ae18bd988b1219` after their independent model and
-shared-runtime PRs passed.
+shared-runtime PRs passed. TSMixer then advanced the same single image family to
+`5767286078f5853a2ef1d6f431eb95a1c47ba4e8`; the image still contains the
+complete model suite and is not a model-specific image.
