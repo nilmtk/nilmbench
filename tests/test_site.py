@@ -26,11 +26,24 @@ def test_site_separates_fixed_paper_from_living_leaderboard():
 
     assert 'href="paper.html"' in landing
     assert 'href="leaderboard.html"' in landing
-    assert "The paper is fixed." in landing
-    assert "The benchmark keeps moving." in landing
+    assert "A reproducible benchmark" in landing
+    assert "for energy disaggregation." in landing
+    for responsibility in (
+        "Dataset conversion, meter access, preprocessing, and metrics",
+        "Appliance taxonomy, synonyms, meter relationships, and dataset schema",
+        "Disaggregation model implementation and testing",
+        "Fixed T1/T2/T3 evaluation and published result bundles",
+    ):
+        assert responsibility in landing
+        assert responsibility in (ROOT / "README.md").read_text(encoding="utf-8")
 
     assert "The fixed NILMBench2026 BuildSys paper" in paper
     assert "fetch('leaderboard.json'" not in paper
+    assert "<main>" in paper
+    assert "</main>" in paper
+    assert "<h4" not in paper
+    assert "generalization is the wall" not in paper.lower()
+    assert "NILM's ImageNet" not in paper
     assert 'href="leaderboard.html"' in paper
 
     assert "T0 smoke leaderboard — not a full benchmark claim." in renderer

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NILMbench — paper, leaderboard, and reproducible runner</title>
-  <meta name="description" content="Choose the fixed NILMBench2026 paper, the living NILM leaderboard, or the reproducible benchmark runner.">
+  <meta name="description" content="NILMBench2026 paper, reproducible experiment runner, and provenance-checked NILM leaderboard.">
   <meta property="og:title" content="NILMbench">
   <meta property="og:description" content="The NILMBench2026 paper and the living, provenance-checked NILM leaderboard.">
   <meta property="og:type" content="website">
@@ -28,7 +28,7 @@
     <nav aria-label="Primary navigation">
       <a href="paper.html">Paper</a>
       <a href="leaderboard.html">Leaderboard</a>
-      <a href="paper.html#run">Run it</a>
+      <a href="paper.html#run">Run benchmark</a>
       <a href="https://github.com/nilmtk/nilmbench">GitHub</a>
     </nav>
   </header>
@@ -36,7 +36,7 @@
   <main id="main-content">
     <section class="landing-hero" aria-labelledby="landing-title">
       <p class="eyebrow">NILMbench · energy disaggregation</p>
-      <h1 id="landing-title">The paper is fixed.<br><em>The benchmark keeps moving.</em></h1>
+      <h1 id="landing-title">A reproducible benchmark<br><em>for energy disaggregation.</em></h1>
       <p class="hero-copy">
         NILMBench2026 reports the BuildSys study. The leaderboard records later,
         provenance-checked runs. They are related, but they are not the same artifact.
@@ -87,7 +87,7 @@
     <section class="run-strip" id="run" aria-labelledby="run-title">
       <div>
         <p class="eyebrow">Run or extend it</p>
-        <h2 id="run-title">The repository is the benchmark runner.</h2>
+        <h2 id="run-title">Install and run NILMbench</h2>
         <p>Use Python 3.11 for development. Real datasets stay on your machine.</p>
       </div>
       <pre><code>git clone https://github.com/nilmtk/nilmbench.git
@@ -102,13 +102,13 @@ nilmbench doctor</code></pre>
     </section>
 
     <section class="ecosystem" aria-labelledby="ecosystem-title">
-      <p class="eyebrow">Where each concern belongs</p>
-      <h2 id="ecosystem-title">Four repositories, four jobs.</h2>
+      <p class="eyebrow">NILMTK ecosystem</p>
+      <h2 id="ecosystem-title">Repository responsibilities</h2>
       <div class="repo-list">
-        <a href="https://github.com/nilmtk/nilmtk"><strong>NILMTK</strong><span>Load and convert energy data</span></a>
-        <a href="https://github.com/nilmtk/nilmtk-contrib"><strong>nilmtk-contrib</strong><span>Implement and test models</span></a>
-        <a href="https://github.com/nilmtk/nilmbench"><strong>NILMbench</strong><span>Run fixed protocols and publish results</span></a>
-        <a href="https://github.com/nilmtk/nilm_metadata"><strong>NILM Metadata</strong><span>Use one appliance and meter vocabulary</span></a>
+        <a href="https://github.com/nilmtk/nilmtk"><strong>NILMTK</strong><span>Dataset conversion, meter access, preprocessing, and metrics</span></a>
+        <a href="https://github.com/nilmtk/nilm_metadata"><strong>NILM Metadata</strong><span>Appliance taxonomy, synonyms, meter relationships, and dataset schema</span></a>
+        <a href="https://github.com/nilmtk/nilmtk-contrib"><strong>nilmtk-contrib</strong><span>Disaggregation model implementation and testing</span></a>
+        <a href="https://github.com/nilmtk/nilmbench"><strong>NILMbench</strong><span>Fixed T1/T2/T3 evaluation and published result bundles</span></a>
       </div>
     </section>
   </main>

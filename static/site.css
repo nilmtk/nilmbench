@@ -425,7 +425,7 @@ h3 {
 }
 
 .board-hero h1 {
-  font-size: clamp(4.5rem, 11vw, 9rem);
+  font-size: clamp(4.5rem, 9vw, 7.5rem);
 }
 
 .board-actions {
@@ -695,6 +695,10 @@ h3 {
   .landing-hero h1,
   .board-hero h1 {
     font-size: clamp(3.2rem, 18vw, 5rem);
+  }
+
+  .landing-hero h1 {
+    font-size: clamp(2.85rem, 12.5vw, 4rem);
   }
 
   .board-hero h1 {
