@@ -170,7 +170,7 @@ def test_run_rejects_invalid_sequence_length_before_data_access(
     ("model_name", "overrides"),
     [
         (model_name, overrides)
-        for model_name in ("HSMM", "Mean")
+        for model_name in ("HSMM", "TorchAFHMM", "Mean")
         for overrides in (
             {"trials": 1},
             {"epochs": 1},
@@ -193,7 +193,10 @@ def test_non_neural_models_reject_irrelevant_overrides_before_data_access(
         )
 
 
-def test_hsmm_fixed_parameters_are_passed_and_recorded(monkeypatch, tmp_path):
+@pytest.mark.parametrize("model_name", ["HSMM", "TorchAFHMM"])
+def test_fixed_state_space_parameters_are_passed_and_recorded(
+    model_name, monkeypatch, tmp_path
+):
     captured = []
 
     def fake_verify(dataset):
@@ -225,14 +228,14 @@ def test_hsmm_fixed_parameters_are_passed_and_recorded(monkeypatch, tmp_path):
     output = run_benchmark(
         load_config(),
         "corrected-t1-redd",
-        "HSMM",
+        model_name,
         42,
         tmp_path,
         appliances=("fridge",),
         max_samples=3960,
     )
 
-    expected = dict(get_model("HSMM").fixed_params)
+    expected = dict(get_model(model_name).fixed_params)
     result = json.loads((output / "result.json").read_text(encoding="utf-8"))
     assert captured == [expected]
     assert result["model_params"] == expected

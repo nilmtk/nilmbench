@@ -101,7 +101,7 @@ Container builds take nilmtk-contrib as a named BuildKit context. The default Co
 Published images pin their nilmtk-contrib build context to an exact reviewed
 integration commit rather than a moving branch. The installable `benchmark`
 extra currently pins
-[`d267f8668fc6c84556b15d80426a1f7f2f41e1b4`](https://github.com/nilmtk/nilmtk-contrib/commit/d267f8668fc6c84556b15d80426a1f7f2f41e1b4);
+[`051d1ef5466c8ce31e5fe4322b4be47c76e45148`](https://github.com/nilmtk/nilmtk-contrib/commit/051d1ef5466c8ce31e5fe4322b4be47c76e45148);
 the source revision and image digest for each verified runtime are recorded in
 [`configs/runtimes.toml`](configs/runtimes.toml). Update either pin only when a
 reviewed integration is adopted. Both image variants synchronize their runtime,
@@ -232,7 +232,7 @@ CI regenerates the artifacts and rejects hand-edited or stale tables.
 
 ## Add a model
 
-Models belong in nilmtk-contrib. Once a model has its own tests and lazy export there, add a small entry and search space in `src/nilmbench/registry.py`; task/data logic should not be copied into model notebooks. PatchTST, ModernTCN, DLinear, TimesNet, SGN, TSMixer, FeatureMLP, NILMMoE, ResidualMoE, and HSMM use this route. Non-neural models such as HSMM record their scientific settings as fixed registry parameters instead of pretending to have neural training epochs or a sequence length.
+Models belong in nilmtk-contrib. Once a model has its own tests and lazy export there, add a small entry and search space in `src/nilmbench/registry.py`; task/data logic should not be copied into model notebooks. PatchTST, ModernTCN, DLinear, TimesNet, SGN, TSMixer, FeatureMLP, NILMMoE, ResidualMoE, HSMM, and TorchAFHMM use this route. State-space models such as HSMM and TorchAFHMM record their scientific settings as fixed registry parameters instead of pretending to have neural training epochs or a sequence length.
 
 ## Cite
 
