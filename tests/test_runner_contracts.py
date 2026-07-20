@@ -368,6 +368,52 @@ def _provenance():
     }
 
 
+def test_result_records_post_run_determinism_provenance(monkeypatch, tmp_path):
+    snapshots = [
+        _provenance() | {"deterministic_algorithms": False},
+        _provenance() | {"deterministic_algorithms": True},
+    ]
+
+    def fake_verify(dataset):
+        return DatasetIdentity(
+            id=dataset.id,
+            path=f"/data/{dataset.id}.h5",
+            size_bytes=dataset.size_bytes,
+            sha256=dataset.sha256,
+        )
+
+    def fake_run(*args, **kwargs):
+        del args, kwargs
+        return {
+            "metrics": {
+                "fridge": {
+                    "mae": 1.0,
+                    "f1": 0.5,
+                    "activation_threshold_watts": 50.0,
+                }
+            },
+            "objective_mae": 1.0,
+        }
+
+    monkeypatch.setattr(runner, "verify_dataset", fake_verify)
+    monkeypatch.setattr(runner, "runtime_provenance", lambda root: snapshots.pop(0))
+    monkeypatch.setattr(runner, "_run_once", fake_run)
+
+    output = run_benchmark(
+        load_config(),
+        "corrected-t1-redd",
+        "HSMM",
+        42,
+        tmp_path,
+        appliances=("fridge",),
+        max_samples=3960,
+    )
+
+    result = json.loads((output / "result.json").read_text(encoding="utf-8"))
+    assert result["runtime"]["deterministic_algorithms"] is True
+    assert snapshots == []
+
+
 def _complete_study_spec():
     config = load_config()
     task = config.task("corrected-t3-redd-to-refit")
