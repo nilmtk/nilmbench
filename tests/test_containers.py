@@ -4,7 +4,7 @@ from pathlib import Path
 ROOT = Path(__file__).parents[1]
 NILMTK_REVISION = "0768b1b8457eef9de76d123a94e2de8af22a45d0"
 NILM_METADATA_REVISION = "59c9990de4836d77c0dcd807bd4293e39e0cc314"
-NILMTK_CONTRIB_REVISION = "d267f8668fc6c84556b15d80426a1f7f2f41e1b4"
+NILMTK_CONTRIB_REVISION = "f7512e3bf34378747f3eb81cbc50a1a596a39a49"
 
 
 def test_cpu_and_cuda_images_pin_the_same_core_revisions():

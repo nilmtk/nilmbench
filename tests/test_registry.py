@@ -9,6 +9,7 @@ def test_registry_exposes_baseline_and_all_smoke_tested_contrib_models():
         "DLinear",
         "FeatureMLP",
         "HSMM",
+        "TorchAFHMM",
         "MSDC",
         "ModernTCN",
         "NILMFormer",
@@ -60,10 +61,23 @@ def test_every_registry_entry_has_traceable_identity():
         "variance_floor": 1.0,
         "kmeans_max_iterations": 100,
     }
+    assert MODELS["TorchAFHMM"].family == "factorial-state-space"
+    assert not MODELS["TorchAFHMM"].supports_training_overrides
+    assert not MODELS["TorchAFHMM"].requires_trainable_parameters
+    assert MODELS["TorchAFHMM"].requires_accelerator_memory
+    assert dict(MODELS["TorchAFHMM"].fixed_params) == {
+        "num_states": 2,
+        "pseudocount": 1.0,
+        "kmeans_max_iterations": 100,
+        "kmeans_tolerance": 1e-6,
+        "noise_std": 100.0,
+        "inference_max_iterations": 20,
+        "fail_on_nonconvergence": True,
+    }
     for name, entry in MODELS.items():
         if name != "Mean":
             assert entry.module == "nilmtk_contrib.torch"
-        if name not in {"HSMM", "Mean"}:
+        if name not in {"HSMM", "TorchAFHMM", "Mean"}:
             assert entry.supports_training_overrides
             assert entry.requires_trainable_parameters
             assert entry.requires_accelerator_memory
