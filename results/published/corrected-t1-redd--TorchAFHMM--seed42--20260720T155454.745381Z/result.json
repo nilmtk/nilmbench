@@ -1,0 +1,250 @@
+{
+  "appliances": [
+    "fridge"
+  ],
+  "created_at": "2026-07-20T15:55:06.814222+00:00",
+  "dataset_identities": {
+    "REDD": {
+      "id": "REDD",
+      "path": "/data/redd.h5",
+      "sha256": "757e694a420157aa035c8fd345915080c2396cb7a37bfeb5f925bcb84f9532b8",
+      "size_bytes": 401317829
+    }
+  },
+  "dataset_manifests": {
+    "REDD": {
+      "appliance_ac_types": [
+        "active",
+        "apparent"
+      ],
+      "default_path": "/data/redd.h5",
+      "id": "REDD",
+      "mains_ac_types": [
+        "apparent",
+        "active"
+      ],
+      "path_env": "NILMBENCH_REDD",
+      "sha256": "757e694a420157aa035c8fd345915080c2396cb7a37bfeb5f925bcb84f9532b8",
+      "size_bytes": 401317829,
+      "timezone": "US/Eastern"
+    }
+  },
+  "max_samples_per_window": 3960,
+  "metric_policy": {
+    "description": "Appliance-specific activation thresholds described in NILMBench2026 Section 3.5",
+    "id": "paper-appliance-thresholds",
+    "source_url": "https://sustainability-lab.github.io/papers/2026/nilmbench2026_buildsys.pdf",
+    "thresholds": {
+      "dish washer": 10.0,
+      "fridge": 50.0,
+      "kettle": 2000.0,
+      "microwave": 200.0,
+      "television": 10.0,
+      "washing machine": 20.0
+    }
+  },
+  "model": "TorchAFHMM",
+  "model_params": {
+    "fail_on_nonconvergence": true,
+    "inference_max_iterations": 20,
+    "kmeans_max_iterations": 100,
+    "kmeans_tolerance": 1e-06,
+    "noise_std": 100.0,
+    "num_states": 2,
+    "pseudocount": 1.0
+  },
+  "model_params_sha256": "b09ed65e2072f52b3e459ba0ff2da37ff0b0701c1e99bd2d9e7b76baf9cee48c",
+  "model_spec": {
+    "class_name": "TorchAFHMM",
+    "family": "factorial-state-space",
+    "module": "nilmtk_contrib.torch"
+  },
+  "protocol_overrides": {
+    "appliances": [
+      "fridge"
+    ],
+    "epochs": null,
+    "max_samples_per_window": 3960,
+    "model_selection": null,
+    "sample_period": null,
+    "sequence_length": null
+  },
+  "result_id": "1b855b6f689b6ee71ce9364d1220c692da482f8cedfa34fdd68eb55a7a2fdba7",
+  "run": {
+    "elapsed_seconds": 12.066200452041812,
+    "elapsed_seconds_by_alignment_group": {
+      "fridge": 12.065081812092103
+    },
+    "flops_method": "dense multiply-add estimate; normalization and activations excluded",
+    "inference_flops_estimate": {
+      "fridge": null
+    },
+    "metrics": {
+      "fridge": {
+        "activation_threshold_watts": 50.0,
+        "f1": 0.6268836648583485,
+        "mae": 52.70154621194001
+      }
+    },
+    "objective_mae": 52.70154621194001,
+    "params_by_alignment_group": {
+      "fridge": {
+        "fail_on_nonconvergence": true,
+        "inference_max_iterations": 20,
+        "kmeans_max_iterations": 100,
+        "kmeans_tolerance": 1e-06,
+        "mains_mean": 327.4779357910156,
+        "mains_std": 358.8458557128906,
+        "noise_std": 100.0,
+        "num_states": 2,
+        "pseudocount": 1.0,
+        "seed": 42
+      }
+    },
+    "peak_accelerator_memory_bytes": {
+      "fridge": 342016
+    },
+    "test_windows": {
+      "fridge": [
+        {
+          "actual_end": "2011-05-24T09:59:00-04:00",
+          "actual_start": "2011-05-22T16:04:00-04:00",
+          "aligned_sample_fraction": 0.6181818181818182,
+          "available_end": "2011-05-24T15:56:34",
+          "available_start": "2011-04-18T09:22:13",
+          "effective_end": "2011-05-24 10:00:00",
+          "effective_start": "2011-05-17 10:00:00",
+          "expected_samples": 3960,
+          "requested": {
+            "building": 1,
+            "dataset": "REDD",
+            "end": "2011-05-24 10:00:00",
+            "start": "2011-05-17 10:00:00"
+          },
+          "resolved_appliance_ac_types": {
+            "fridge": "active"
+          },
+          "resolved_appliances": {
+            "fridge": [
+              "fridge#1"
+            ]
+          },
+          "resolved_mains_ac_type": "apparent",
+          "resolved_meters": {
+            "fridge": [
+              "ElecMeterID(instance=5, building=1, dataset='REDD')"
+            ]
+          },
+          "sample_limit": 3960,
+          "samples": 2448,
+          "shared_meter_appliances": {
+            "fridge": []
+          }
+        }
+      ]
+    },
+    "train_windows": {
+      "fridge": [
+        {
+          "actual_end": "2011-04-21T08:33:00-04:00",
+          "actual_start": "2011-04-18T10:00:00-04:00",
+          "aligned_sample_fraction": 1.0,
+          "available_end": "2011-05-24T15:56:34",
+          "available_start": "2011-04-18T09:22:13",
+          "effective_end": "2011-05-17 10:00:00",
+          "effective_start": "2011-04-18 10:00:00",
+          "expected_samples": 3960,
+          "requested": {
+            "building": 1,
+            "dataset": "REDD",
+            "end": "2011-05-17 10:00:00",
+            "start": "2011-04-18 10:00:00"
+          },
+          "resolved_appliance_ac_types": {
+            "fridge": "active"
+          },
+          "resolved_appliances": {
+            "fridge": [
+              "fridge#1"
+            ]
+          },
+          "resolved_mains_ac_type": "apparent",
+          "resolved_meters": {
+            "fridge": [
+              "ElecMeterID(instance=5, building=1, dataset='REDD')"
+            ]
+          },
+          "sample_limit": 3960,
+          "samples": 3960,
+          "shared_meter_appliances": {
+            "fridge": []
+          }
+        }
+      ]
+    },
+    "trainable_parameters": {
+      "fridge": null
+    }
+  },
+  "run_scope": "smoke",
+  "runtime": {
+    "container_digest": "sha256:8e0221e78b20a62eff8a66fa8b53fd5fc8f58891414bf92f830dd86802546f05",
+    "container_image": "nilmbench:t0-4d05aa2-051d1ef-cuda",
+    "cpu": "x86_64",
+    "cuda_available": true,
+    "cuda_runtime": "12.4",
+    "deterministic_algorithms": true,
+    "gpu": "NVIDIA A100-SXM4-80GB",
+    "nilm_metadata_version": "0.2.6.dev6+g59c9990de",
+    "nilmbench_git_dirty": false,
+    "nilmbench_git_sha": "4d05aa208d61b8c8ee56d86387bd1d159ba86b18",
+    "nilmtk_contrib_git_dirty": false,
+    "nilmtk_contrib_git_sha": "051d1ef5466c8ce31e5fe4322b4be47c76e45148",
+    "nilmtk_contrib_version": "0.1.2",
+    "nilmtk_version": "0.4.1",
+    "platform": "Linux-5.15.0-139-generic-x86_64-with-glibc2.35",
+    "python": "3.11.11",
+    "torch": "2.6.0+cu124"
+  },
+  "sample_period": 60,
+  "schema_version": "1.2",
+  "seed": 42,
+  "study": null,
+  "task": {
+    "alignment_policy": "per_appliance",
+    "appliances": [
+      "fridge",
+      "washing machine",
+      "microwave",
+      "dish washer"
+    ],
+    "coverage_policy": "strict",
+    "description": "REDD building 1 with an explicit 29-day train / 7-day test split",
+    "family": "T1",
+    "id": "corrected-t1-redd",
+    "metric_policy": "paper-appliance-thresholds",
+    "minimum_aligned_fraction": 0.5,
+    "profile": "corrected",
+    "sample_period": 60,
+    "shared_meter_policy": "warn",
+    "target_data_access": "not_applicable",
+    "target_label_fraction": null,
+    "test": [
+      {
+        "building": 1,
+        "dataset": "REDD",
+        "end": "2011-05-24 10:00:00",
+        "start": "2011-05-17 10:00:00"
+      }
+    ],
+    "train": [
+      {
+        "building": 1,
+        "dataset": "REDD",
+        "end": "2011-05-17 10:00:00",
+        "start": "2011-04-18 10:00:00"
+      }
+    ]
+  },
+  "task_config_sha256": "95088d9a943c124c25a2cfada707f34088c178ee85b78da9052edbd2cc69fea4"
+}
