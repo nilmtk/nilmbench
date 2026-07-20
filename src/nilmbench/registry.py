@@ -74,6 +74,7 @@ MODELS = {
         _entry("ConvLSTM", "ConvLSTM", "hybrid"),
         _entry("DAE", "DAE", "autoencoder"),
         _entry("DLinear", "DLinear", "decomposition-linear"),
+        _entry("FeatureMLP", "FeatureMLP", "statistical-feature-mlp"),
         _entry(
             "HSMM",
             "HSMM",
