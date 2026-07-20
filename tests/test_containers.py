@@ -32,6 +32,33 @@ def test_cpu_and_cuda_images_pin_the_same_core_revisions():
         assert "NILMTK_CONTRIB_GIT_DIRTY=false" in source
 
 
+def test_dependency_layer_precedes_all_local_source_contexts():
+    for name in ("Dockerfile.cpu", "Dockerfile.cuda"):
+        source = (ROOT / "docker" / name).read_text(encoding="utf-8")
+        sync_position = source.index("uv sync")
+        config_position = source.index("COPY configs/ configs/")
+        source_position = source.index("COPY src/ src/")
+        contrib_position = source.index("COPY --from=contrib")
+        local_install_position = source.rindex("RUN uv pip install")
+
+        assert sync_position < config_position < local_install_position
+        assert sync_position < source_position < local_install_position
+        assert sync_position < contrib_position < local_install_position
+        assert source.count(
+            "--mount=type=cache,target=/root/.cache/uv,sharing=locked"
+        ) == 1
+
+
+def test_runtime_os_setup_is_independent_of_revision_labels():
+    for name in ("Dockerfile.cpu", "Dockerfile.cuda"):
+        source = (ROOT / "docker" / name).read_text(encoding="utf-8")
+        runtime_stage_position = source.rindex("\nFROM ")
+        runtime_setup_position = source.index("\nRUN ", runtime_stage_position)
+        revision_position = source.index("\nARG SOURCE_REVISION", runtime_stage_position)
+
+        assert runtime_stage_position < runtime_setup_position < revision_position
+
+
 def test_locked_runtime_selects_exact_core_sources_and_cpu_torch_dependencies():
     pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
     lock = (ROOT / "uv.lock").read_text(encoding="utf-8")

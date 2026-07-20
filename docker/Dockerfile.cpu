@@ -15,10 +15,8 @@ ARG NILMTK_COMMIT=0768b1b8457eef9de76d123a94e2de8af22a45d0
 ARG NILM_METADATA_COMMIT=59c9990de4836d77c0dcd807bd4293e39e0cc314
 WORKDIR /src
 COPY pyproject.toml uv.lock README.md ./
-COPY configs/ configs/
-COPY src/ src/
-COPY --from=contrib . /src/nilmtk-contrib
-RUN grep -F "${NILMTK_COMMIT}" pyproject.toml \
+RUN --mount=type=cache,target=/root/.cache/uv,sharing=locked \
+    grep -F "${NILMTK_COMMIT}" pyproject.toml \
     && grep -F "${NILM_METADATA_COMMIT}" pyproject.toml \
     && uv sync \
       --frozen \
@@ -31,13 +29,20 @@ RUN grep -F "${NILMTK_COMMIT}" pyproject.toml \
     && uv pip install "--python=${VIRTUAL_ENV}/bin/python" \
       --torch-backend=cpu \
       --no-deps \
-      "torch==2.6.0" \
-    && uv pip install "--python=${VIRTUAL_ENV}/bin/python" \
-      --no-build-isolation \
-      --no-deps \
-      . /src/nilmtk-contrib
+      "torch==2.6.0"
+COPY configs/ configs/
+COPY src/ src/
+COPY --from=contrib . /src/nilmtk-contrib
+RUN uv pip install "--python=${VIRTUAL_ENV}/bin/python" \
+    --no-build-isolation \
+    --no-deps \
+    . /src/nilmtk-contrib
 
 FROM python:3.11-slim-bookworm@sha256:28255a3ace7eb4c48bc1b57b90af29e1bc82b4fd6c60614a8e3dce61b87ff941
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libgomp1 \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --create-home --uid 10001 benchmark
 ARG SOURCE_REVISION=unknown
 ARG NILMTK_CONTRIB_REVISION=unknown
 LABEL org.opencontainers.image.title="NILMbench CPU smoke runner" \
@@ -54,10 +59,6 @@ ENV PATH=/opt/nilmbench/bin:${PATH} \
     NILMBENCH_GIT_DIRTY=false \
     NILMTK_CONTRIB_GIT_SHA=${NILMTK_CONTRIB_REVISION} \
     NILMTK_CONTRIB_GIT_DIRTY=false
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends libgomp1 \
-    && rm -rf /var/lib/apt/lists/* \
-    && useradd --create-home --uid 10001 benchmark
 COPY --from=builder /opt/nilmbench /opt/nilmbench
 USER benchmark
 WORKDIR /work
