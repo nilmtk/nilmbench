@@ -7,7 +7,7 @@
     <meta name="description" content="The fixed NILMBench2026 BuildSys paper: 16 NILM models across 3 datasets and 2 resolutions, evaluated on accuracy, efficiency, and generalization.">
     <meta name="keywords" content="NILM, energy disaggregation, non-intrusive load monitoring, benchmark, NILMTK, nilmtk-contrib, BuildSys 2026, PyTorch, smart meters, NILMFormer">
     <meta property="og:title" content="NILMBench2026: A Benchmark for Energy Disaggregation">
-    <meta property="og:description" content="16 NILM models, 3 datasets, 2 resolutions — one reproducible, deployment-aware benchmark. Generalization is the wall. BuildSys 2026.">
+    <meta property="og:description" content="A reproducible evaluation of 16 NILM models across 3 datasets, 2 resolutions, and within-building, cross-building, and cross-dataset tasks. BuildSys 2026.">
     <meta property="og:type" content="website">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M4 38h13l7-25 10 39 8-26 6 12h12' fill='none' stroke='%232de3b0' stroke-width='6' stroke-linejoin='round'/%3E%3C/svg%3E">
 
@@ -316,7 +316,7 @@
             width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
             background: var(--accent-glow); color: var(--accent); font-size: 1.15rem; margin-bottom: 0.85rem;
         }
-        .util-card h4 { font-size: 0.96rem; font-weight: 700; margin-bottom: 0.3rem; }
+        .util-card h3 { font-size: 0.96rem; font-weight: 700; margin-bottom: 0.3rem; }
         .util-card p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
         .util-card code { font-family: var(--mono); font-size: 0.8rem; color: var(--accent); }
 
@@ -427,7 +427,7 @@
         .future-item { display: flex; gap: 1rem; align-items: flex-start; padding: 1.2rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; transition: all 0.3s; }
         .future-item:hover { border-color: var(--border-hover); }
         .future-item .fnum { font-family: var(--mono); font-weight: 700; color: var(--accent); font-size: 0.9rem; flex-shrink: 0; }
-        .future-item h4 { font-size: 0.92rem; font-weight: 700; margin-bottom: 0.2rem; }
+        .future-item h3 { font-size: 0.92rem; font-weight: 700; margin-bottom: 0.2rem; }
         .future-item p { font-size: 0.82rem; color: var(--text-muted); line-height: 1.55; }
 
         /* ===== Equation ===== */
@@ -453,7 +453,7 @@
         .step { background: var(--bg-card); border: 1px solid var(--border); border-radius: 13px; padding: 1.4rem; transition: all 0.3s; }
         .step:hover { border-color: var(--border-hover); transform: translateY(-2px); }
         .step .sn { font-family: var(--mono); font-weight: 700; color: var(--accent); font-size: 0.82rem; letter-spacing: 0.03em; }
-        .step h4 { font-size: 1rem; font-weight: 700; margin: 0.45rem 0 0.3rem; }
+        .step h3 { font-size: 1rem; font-weight: 700; margin: 0.45rem 0 0.3rem; }
         .step p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
 
         .lb-title { font-family: 'Sora',sans-serif; font-size: 1.05rem; font-weight: 700; margin: 2.4rem 0 0.3rem; display: flex; align-items: center; gap: 0.5rem; }
@@ -597,6 +597,7 @@
 </nav>
 
 <!-- HERO -->
+<main>
 <section class="hero">
     <div class="badge-row">
         <span class="conf-badge"><span class="dot"></span>BuildSys '26 · Banff, Canada</span>
@@ -605,9 +606,10 @@
     <h1><span class="wordmark">NILMBench2026</span></h1>
     <p class="tagline">A reproducible benchmark for energy disaggregation</p>
     <p class="subtitle">
-        One aggregate power signal in. Appliance-level estimates out. We benchmark
+        We evaluate
         <strong>16 NILM models</strong> across <strong>3 datasets</strong> and <strong>2 resolutions</strong> — on
-        accuracy, efficiency, and generalization — and find that <strong>generalization is the wall</strong>.
+        accuracy, efficiency, and generalization. Cross-building and cross-dataset results
+        show a substantial generalization gap.
     </p>
 
     <div class="authors">
@@ -695,7 +697,7 @@
 <!-- ABSTRACT -->
 <section id="abstract" class="fade-up">
     <div class="section-label">Abstract</div>
-    <h2>Disaggregation has innovations — but no reproducible yardstick</h2>
+    <h2>Benchmark scope and motivation</h2>
     <div class="abstract-content">
         <p>
             Non-Intrusive Load Monitoring (NILM) decomposes a household's aggregate power signal into
@@ -714,9 +716,9 @@
         </p>
         <br>
         <p>
-            We also modernize the NILMTK ecosystem: every legacy model is re-implemented in <strong>PyTorch</strong> behind a
-            unified API, with <strong>Docker</strong> + <strong>uv</strong> for one-command reproducibility. NILMBench2026 offers a
-            platform — and actionable insights — to steer NILM toward robust, deployable solutions.
+            We also update the NILMTK model implementations: legacy models are re-implemented in <strong>PyTorch</strong> behind a
+            unified API, and the evaluated environments are specified with <strong>Docker</strong> and <strong>uv</strong>.
+            These artifacts support reproduction and extension of the reported experiments.
         </p>
     </div>
 
@@ -733,12 +735,12 @@
 
 <!-- WHY / COMPARISON -->
 <section id="why" class="fade-up">
-    <div class="section-label">What's new</div>
-    <h2>The first deployment-aware NILM benchmark</h2>
+    <div class="section-label">Contribution</div>
+    <h2>Evaluation beyond in-domain accuracy</h2>
     <p class="lede">
-        Foundational toolkits standardized data parsers and baselines, but overlooked the constraints that decide real-world
-        adoption. NILMBench2026 adds the first rigorous evaluation of <strong>efficiency</strong>, <strong>utility-scale resolution</strong>,
-        and <strong>cross-domain generalization</strong> — on a modernized, reproducible software stack.
+        Foundational toolkits standardized data parsers and baselines. NILMBench2026 additionally evaluates
+        <strong>computational efficiency</strong>, <strong>15-minute resolution</strong>, and
+        <strong>cross-domain generalization</strong> under a recorded software environment.
     </p>
 
     <div class="cmp-wrap">
@@ -850,23 +852,23 @@ nilmbench leaderboard --results results/published \
     <div class="util-grid">
         <div class="util-card">
             <div class="ic"><i class="fas fa-arrows-rotate"></i></div>
-            <h4>PyTorch, unified</h4>
-            <p>Every legacy Keras/TF model re-implemented in modern PyTorch under one common train/infer interface.</p>
+            <h3>Unified PyTorch interface</h3>
+            <p>Legacy Keras and TensorFlow models are re-implemented in PyTorch under a common training and inference interface.</p>
         </div>
         <div class="util-card">
             <div class="ic"><i class="fas fa-box-archive"></i></div>
-            <h4>Pinned &amp; containerized</h4>
-            <p>Docker + <code>uv</code> lock every version into isolated environments — results that actually reproduce.</p>
+            <h3>Pinned environments</h3>
+            <p>Docker images and <code>uv</code> lock files record the software environment used for each evaluation.</p>
         </div>
         <div class="util-card">
             <div class="ic"><i class="fas fa-puzzle-piece"></i></div>
-            <h4>Drop-in models</h4>
-            <p>All architectures conform to the NILMTK Experiment API. Swap, add, or compare with a dict entry.</p>
+            <h3>Common model contract</h3>
+            <p>All architectures conform to the NILMTK Experiment API and can be selected through the experiment configuration.</p>
         </div>
         <div class="util-card">
             <div class="ic"><i class="fas fa-flask"></i></div>
-            <h4>+5 new architectures</h4>
-            <p>TCN, ConvLSTM, MSDC, Reformer, and NILMFormer extend the suite to reflect SOTA temporal modeling.</p>
+            <h3>Five additional architectures</h3>
+            <p>TCN, ConvLSTM, MSDC, Reformer, and NILMFormer extend the evaluated temporal-modeling families.</p>
         </div>
     </div>
 </section>
@@ -876,12 +878,11 @@ nilmbench leaderboard --results results/published \
 <!-- EXTEND & COMPETE -->
 <section id="extend" class="fade-up">
     <div class="section-label">A living benchmark</div>
-    <h2>Built to become NILM's ImageNet</h2>
+    <h2>A maintained benchmark for NILM</h2>
     <p class="lede">
-        Benchmarks move fields. <strong>ImageNet</strong> moved vision, <strong>GLUE</strong> moved language, the
-        <strong>KDD&nbsp;Cup</strong> moved applied ML. NILM has never had a shared, sealed, generalization-first leaderboard —
-        NILMBench2026 is engineered to be exactly that. Add a model in <em>one class</em>, add a metric in <em>one function</em>,
-        and submit to a public board scored on held-out buildings and datasets.
+        NILMBench2026 defines shared T1, T2, and T3 evaluation tasks, fixed data windows,
+        and a public result format. New models and metrics use the same experiment API and
+        can be evaluated on held-out buildings and datasets without changing the protocol.
     </p>
 
     <div class="extend-grid">
@@ -925,9 +926,9 @@ experiment['test']['metrics'] = ['mae', 'f1score', 'sae', 'nep']
     </div>
 
     <div class="steps">
-        <div class="step"><div class="sn">01 · IMPLEMENT</div><h4>Subclass Disaggregator</h4><p>One class, a couple of methods. Any PyTorch model plugs into the same train / infer contract as the 16 built-ins.</p></div>
-        <div class="step"><div class="sn">02 · EVALUATE</div><h4>Run the frozen harness</h4><p>Sealed T1 / T2 / T3 splits and fixed test windows — identical data pipeline for every entry, by construction.</p></div>
-        <div class="step"><div class="sn">03 · SUBMIT</div><h4>Open a pull request</h4><p>Your results are checked and your model takes its place on the public, generalization-first leaderboard.</p></div>
+        <div class="step"><div class="sn">01 · IMPLEMENT</div><h3>Subclass Disaggregator</h3><p>Implement the shared training and inference contract used by the reference models.</p></div>
+        <div class="step"><div class="sn">02 · EVALUATE</div><h3>Run the fixed protocol</h3><p>Use the published T1, T2, or T3 split and record the resulting data, runtime, and model provenance.</p></div>
+        <div class="step"><div class="sn">03 · SUBMIT</div><h3>Open a pull request</h3><p>Submit the implementation and validated result bundle for review and possible publication.</p></div>
     </div>
 
     <div class="lb-title"><span class="live"></span>The leaderboard now lives separately</div>
@@ -943,10 +944,6 @@ experiment['test']['metrics'] = ['mae', 'f1score', 'sae', 'nep']
         <a href="mailto:nipun.batra@iitgn.ac.in?subject=NILM%20Challenge" class="btn btn-secondary"><i class="fas fa-trophy"></i> Propose a NILM Challenge</a>
     </div>
 
-    <div class="marquee-logos">
-        <span>Inspired by the benchmarks that moved their fields:</span>
-        <b>ImageNet</b> <span>·</span> <b>GLUE / SuperGLUE</b> <span>·</span> <b>KDD&nbsp;Cup</b> <span>·</span> <b>MLPerf</b> <span>·</span> <b>Open&nbsp;LLM&nbsp;Leaderboard</b>
-    </div>
 </section>
 
 <div class="section-divider"></div>
@@ -955,8 +952,8 @@ experiment['test']['metrics'] = ['mae', 'f1score', 'sae', 'nep']
 <section id="models" class="fade-up">
     <div class="section-label">Models</div>
     <h2>Sixteen architectures, four families</h2>
-    <p class="lede">From foundational baselines to current state-of-the-art, spanning recurrent, convolutional, attention-based,
-        and hybrid designs &mdash; integrated behind one unified PyTorch API.</p>
+    <p class="lede">The evaluated suite spans baseline, recurrent, convolutional, attention-based,
+        and hybrid designs behind one PyTorch API.</p>
     <div class="model-legend">
         <span class="pill new">added in NILMBench2026</span>
         <span class="pill">existing NILMTK / contrib model</span>
@@ -1123,8 +1120,8 @@ experiment['test']['metrics'] = ['mae', 'f1score', 'sae', 'nep']
 <section id="results" class="fade-up">
     <div class="section-label">Results</div>
     <h2>Explore the benchmark</h2>
-    <p class="lede">Cells are heat-mapped exactly as in the paper — <strong style="color:var(--p-green)">green is good</strong>,
-        <strong style="color:var(--p-red)">red is bad</strong>. <strong>Bold</strong> = best, <u>underline</u> = second-best per column.
+    <p class="lede">Cells use the paper's color scale: <strong style="color:var(--p-green)">green indicates better performance</strong> and
+        <strong style="color:var(--p-red)">red indicates worse performance</strong>. <strong>Bold</strong> marks the best and <u>underline</u> the second-best value per column.
         Scroll tables horizontally.</p>
 
     <div class="res-controls" id="res-controls"></div>
@@ -1140,18 +1137,18 @@ experiment['test']['metrics'] = ['mae', 'f1score', 'sae', 'nep']
 <!-- KEY FIGURES -->
 <section id="evidence" class="fade-up">
     <div class="section-label">Evidence</div>
-    <h2>What the failures actually look like</h2>
-    <p class="lede">Real predictions on real UK-DALE / REDD / REFIT traces — the receipts behind the headline findings.</p>
+    <h2>Representative failure cases</h2>
+    <p class="lede">Predictions on UK-DALE, REDD, and REFIT illustrate the quantitative findings.</p>
 
     <div class="fig-grid">
         <div class="fig-box">
             <div class="imgwrap"><img src="static/images/disaggregation_teaser.png" alt="UK-DALE aggregate mains decomposed by NILMFormer into a fridge and a bursty appliance." loading="lazy"></div>
-            <div class="cap"><strong>The task, on real data.</strong> A UK-DALE site meter (top) and NILMFormer's appliance estimates against ground truth — a periodic fridge (middle) and a sparse, high-power load (bottom). Within a building, modern models track signatures well.</div>
+            <div class="cap"><strong>Within-building predictions.</strong> A UK-DALE site meter (top) and NILMFormer's appliance estimates against ground truth for a periodic fridge (middle) and a sparse, high-power load (bottom).</div>
         </div>
 
         <div class="fig-box">
             <div class="imgwrap"><img src="static/images/generalization_failure.png" alt="NILMFormer television predictions: cross-building fails with spurious spikes; same-building tracks well." loading="lazy"></div>
-            <div class="cap"><strong>Generalization is the wall.</strong> NILMFormer on a REFIT television. Same-building (bottom) the model tracks the dynamic signature; on an <em>unseen</em> television (top) it collapses into spurious spikes — it memorized one device's electrical fingerprint, not the abstract concept of "television".</div>
+            <div class="cap"><strong>Cross-building generalization gap.</strong> NILMFormer tracks a REFIT television in the same-building setting (bottom), but produces spurious spikes for an unseen television (top).</div>
         </div>
 
         <div class="fig-two">
@@ -1172,17 +1169,17 @@ experiment['test']['metrics'] = ['mae', 'f1score', 'sae', 'nep']
 <!-- FINDINGS -->
 <section id="findings" class="fade-up">
     <div class="section-label">Key findings</div>
-    <h2>Four takeaways for the community</h2>
+    <h2>Four findings</h2>
     <div class="find-grid">
         <div class="find-card">
             <div class="fi" style="color:var(--p-green)"><i class="fas fa-trophy"></i></div>
             <h3>No single model wins</h3>
-            <p>The best architecture depends on the appliance's electrical signature — <strong>CNNs</strong> excel at sparse, high-power events; <strong>Transformers</strong> handle complex multi-state loads. Real deployment likely needs an ensemble.</p>
+            <p>The best architecture depends on the appliance's electrical signature: <strong>CNNs</strong> perform well on sparse, high-power events, whereas <strong>Transformers</strong> perform well on several multi-state loads.</p>
         </div>
         <div class="find-card">
             <div class="fi" style="color:var(--p-red)"><i class="fas fa-building-circle-exclamation"></i></div>
             <h3>Generalization is the main hurdle</h3>
-            <p>Most models <strong>fail on unseen buildings and datasets</strong>. The drop from intra- to cross-building is steep and symmetric across directions — the core barrier to real-world adoption.</p>
+            <p>Most models lose substantial accuracy on <strong>unseen buildings and datasets</strong>. The decrease from within-building to cross-building evaluation occurs in both transfer directions.</p>
         </div>
         <div class="find-card">
             <div class="fi" style="color:var(--p-amber)"><i class="fas fa-mask"></i></div>
@@ -1198,7 +1195,7 @@ experiment['test']['metrics'] = ['mae', 'f1score', 'sae', 'nep']
 
     <div style="margin-top:2rem; background:var(--bg-card); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:12px; padding:1.4rem 1.6rem;">
         <p style="color:var(--text-secondary); font-size:0.98rem; line-height:1.7;">
-            <strong style="color:var(--text-primary)">Real-world impact.</strong> On the UK-DALE fridge, moving from RNN (~43 W MAE) to RNN&nbsp;Attn.&nbsp;Cl. (~18 W)
+            <strong style="color:var(--text-primary)">Illustrative error difference.</strong> On the UK-DALE fridge, moving from RNN (~43 W MAE) to RNN&nbsp;Attn.&nbsp;Cl. (~18 W)
             corrects roughly <strong style="color:var(--accent)">219 kWh / year</strong> of energy attribution — a difference that matters for consumer feedback and billing systems.
         </p>
     </div>
@@ -1209,16 +1206,16 @@ experiment['test']['metrics'] = ['mae', 'f1score', 'sae', 'nep']
 <!-- FUTURE -->
 <section id="future" class="fade-up">
     <div class="section-label">What's next</div>
-    <h2>Closing the generalization gap</h2>
-    <p class="lede">Based on the failure modes the benchmark surfaces, we chart six directions to move NILM from controlled accuracy to deployable robustness.</p>
+    <h2>Research directions</h2>
+    <p class="lede">The observed failure modes motivate six directions for improving cross-building and cross-dataset performance.</p>
 
     <div class="future-list">
-        <div class="future-item"><div class="fnum">01</div><div><h4>Domain adaptation</h4><p>Align source/target latent distributions so models survive new grids &amp; appliances without per-home labels.</p></div></div>
-        <div class="future-item"><div class="fnum">02</div><div><h4>Self-supervised pre-training</h4><p>Masked modeling on large unlabeled mains data to learn abstract, transferable load representations.</p></div></div>
-        <div class="future-item"><div class="fnum">03</div><div><h4>Multi-task state classification</h4><p>Classification branches stabilize sparse, high-power loads — extend to probabilistic state modeling.</p></div></div>
-        <div class="future-item"><div class="fnum">04</div><div><h4>Adaptive denormalization</h4><p>Local stats + exogenous priors (time-of-day, occupancy) to disambiguate at low resolution.</p></div></div>
-        <div class="future-item"><div class="fnum">05</div><div><h4>Generative augmentation</h4><p>GANs / diffusion to synthesize adversarial appliance signatures and broaden training diversity.</p></div></div>
-        <div class="future-item"><div class="fnum">06</div><div><h4>Community leaderboards</h4><p>Maintained, OOD-focused leaderboards — GLUE/ImageNet for energy — to reward robustness over marginal gains.</p></div></div>
+        <div class="future-item"><div class="fnum">01</div><div><h3>Domain adaptation</h3><p>Study source/target alignment for transfer to new grids and appliances with limited labels.</p></div></div>
+        <div class="future-item"><div class="fnum">02</div><div><h3>Self-supervised pre-training</h3><p>Evaluate masked modeling on unlabeled aggregate-power data before supervised fine-tuning.</p></div></div>
+        <div class="future-item"><div class="fnum">03</div><div><h3>Multi-task state classification</h3><p>Combine power regression with probabilistic state and transition modeling for sparse loads.</p></div></div>
+        <div class="future-item"><div class="fnum">04</div><div><h3>Adaptive denormalization</h3><p>Test local statistics and exogenous covariates, including time of day and occupancy, at low resolution.</p></div></div>
+        <div class="future-item"><div class="fnum">05</div><div><h3>Generative augmentation</h3><p>Measure whether synthetic appliance signatures improve performance on held-out domains.</p></div></div>
+        <div class="future-item"><div class="fnum">06</div><div><h3>Maintained leaderboards</h3><p>Publish provenance-checked results with explicit in-domain and out-of-domain cohorts.</p></div></div>
     </div>
 </section>
 
@@ -1228,7 +1225,7 @@ experiment['test']['metrics'] = ['mae', 'f1score', 'sae', 'nep']
 <section id="cite" class="fade-up">
     <div class="section-label">Citation</div>
     <h2>Cite NILMBench2026</h2>
-    <p class="lede">If the benchmark or modernized toolkit helps your research, please cite the paper.</p>
+    <p class="lede">If you use the benchmark protocol, implementation, or reported results, please cite the paper.</p>
     <div class="bib">
         <button class="copy-btn" onclick="copyBib()"><i class="fas fa-copy"></i> Copy</button>
         <pre><code id="bibtex">@inproceedings{kuloor2026nilmbench,
@@ -1243,6 +1240,7 @@ experiment['test']['metrics'] = ['mae', 'f1score', 'sae', 'nep']
 }</code></pre>
     </div>
 </section>
+</main>
 
 <!-- FOOTER -->
 <footer>

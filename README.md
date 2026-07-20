@@ -1,20 +1,32 @@
 # NILMbench
 
-Reproducible runner and project website for **[NILMBench2026](https://nilmtk.github.io/nilmbench/)** — *A Benchmark for Energy Disaggregation* (BuildSys '26, **Best Paper Candidate**).
+Reference implementation, experiment runner, and project website for
+**[NILMBench2026](https://nilmtk.github.io/nilmbench/)** — *A Benchmark for
+Energy Disaggregation* (BuildSys '26, **Best Paper Candidate**).
 
-> One aggregate power signal in. Appliance-level estimates out. We benchmark **16 NILM models**
-> across **3 datasets** and **2 resolutions** — on accuracy, efficiency, and generalization —
-> and find that **generalization is the wall**.
+The paper evaluates **16 NILM models** across **3 datasets**, **2 sampling
+resolutions**, and within-building, cross-building, and cross-dataset tasks. The
+repository also maintains a provenance-checked leaderboard for results produced
+after the fixed paper study.
+
+## Ecosystem repositories
+
+| Research task | Repository |
+| --- | --- |
+| Dataset conversion, meter access, preprocessing, and metrics | [NILMTK core](https://github.com/nilmtk/nilmtk) |
+| Appliance taxonomy, synonyms, meter relationships, and dataset schema | [NILM Metadata](https://github.com/nilmtk/nilm_metadata) |
+| Disaggregation model implementation and testing | [nilmtk-contrib](https://github.com/nilmtk/nilmtk-contrib) |
+| Fixed T1/T2/T3 evaluation and published result bundles | **NILMbench — this repository** |
 
 **Authors:** Aayush Kuloor\*, Anurag Singh\*, Harsh Dhru\*, Nipun Batra† · IIT Gandhinagar
 (\* equal contribution, † corresponding author)
 
 ## Links
 
-- 📄 **Paper:** https://sustainability-lab.github.io/papers/2026/nilmbench2026_buildsys.pdf
-- 💻 **Code (modernized NILMTK):** https://github.com/nilmtk/nilmtk-contrib
-- 🌐 **Website:** https://nilmtk.github.io/nilmbench/
-- 📊 **Living leaderboard:** https://nilmtk.github.io/nilmbench/leaderboard.html
+- **Paper:** https://sustainability-lab.github.io/papers/2026/nilmbench2026_buildsys.pdf
+- **Model implementations:** https://github.com/nilmtk/nilmtk-contrib
+- **Project website:** https://nilmtk.github.io/nilmbench/
+- **Living leaderboard:** https://nilmtk.github.io/nilmbench/leaderboard.html
 
 ## What is reproducible here
 
@@ -86,7 +98,18 @@ into `results/published`, never an automatic side effect of training.
 
 Container builds take nilmtk-contrib as a named BuildKit context. The default Compose configuration expects the two repositories to be sibling directories; set `NILMTK_CONTRIB_CONTEXT` to override that location.
 
-Published images pin their nilmtk-contrib build context to the exact reviewed integration commit rather than a moving branch. The current dependency and image pin is [`1148e1c65f43878dfa1b8e08dc6411f5991d7dbd`](https://github.com/nilmtk/nilmtk-contrib/commit/1148e1c65f43878dfa1b8e08dc6411f5991d7dbd). Update that pin deliberately when a reviewed model release is adopted. Both image variants synchronize their runtime, NILMTK, and NILM Metadata dependencies from the checked-in `uv.lock` with `--frozen`; the project and named-context contrib source are then installed with `--no-deps`. The CPU-only Torch wheel is installed with `--no-deps` after its common Python dependencies have been synchronized from the same lock, avoiding the CUDA wheel stack in the CPU image.
+Published images pin their nilmtk-contrib build context to an exact reviewed
+integration commit rather than a moving branch. The installable `benchmark`
+extra currently pins
+[`1148e1c65f43878dfa1b8e08dc6411f5991d7dbd`](https://github.com/nilmtk/nilmtk-contrib/commit/1148e1c65f43878dfa1b8e08dc6411f5991d7dbd);
+the source revision and image digest for each verified runtime are recorded in
+[`configs/runtimes.toml`](configs/runtimes.toml). Update either pin only when a
+reviewed integration is adopted. Both image variants synchronize their runtime,
+NILMTK, and NILM Metadata dependencies from the checked-in `uv.lock` with
+`--frozen`; the project and named-context contrib source are then installed with
+`--no-deps`. The CPU-only Torch wheel is installed with `--no-deps` after its
+common Python dependencies have been synchronized from the same lock, avoiding
+the CUDA wheel stack in the CPU image.
 
 Model contributions and benchmark-image releases have separate cadences. A
 model can merge after its contrib contract, CPU, and targeted CUDA checks pass;
@@ -125,7 +148,7 @@ The real benchmark path uses the pinned PyTorch 2.6.0 / CUDA 12.4 image and all 
 docker compose --profile cuda run --rm cuda-benchmark
 ```
 
-To run one inspectable A100 smoke before spending on 20 trials:
+To validate one A100 execution path before the full study:
 
 ```bash
 docker compose --profile cuda run --rm cuda-benchmark \
@@ -139,7 +162,7 @@ For the full paper matrix, repeat each task at 60 and 900 seconds for evaluation
 
 The recovered notebooks requested REDD building 1 from 1–30 April 2011, although this converted file starts on 18 April. `historical-t1-redd` retains that request and emits a coverage warning. Two other historical definitions request unavailable appliance/building pairs; validation reports those explicitly. Historical tasks also retain the legacy joint appliance alignment and fixed 10 W F1 threshold.
 
-The eight `corrected-*` tasks form a real-data-validated T1/T2/T3 matrix. They enforce dataset/meter coverage, use the paper's appliance-specific F1 thresholds, select active or apparent power from an explicit preference list, and align each appliance independently. NILM Metadata remains the source of truth for taxonomy and synonyms. Shared physical circuits are warned and recorded; a future clean-meter profile can reject them. Corrected profiles are the basis for new leaderboard claims, while historical profiles are retained for forensic reproduction.
+The eight `corrected-*` tasks form a real-data-validated T1/T2/T3 matrix. They enforce dataset/meter coverage, use the paper's appliance-specific F1 thresholds, select active or apparent power from an explicit preference list, and align each appliance independently. NILM Metadata supplies the canonical taxonomy and synonyms. Shared physical circuits are warned and recorded; a future clean-meter profile can reject them. Corrected profiles are the basis for new leaderboard claims, while historical profiles are retained for forensic reproduction.
 
 ## Repository layout
 
@@ -175,7 +198,7 @@ nilmbench leaderboard --results results/published \
 git diff -- leaderboard.json leaderboard.csv
 ```
 
-Those immutable, hashable JSON bundles are the scientific source of truth.
+Those immutable, hashable JSON bundles are the primary scientific artifacts.
 Each completed HPO trial also has a write-once JSON audit record under its
 `results/optuna/<study>/trials/` directory, and those records are embedded in
 the final result bundle. SQLite is reserved for mutable coordination such as resumable Optuna studies;
