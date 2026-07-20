@@ -101,7 +101,7 @@ Container builds take nilmtk-contrib as a named BuildKit context. The default Co
 Published images pin their nilmtk-contrib build context to an exact reviewed
 integration commit rather than a moving branch. The installable `benchmark`
 extra currently pins
-[`9ce85b38b584026a68e72a372dc893d933563aa9`](https://github.com/nilmtk/nilmtk-contrib/commit/9ce85b38b584026a68e72a372dc893d933563aa9);
+[`d267f8668fc6c84556b15d80426a1f7f2f41e1b4`](https://github.com/nilmtk/nilmtk-contrib/commit/d267f8668fc6c84556b15d80426a1f7f2f41e1b4);
 the source revision and image digest for each verified runtime are recorded in
 [`configs/runtimes.toml`](configs/runtimes.toml). Update either pin only when a
 reviewed integration is adopted. Both image variants synchronize their runtime,
