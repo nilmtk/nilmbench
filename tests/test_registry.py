@@ -7,6 +7,7 @@ def test_registry_exposes_baseline_and_all_smoke_tested_contrib_models():
         "ConvLSTM",
         "DAE",
         "DLinear",
+        "FeatureMLP",
         "HSMM",
         "MSDC",
         "ModernTCN",
@@ -45,6 +46,7 @@ def test_every_registry_entry_has_traceable_identity():
     assert not MODELS["Mean"].requires_accelerator_memory
     assert MODELS["Mean"].search_space(object()) == {}
     assert MODELS["TSMixer"].family == "mlp-mixer"
+    assert MODELS["FeatureMLP"].family == "statistical-feature-mlp"
     assert MODELS["NILMMoE"].family == "mixture-of-experts"
     assert MODELS["ResidualMoE"].family == "residual-mixture-of-experts"
     assert MODELS["HSMM"].family == "explicit-duration"
