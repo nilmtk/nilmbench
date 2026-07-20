@@ -24,7 +24,11 @@ jobs:
       - name: Lint
         run: uv run ruff check src tests
       - name: Test
-        run: uv run pytest
+        run: >-
+          uv run pytest
+          --cov=nilmbench
+          --cov-report=term-missing
+          --cov-fail-under=74
       - name: Verify generated leaderboard artifacts
         run: |
           uv run nilmbench leaderboard --results results/published --output /tmp/leaderboard.json --csv /tmp/leaderboard.csv
