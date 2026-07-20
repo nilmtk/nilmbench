@@ -867,6 +867,9 @@ def run_benchmark(
         resolved_period,
         max_samples,
     )
+    # _run_once enables strict Torch determinism. Capture the effective runtime
+    # state rather than the process default observed before execution.
+    provenance = runtime_provenance(root)
     model_params_sha256 = _canonical_digest(base_params)
     result = {
         "schema_version": "1.2",
