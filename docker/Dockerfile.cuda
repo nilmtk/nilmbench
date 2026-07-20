@@ -15,10 +15,8 @@ ARG NILMTK_COMMIT=0768b1b8457eef9de76d123a94e2de8af22a45d0
 ARG NILM_METADATA_COMMIT=59c9990de4836d77c0dcd807bd4293e39e0cc314
 WORKDIR /src
 COPY pyproject.toml uv.lock README.md ./
-COPY configs/ configs/
-COPY src/ src/
-COPY --from=contrib . /src/nilmtk-contrib
-RUN grep -F "${NILMTK_COMMIT}" pyproject.toml \
+RUN --mount=type=cache,target=/root/.cache/uv,sharing=locked \
+    grep -F "${NILMTK_COMMIT}" pyproject.toml \
     && grep -F "${NILM_METADATA_COMMIT}" pyproject.toml \
     && uv sync \
       --frozen \
@@ -26,13 +24,17 @@ RUN grep -F "${NILMTK_COMMIT}" pyproject.toml \
       --extra runtime \
       --extra build-runtime \
       --no-install-project \
-      --active \
-    && uv pip install "--python=${VIRTUAL_ENV}/bin/python" \
-      --no-build-isolation \
-      --no-deps \
-      . /src/nilmtk-contrib
+      --active
+COPY configs/ configs/
+COPY src/ src/
+COPY --from=contrib . /src/nilmtk-contrib
+RUN uv pip install "--python=${VIRTUAL_ENV}/bin/python" \
+    --no-build-isolation \
+    --no-deps \
+    . /src/nilmtk-contrib
 
 FROM pytorch/pytorch:2.6.0-cuda12.4-cudnn9-runtime@sha256:77f17f843507062875ce8be2a6f76aa6aa3df7f9ef1e31d9d7432f4b0f563dee
+RUN useradd --create-home --uid 10001 benchmark
 ARG SOURCE_REVISION=unknown
 ARG NILMTK_CONTRIB_REVISION=unknown
 LABEL org.opencontainers.image.title="NILMbench CUDA benchmark runner" \
@@ -49,7 +51,6 @@ ENV PATH=/opt/nilmbench/bin:${PATH} \
     NILMBENCH_GIT_DIRTY=false \
     NILMTK_CONTRIB_GIT_SHA=${NILMTK_CONTRIB_REVISION} \
     NILMTK_CONTRIB_GIT_DIRTY=false
-RUN useradd --create-home --uid 10001 benchmark
 COPY --from=builder /opt/nilmbench /opt/nilmbench
 USER benchmark
 WORKDIR /work

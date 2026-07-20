@@ -111,6 +111,12 @@ NILMTK, and NILM Metadata dependencies from the checked-in `uv.lock` with
 common Python dependencies have been synchronized from the same lock, avoiding
 the CUDA wheel stack in the CPU image.
 
+The dependency layer is resolved before either local source tree is copied and
+uses a locked BuildKit cache for uv downloads. A source-only change therefore
+reinstalls NILMbench and nilmtk-contrib without downloading the unchanged locked
+environment; changing `pyproject.toml` or `uv.lock` still invalidates dependency
+resolution.
+
 Model contributions and benchmark-image releases have separate cadences. A
 model can merge after its contrib contract, CPU, and targeted CUDA checks pass;
 it does not trigger a public image by itself. NILMbench periodically batches
