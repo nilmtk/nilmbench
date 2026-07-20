@@ -15,7 +15,7 @@ dependencies = []
 [project.optional-dependencies]
 runtime = [
   "nilm-metadata @ git+https://github.com/nilmtk/nilm_metadata.git@59c9990de4836d77c0dcd807bd4293e39e0cc314",
-  "nilmtk @ git+https://github.com/nilmtk/nilmtk.git@0768b1b8457eef9de76d123a94e2de8af22a45d0",
+  "nilmtk @ git+https://github.com/nilmtk/nilmtk.git@8967bd1fde24d0c8d89408179dd2499d8e60b4c3",
   "numpy>=1.26,<2",
   "optuna>=4,<5",
   "pandas>=2,<3",
@@ -33,7 +33,7 @@ build-runtime = [
 ]
 benchmark = [
   "nilm-metadata @ git+https://github.com/nilmtk/nilm_metadata.git@59c9990de4836d77c0dcd807bd4293e39e0cc314",
-  "nilmtk @ git+https://github.com/nilmtk/nilmtk.git@0768b1b8457eef9de76d123a94e2de8af22a45d0",
+  "nilmtk @ git+https://github.com/nilmtk/nilmtk.git@8967bd1fde24d0c8d89408179dd2499d8e60b4c3",
   "nilmtk-contrib[torch] @ git+https://github.com/nilmtk/nilmtk-contrib.git@051d1ef5466c8ce31e5fe4322b4be47c76e45148",
   "numpy>=1.26,<2",
   "optuna>=4,<5",
@@ -59,7 +59,7 @@ allow-direct-references = true
 [tool.uv]
 override-dependencies = [
   "nilm-metadata @ git+https://github.com/nilmtk/nilm_metadata.git@59c9990de4836d77c0dcd807bd4293e39e0cc314",
-  "nilmtk @ git+https://github.com/nilmtk/nilmtk.git@0768b1b8457eef9de76d123a94e2de8af22a45d0",
+  "nilmtk @ git+https://github.com/nilmtk/nilmtk.git@8967bd1fde24d0c8d89408179dd2499d8e60b4c3",
 ]
 
 [tool.hatch.build.targets.wheel.force-include]

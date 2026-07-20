@@ -5,7 +5,7 @@ requires-python = "==3.11.*"
 [manifest]
 overrides = [
     { name = "nilm-metadata", git = "https://github.com/nilmtk/nilm_metadata.git?rev=59c9990de4836d77c0dcd807bd4293e39e0cc314" },
-    { name = "nilmtk", git = "https://github.com/nilmtk/nilmtk.git?rev=0768b1b8457eef9de76d123a94e2de8af22a45d0" },
+    { name = "nilmtk", git = "https://github.com/nilmtk/nilmtk.git?rev=8967bd1fde24d0c8d89408179dd2499d8e60b4c3" },
 ]
 
 [[package]]
@@ -694,8 +694,8 @@ requires-dist = [
     { name = "networkx", marker = "extra == 'torch-runtime'", specifier = ">=3,<4" },
     { name = "nilm-metadata", marker = "extra == 'benchmark'", git = "https://github.com/nilmtk/nilm_metadata.git?rev=59c9990de4836d77c0dcd807bd4293e39e0cc314" },
     { name = "nilm-metadata", marker = "extra == 'runtime'", git = "https://github.com/nilmtk/nilm_metadata.git?rev=59c9990de4836d77c0dcd807bd4293e39e0cc314" },
-    { name = "nilmtk", marker = "extra == 'benchmark'", git = "https://github.com/nilmtk/nilmtk.git?rev=0768b1b8457eef9de76d123a94e2de8af22a45d0" },
-    { name = "nilmtk", marker = "extra == 'runtime'", git = "https://github.com/nilmtk/nilmtk.git?rev=0768b1b8457eef9de76d123a94e2de8af22a45d0" },
+    { name = "nilmtk", marker = "extra == 'benchmark'", git = "https://github.com/nilmtk/nilmtk.git?rev=8967bd1fde24d0c8d89408179dd2499d8e60b4c3" },
+    { name = "nilmtk", marker = "extra == 'runtime'", git = "https://github.com/nilmtk/nilmtk.git?rev=8967bd1fde24d0c8d89408179dd2499d8e60b4c3" },
     { name = "nilmtk-contrib", extras = ["torch"], marker = "extra == 'benchmark'", git = "https://github.com/nilmtk/nilmtk-contrib.git?rev=051d1ef5466c8ce31e5fe4322b4be47c76e45148" },
     { name = "numpy", marker = "extra == 'benchmark'", specifier = ">=1.26,<2" },
     { name = "numpy", marker = "extra == 'dev'", specifier = ">=1.26,<2" },
@@ -716,7 +716,7 @@ provides-extras = ["runtime", "torch-runtime", "build-runtime", "benchmark", "de
 [[package]]
 name = "nilmtk"
 version = "0.4.1"
-source = { git = "https://github.com/nilmtk/nilmtk.git?rev=0768b1b8457eef9de76d123a94e2de8af22a45d0#0768b1b8457eef9de76d123a94e2de8af22a45d0" }
+source = { git = "https://github.com/nilmtk/nilmtk.git?rev=8967bd1fde24d0c8d89408179dd2499d8e60b4c3#8967bd1fde24d0c8d89408179dd2499d8e60b4c3" }
 dependencies = [
     { name = "h5py" },
     { name = "hmmlearn" },
